@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Tai Soluciones - taisoluciones@gmail.com -->
+<resources>
+    <!-- Dark theme: tactical HUD palette (navy #0B131C, cards #131E2A,
+         mesh green #32D77B, tactical gold #D8B255, crimson #C81D25). -->
+    <style name="Theme.MeshKachoUtility" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#32D77B</item>
+        <item name="colorOnPrimary">#003517</item>
+        <item name="colorPrimaryContainer">#0E4D2C</item>
+        <item name="colorOnPrimaryContainer">#A8F5C8</item>
+
+        <item name="colorSecondary">#D8B255</item>
+        <item name="colorOnSecondary">#3A2C00</item>
+        <item name="colorSecondaryContainer">#4A3C10</item>
+        <item name="colorOnSecondaryContainer">#FFE28A</item>
+
+        <item name="colorTertiary">#C81D25</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+
+        <item name="android:windowBackground">#0B131C</item>
+        <item name="android:colorBackground">#0B131C</item>
+        <item name="colorOnBackground">#FFFFFF</item>
+        <item name="colorSurface">#0B131C</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSurfaceVariant">#131E2A</item>
+        <item name="colorOnSurfaceVariant">#A0B0C0</item>
+
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.MeshKacho.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.MeshKacho.TitleMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.MeshKacho.TitleLarge</item>
+    </style>
+
+    <style name="TextAppearance.MeshKacho.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MeshKacho.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

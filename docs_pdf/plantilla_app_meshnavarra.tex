@@ -1,0 +1,254 @@
+$document-metadata.latex()$
+$passoptions.latex()$
+\documentclass[
+$for(babel-otherlangs)$
+  $babel-otherlangs$,
+$endfor$
+$if(babel-lang)$
+  $babel-lang$,
+$endif$
+$if(fontsize)$
+  $fontsize$,
+$endif$
+$if(papersize)$
+  $papersize$paper,
+$endif$
+$for(classoption)$
+  $classoption$$sep$,
+$endfor$
+]{$documentclass$}
+
+% ============================================================
+% PLANTILLA NAVA TASTIC - Firmware Meshtastic 4.3
+% Estetica "panel de control" tecnico:
+%   - Fondo azul marino oscuro (#0A1120)
+%   - Texto blanco roto (#F0F0F0)
+%   - Acento dorado (#F1D38E) para titulos y bordes de cajas
+%   - Acento verde neon (#39FF14) para iconos y subtextos
+%   - Acento rojo (#C62828) para detalles del emblema
+% ============================================================
+
+\usepackage{xcolor}
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$endif$
+\usepackage{amsmath,amssymb}
+
+% --- Paleta de colores NavaTastic (panel de control) ---
+\definecolor{navBg}{HTML}{0A1120}      % fondo azul marino oscuro
+\definecolor{navBgAlt}{HTML}{111A2E}   % fondo alterno de cajas
+\definecolor{navText}{HTML}{F0F0F0}    % texto blanco roto
+\definecolor{navGold}{HTML}{F1D38E}    % dorado titulos / bordes
+\definecolor{navNeon}{HTML}{39FF14}    % verde neon iconos / subtextos
+\definecolor{navRed}{HTML}{C62828}     % rojo intenso detalles
+
+% --- Fondo oscuro de pagina y texto claro ---
+\pagecolor{navBg}
+\color{navText}
+% Fuerza color blanco en TODOS los elementos (tablas, cajas, codigo, verbatim)
+\renewcommand{\normalcolor}{\color{navText}}
+
+% --- Fuentes (Segoe UI: sans-serif moderna similar a Roboto) ---
+\usepackage{fontspec}
+\setmainfont{Segoe UI}[
+  BoldFont=Segoe UI Bold,
+  ItalicFont=Segoe UI Italic,
+  BoldItalicFont=Segoe UI Bold Italic,
+  Ligatures=TeX
+]
+\setsansfont{Segoe UI}[
+  BoldFont=Segoe UI Bold,
+  ItalicFont=Segoe UI Italic
+]
+\setmonofont{Consolas}
+
+% Emojis con Segoe UI Emoji (fallback por caracter)
+\newfontfamily\emojifont{Segoe UI Emoji}
+\usepackage{newunicodechar}
+\newunicodechar{⚠}{\mbox{\emojifont ⚠}}
+\newunicodechar{️}{\mbox{\emojifont ️}}
+\newunicodechar{🔴}{\mbox{\emojifont 🔴}}
+\newunicodechar{📄}{\mbox{\emojifont 📄}}
+\newunicodechar{🚫}{\mbox{\emojifont 🚫}}
+\newunicodechar{⭐}{\mbox{\emojifont ⭐}}
+\newunicodechar{⚙}{\mbox{\emojifont ⚙}}
+\newunicodechar{🧹}{\mbox{\emojifont 🧹}}
+\newunicodechar{📊}{\mbox{\emojifont 📊}}
+\newunicodechar{🔋}{\mbox{\emojifont 🔋}}
+\newunicodechar{📡}{\mbox{\emojifont 📡}}
+\newunicodechar{🔔}{\mbox{\emojifont 🔔}}
+\newunicodechar{🎯}{\mbox{\emojifont 🎯}}
+\newunicodechar{🛡}{\mbox{\emojifont 🛡}}
+\newunicodechar{📋}{\mbox{\emojifont 📋}}
+\newunicodechar{🗂}{\mbox{\emojifont 🗂}}
+\newunicodechar{🛠}{\mbox{\emojifont 🛠}}
+\newunicodechar{🎛}{\mbox{\emojifont 🎛}}
+\newunicodechar{🚀}{\mbox{\emojifont 🚀}}
+\newunicodechar{💬}{\mbox{\emojifont 💬}}
+\newunicodechar{👥}{\mbox{\emojifont 👥}}
+\newunicodechar{📝}{\mbox{\emojifont 📝}}
+\newunicodechar{🧪}{\mbox{\emojifont 🧪}}
+\newunicodechar{🎬}{\mbox{\emojifont 🎬}}
+\newunicodechar{❓}{\mbox{\emojifont ❓}}
+\newunicodechar{🔵}{\mbox{\emojifont 🔵}}
+\newunicodechar{🟢}{\mbox{\emojifont 🟢}}
+\newunicodechar{🟠}{\mbox{\emojifont 🟠}}
+\newunicodechar{🔌}{\mbox{\emojifont 🔌}}
+\newunicodechar{🔑}{\mbox{\emojifont 🔑}}
+\newunicodechar{🌡}{\mbox{\emojifont 🌡}}
+\newunicodechar{⚡}{\mbox{\emojifont ⚡}}
+\newunicodechar{✓}{\mbox{\emojifont ✓}}
+\newunicodechar{✗}{\mbox{\emojifont ✗}}
+
+% --- Tablas estilizadas (bordes dorados, texto claro) ---
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{colortbl}          % define \arrayrulecolor
+\renewcommand{\arraystretch}{1.4}
+\arrayrulecolor{navGold}       % reglas de tabla en dorado
+
+% --- Cabeceras de seccion (doradas, bold) ---
+\usepackage{sectsty}
+\allsectionsfont{\color{navGold}\sffamily\bfseries}
+\subsectionfont{\color{navGold}}
+\subsubsectionfont{\color{navGold}}
+
+% --- Cajas de aviso estilo "tech-panel" (borde dorado, fondo alt, texto claro) ---
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\renewenvironment{quote}
+  {\begin{tcolorbox}[colback=navBgAlt, colframe=navGold, coltext=navText, boxrule=0.8pt, arc=2mm, breakable]}
+  {\end{tcolorbox}}
+
+% --- Bloques de codigo: fondo oscuro y texto claro ---
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\small, formatcom=\color{navText}}
+
+% --- Cabecera y pie de pagina ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{navGold}\sffamily MeshNavarra Utility}
+\fancyhead[R]{\footnotesize\color{navNeon}\sffamily App Android Meshtastic}
+\fancyfoot[C]{\footnotesize\color{navText}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{navGold}\leaders\hrule height \headrulewidth\hfill}}
+
+$if(cancel)$
+\usepackage{cancel}
+$endif$
+$--
+$-- section numbering
+$--
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+$endif$
+$fonts.latex()$
+$font-settings.latex()$
+$common.latex()$
+$for(header-includes)$
+$header-includes$
+$endfor$
+$after-header-includes.latex()$
+$hypersetup.latex()$
+$if(pdf-trailer-id)$
+
+\ifXeTeX
+\special{pdf:trailerid [ $pdf-trailer-id$ ]}
+\fi
+\ifPDFTeX
+\pdftrailerid{}
+\pdftrailer{/ID [ $pdf-trailer-id$ ]}
+\fi
+\ifLuaTeX
+\pdfvariable trailerid {[ $pdf-trailer-id$ ]}
+\fi
+$endif$
+
+$if(title)$
+\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+$endif$
+$if(subtitle)$
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{$subtitle$}
+$endif$
+\author{$for(author)$$author$$sep$ \and $endfor$}
+\date{$date$}
+
+% --- Portada "panel de control" MeshNavarra ---
+$if(title)$
+\newcommand{\maketitlepage}{
+  \begin{titlepage}
+    \pagecolor{navBg}
+    \centering
+    \vspace*{2cm}
+    {\Huge\bfseries\sffamily\color{navGold} MeshNavarra Utility \par}
+    \vspace{0.3cm}
+    {\color{navNeon}\rule{0.6\textwidth}{1.2pt}\par}
+    \vspace{0.8cm}
+    {\LARGE\sffamily\color{navText}$title$ \par}
+    \vspace{1.5cm}
+    {\large\itshape\color{navNeon}$if(subtitle)$$subtitle$$endif$ \par}
+    \vspace{3cm}
+    {\normalsize\sffamily\color{navGold}$for(author)$$author$$sep$ \\ $endfor$ \par}
+    \vspace{0.5cm}
+    {\normalsize\color{navText}$date$ \par}
+    \vfill
+    {\footnotesize\color{navNeon} Administración de nodos Meshtastic \\ USB OTG + Bluetooth LE · GPL-3.0 \par}
+  \end{titlepage}
+}
+$endif$
+
+\begin{document}
+$if(has-frontmatter)$
+\frontmatter
+$endif$
+$if(title)$
+\maketitlepage
+$if(abstract)$
+\begin{abstract}
+$abstract$
+\end{abstract}
+$endif$
+$endif$
+
+$for(include-before)$
+$include-before$
+
+$endfor$
+$if(toc)$
+$if(toc-title)$
+\renewcommand*\contentsname{$toc-title$}
+$endif$
+{
+\setcounter{tocdepth}{$toc-depth$}
+\tableofcontents
+}
+$endif$
+$if(lof)$
+\listoffigures
+$endif$
+$if(lot)$
+\listoftables
+$endif$
+$if(has-frontmatter)$
+\mainmatter
+$endif$
+$body$
+
+$if(has-frontmatter)$
+\backmatter
+$endif$
+$for(include-after)$
+$include-after$
+
+$endfor$
+\end{document}

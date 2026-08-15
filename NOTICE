@@ -1,0 +1,39 @@
+MeshNavarra Utility
+Copyright (c) 2026 Tai Soluciones - taisoluciones@gmail.com
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------
+
+Third-party components:
+
+- Meshtastic protobuf definitions and protocol concepts:
+  Copyright (c) the Meshtastic project contributors
+  Licensed under the GNU General Public License v3.0
+  https://meshtastic.org
+
+- usb-serial-for-android:
+  Copyright (c) Mike Wakerly and contributors
+  https://github.com/mik3y/usb-serial-for-android
+  Licensed under the Apache License, Version 2.0
+
+- NavaTastic / Navarrico firmware command set (reference, remote control):
+  see the bundled Manual_NavaTastic.pdf. The firmware itself is a Meshtastic
+  fork and is not part of this application.
+
+- Bundled PDF manual (assets/Manual_NavaTastic.pdf):
+  Copyright (c) the Navarrico project authors, distributed with the firmware
+  package as reference documentation for the /nava command set.
+
+This project is an unofficial fork/tool and is NOT affiliated with or
+endorsed by the Meshtastic project.
