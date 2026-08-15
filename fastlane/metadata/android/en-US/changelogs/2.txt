@@ -1,0 +1,5 @@
+- targetSdk 35 with edge-to-edge support (Android 15/16)
+- BLE: one config request per connection (fixes duplicate NodeDB download)
+- Remote test channel rejects unrecognized commands (fail-closed)
+- Bundled usb-serial-for-android source (removed JitPack dependency, F-Droid ready)
+- Clickable source-code link and build date in the splash screen and Help

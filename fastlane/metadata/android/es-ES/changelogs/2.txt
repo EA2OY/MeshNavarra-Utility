@@ -1,0 +1,5 @@
+- targetSdk 35 con soporte edge-to-edge (Android 15/16)
+- BLE: una sola petición de configuración por conexión (evita la descarga duplicada)
+- El canal de pruebas remoto rechaza comandos no reconocidos (fail-closed)
+- Código fuente de usb-serial-for-android incluido (sin dependencia de JitPack, listo para F-Droid)
+- Enlace clickable al código fuente y fecha de build en el splash y la Ayuda

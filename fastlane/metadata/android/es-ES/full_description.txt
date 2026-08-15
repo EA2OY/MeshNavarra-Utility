@@ -1,0 +1,14 @@
+MeshNavarra Utility es una aplicación para gestionar tus nodos Meshtastic desde el móvil, por cable USB OTG o Bluetooth Low Energy. No es oficial y no está afiliada al proyecto Meshtastic.
+
+Qué puedes hacer:
+- Conectar el nodo por USB (cable OTG) o Bluetooth y descargar su base de datos de nodos.
+- Ver todos los nodos de la malla en tarjetas visuales (favoritos primero) con batería, señal, saltos y último contacto.
+- Administración: reiniciar, borrar la base de nodos (conservando favoritos), marcar favorito/ignorar, eliminar nodo y gestionar claves de administrador.
+- Comandos: telemetría, posición, traceroute, cambiar nombre del nodo, mensajes de texto.
+- Chat por canales con estado de entrega de cada mensaje.
+- Buenas prácticas ETSI: presets de radio (SFN España y los oficiales) aplicados con lectura-modificación-escritura segura y copias de respaldo.
+- NavaTastic CLI: control remoto de repetidores con el firmware NavaTastic/Navarrico mediante mensajes cifrados, con confirmación de seguridad para comandos destructivos.
+- Importar nodos por URL y conservar una caché propia.
+- Manual de usuario incluido en la aplicación, en español e inglés.
+
+Sin permisos de red, sin anuncios, sin analíticas. Software libre (GPL-3.0) con el código fuente disponible en GitHub.

@@ -1,0 +1,14 @@
+MeshNavarra Utility lets you manage your Meshtastic nodes from your phone, over USB OTG or Bluetooth Low Energy. Unofficial app, not affiliated with the Meshtastic project.
+
+What you can do:
+- Connect the node over USB (OTG cable) or Bluetooth and download its node database.
+- Browse all mesh nodes as visual cards (favorites first) with battery, signal, hops and last-heard.
+- Administration: reboot, wipe the node database (keeping favorites), favorite/ignore, remove node and manage admin keys.
+- Commands: telemetry, position, traceroute, rename node, text messages.
+- Channel chat with per-message delivery status.
+- ETSI good practices: radio presets (SFN Spain and stock) applied with safe read-modify-write and backups.
+- NavaTastic CLI: remote control of repeaters running the NavaTastic/Navarrico firmware via encrypted messages, with a safety gate for destructive commands.
+- Import nodes by URL and keep your own node cache.
+- Built-in user manual, in Spanish and English.
+
+No network permissions, no ads, no analytics. Free software (GPL-3.0), source code on GitHub.
