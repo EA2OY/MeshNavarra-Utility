@@ -19,7 +19,7 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 | **Chat** | Historial persistente por canal, indicador de entrega (⟳ en camino / ✓ entregado / ✗ error + reenviar) |
 | **Nodes** | Tarjetas de nodo (favoritos primero), caché propia persistente (sobrevive al NodeDB de 80 entradas del nodo), búsqueda inteligente, importar nodos por URL, popup de nodo con 11 acciones |
 | **Log** | Consola persistente de peticiones/respuestas |
-| **Debug** | Modo de bajo impacto, overrides LoRa (saltos/frecuencia/duty cycle), toggles de sensores, baterías de auditoría automatizadas + control remoto por broadcast ADB |
+| **Debug** | Herramientas de desarrollo (oculta por defecto): modo de bajo impacto, sensores y baterías de auditoría |
 
 **También incluye**: interfaz bilingüe EN/ES, tema táctico DayNight, ayuda con pulsación larga en todos los botones, manuales en PDF dentro de la app, modo demo con puntero animado para promos, registro de errores a archivo, control remoto (receiver `com.meshkachoutility.REMOTE`) para pruebas scriptadas.
 
@@ -99,7 +99,7 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 | **Chat** | Persistent per-channel history, delivery indicator (⟳ enroute / ✓ delivered / ✗ error + resend) |
 | **Nodes** | Visual node cards (favorites first), own persistent cache (survives the node's 80-entry NodeDB), smart search, import nodes by shared URL, rich node popup with 11 request actions |
 | **Log** | Persistent request/response console |
-| **Debug** | Low-impact mode, LoRa overrides (hops/frequency/duty cycle), sensor toggles, automated audit batteries + remote control via ADB broadcast |
+| **Debug** | Developer tools (hidden by default): low-impact mode, sensor toggles, automated audit batteries |
 
 **Also includes**: bilingual UI (EN/ES), DayNight tactical HUD, long-press help on every button, in-app manuals (PDF), demo mode with animated pointer for promos, crash-to-file logging, remote control (`com.meshkachoutility.REMOTE` receiver) for scripted testing.
 

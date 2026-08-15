@@ -348,6 +348,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // Binding Material 3 components
         statusText = findViewById(R.id.statusText)
+        attachDebugTabGesture()
         statusProgress = findViewById(R.id.statusProgress)
         connectBluetoothButton = findViewById(R.id.connectBluetoothButton)
         logText = findViewById(R.id.logText)
@@ -1422,8 +1423,21 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      * Sets up the bottom tabs (Excel-style) that switch between the
      * Administration and Commands panels.
      */
+    private var tabListener: TabLayout.OnTabSelectedListener? = null
+
     private fun setupBottomTabs() {
         // Order: Good Practices, Commands, Administration, NavaTastic CLI, Chat, Nodes, Log.
+        // The Debug tab (developer tools, LoRa test overrides) is hidden by
+        // default and only added when explicitly enabled (see setDebugTabEnabled).
+        buildBottomTabs()
+        setupTabSwipe()
+        setupTabEdgeHints()
+    }
+
+    /** (Re)builds the tab bar. The Debug tab only exists when enabled. */
+    private fun buildBottomTabs() {
+        bottomTabs.removeAllTabs()
+        tabListener?.let { bottomTabs.removeOnTabSelectedListener(it) }
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_bp))
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_commands))
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_admin))
@@ -1431,8 +1445,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_chat))
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_nodes))
         bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_log))
-        bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_debug))
-        bottomTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        if (debugTabEnabled()) bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_debug))
+        val listener = object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 bpPanel.visibility = if (tab.position == 0) android.view.View.VISIBLE else android.view.View.GONE
                 commandsPanel.visibility = if (tab.position == 1) android.view.View.VISIBLE else android.view.View.GONE
@@ -1456,9 +1470,42 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
             override fun onTabReselected(tab: TabLayout.Tab) = Unit
-        })
-        setupTabSwipe()
-        setupTabEdgeHints()
+        }
+        tabListener = listener
+        bottomTabs.addOnTabSelectedListener(listener)
+    }
+
+    /** Debug tab is a developer-only tool: hidden unless explicitly enabled. */
+    private fun debugTabEnabled(): Boolean =
+        getSharedPreferences("meshkacho", MODE_PRIVATE).getBoolean("debug_tab_enabled", false)
+
+    private fun setDebugTabEnabled(enabled: Boolean) {
+        getSharedPreferences("meshkacho", MODE_PRIVATE).edit().putBoolean("debug_tab_enabled", enabled).apply()
+        buildBottomTabs()
+        appendLog(if (enabled) "DEBUG: pestaña Debug activada" else "DEBUG: pestaña Debug ocultada")
+    }
+
+    private var lastStatusTap = 0L
+    private var statusTapCount = 0
+
+    /** 7 quick taps on the status line toggle the hidden developer Debug tab. */
+    private fun attachDebugTabGesture() {
+        statusText.setOnClickListener {
+            val now = System.currentTimeMillis()
+            if (now - lastStatusTap <= 600L) statusTapCount++ else statusTapCount = 1
+            lastStatusTap = now
+            if (statusTapCount >= 7) {
+                statusTapCount = 0
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.debug_tab_dialog_title)
+                    .setMessage(R.string.debug_tab_dialog_body)
+                    .setPositiveButton(
+                        if (debugTabEnabled()) R.string.debug_tab_hide else R.string.debug_tab_show
+                    ) { _, _ -> setDebugTabEnabled(!debugTabEnabled()) }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
+        }
     }
 
     /** The very first automatic selection (app start) does not trigger popups. */
@@ -5121,6 +5168,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 stopAuditBattery()
                 appendLog("REMOTE: audit_stop")
             }
+            "debug_tab" -> setDebugTabEnabled(arg.equals("on", true) || arg == "1")
             else -> appendLog("REMOTE: comando desconocido '$cmd'")
         }
     }

@@ -23,7 +23,7 @@ Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetido
 MeshNavarra Utility es una app Android que administra nodos de la red Meshtastic directamente desde el teléfono, **sin ordenador**. Ofrece:
 
 - Conexión **USB OTG** (framed serial) y **Bluetooth LE** (GATT, descarga rápida de la NodeDB).
-- **8 pestañas** en la barra inferior: Utilidades, Comandos, Administración, NavaTastic CLI, Chat, Nodos, Log y Debug.
+- **8 pestañas** en la barra inferior: Utilidades, Comandos, Administración, NavaTastic CLI, Chat, Nodos y Log (la pestaña **Debug** es una herramienta de desarrollo **oculta por defecto**).
 - Administración local y remota de nodos (reinicio, NodeDB, favoritos, bloqueos, configuración).
 - **NavaTastic CLI** (la función estrella): control remoto de repetidores con el firmware Navarrico/NavaTastic (`/nava`).
 - Interfaz **bilingüe EN/ES**, ayuda por pulsación larga en todos los controles, manual integrado, **demo guiada** y licencia GPL-3.0.
@@ -78,7 +78,7 @@ Si el enlace se cae, la app reconecta automáticamente (5 intentos × 5 s). Al r
 | 4 | **Chat** | Mensajería por canal con indicador de entrega |
 | 5 | **Nodos** | Tarjetas visuales de nodos (favoritos primero) |
 | 6 | **Log** | Registro persistente de peticiones/respuestas |
-| 7 | **Debug** | Modo bajo impacto, overrides LoRa, sensores y auditorías |
+| 7 | **Debug** | Herramientas de desarrollo (oculta por defecto): bajo impacto, sensores y auditorías |
 
 Barra desplazable con flechas de borde; también se navega deslizando. Cada pestaña muestra un popup explicativo las primeras veces.
 
@@ -236,12 +236,13 @@ Registro persistente de cada petición y respuesta con marcas de tiempo (última
 
 ---
 
-## 🧪 12. Pestaña Debug
+## 🧪 12. Pestaña Debug (herramienta de desarrollo, oculta por defecto)
 
-Herramientas de pruebas y diagnóstico (nivel avanzado):
+La pestaña **Debug es una herramienta de desarrollo y pruebas** y está **oculta por defecto** para uso normal. Puede mostrarse puntualmente desde el panel de estado (7 pulsaciones rápidas) cuando se necesiten pruebas en banda de laboratorio.
 
-- **Modo bajo impacto**: limita todos los paquetes a **1 salto** y fuerza hop 1 en el nodo (ideal para bandas de pruebas). Al **desactivarlo**, restaura la configuración del nodo (primero saltos, luego frecuencia).
-- **Overrides LoRa**: límite de saltos (1-7), **frecuencia MHz** e **ignorar ciclo de trabajo** (100 %, solo banda de pruebas).
+Incluye:
+
+- **Modo de bajo impacto**: limita todos los paquetes a **1 salto** y fuerza hop 1 en el nodo (ideal para bandas de pruebas). Al **desactivarlo**, restaura la configuración del nodo (primero saltos, luego frecuencia).
 - **Sensores**: toggles 🌡 **Ambiente** (BME680: `environment_measurement_enabled` + `air_quality_enabled`) y ⚡ **Energía** (`power_measurement_enabled`), vía read-modify-write.
 - **Auditorías automatizadas** (baterías de test en vivo, con popup de consola en color y archivo de resultados):
   1. **Navadmin** (solo lectura, 32 s entre comandos)
@@ -251,6 +252,8 @@ Herramientas de pruebas y diagnóstico (nivel avanzado):
   5. **Admin remota PKI (B)**
   6. **DM control (B, seguros)**
   7. **Config get (A, solo lectura)**
+
+> ⚠️ **Uso responsable**: usa estas herramientas solo en banda de pruebas aislada y respetando siempre la normativa ETSI EN 300 220 de la banda de 868 MHz (ciclo de trabajo y potencia).
 
 > Los comandos destructivos (`db_purge`, `db_clear`, `storm`, `set_chem`, `set_vbat`, `set_vwake`, `factory_reset`) quedan **manualmente** detrás de CONFIRMAR — nunca se automatizan.
 
