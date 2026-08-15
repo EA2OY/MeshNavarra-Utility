@@ -18,6 +18,7 @@
     <string name="progress_section">Paso %1$d/%2$d (%3$d%%) — %4$s</string>
     <string name="backup_title">Guardando ajustes</string>
     <string name="restore_title">Restaurando ajustes</string>
+    <string name="restore_done">RESTORE: hecho</string>
     <string name="status_connected">Estado: Conectado</string>
     <string name="discover_connect">Conectar por USB</string>
     <string name="discover_connect_ble">Conectar por Bluetooth</string>

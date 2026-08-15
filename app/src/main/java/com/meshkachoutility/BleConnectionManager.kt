@@ -64,6 +64,7 @@ class BleConnectionManager(
     @Volatile private var stallWatchdogArmed = false
     private var lastDataTimestamp = 0L
     private var mtuNegotiated = false
+    private var connectCompleted = false
 
     /**
      * Reconnects to the last used BLE device (e.g. after a node reboot).
@@ -94,9 +95,16 @@ class BleConnectionManager(
      * Called once the GATT session is fully ready (services + MTU negotiated):
      * marks the transport connected and seeds the proactive drain so the
      * firmware's config burst starts flowing immediately.
+     *
+     * Idempotent: onServicesDiscovered and onMtuChanged can both fire for the
+     * same session; only the first call notifies the listener (a second
+     * onConnected() would schedule a duplicate sendWantConfig → duplicate
+     * want_config + reset of the in-flight download counters).
      */
     private fun completeConnect() {
         isConnected = true
+        if (connectCompleted) return
+        connectCompleted = true
         listener.onConnected()
         triggerDrain()
     }
@@ -338,6 +346,7 @@ class BleConnectionManager(
     fun connect(device: BluetoothDevice): Boolean {
         return try {
             bondRequested = false
+            connectCompleted = false
             val doRefresh = lastDevice?.address == device.address && sessionCount > 0
             lastDevice = device
             sessionCount++
@@ -382,6 +391,7 @@ class BleConnectionManager(
     private fun tearDownGattSilently() {
         val wasConnected = isConnected
         isConnected = false
+        connectCompleted = false
         pendingRead = false
         handler.removeCallbacksAndMessages(null)
         try {

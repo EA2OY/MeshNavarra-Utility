@@ -4387,8 +4387,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         if (restoreIndex >= restorePlan.size) {
             restoreRunning = false
             hideProgress()
-            appendLog("RESTORE: done")
-            Toast.makeText(this, "RESTORE: done", Toast.LENGTH_SHORT).show()
+            appendLog(getString(R.string.restore_done))
+            Toast.makeText(this, getString(R.string.restore_done), Toast.LENGTH_SHORT).show()
             return
         }
         val (isModule, type, data) = restorePlan[restoreIndex]
@@ -5612,8 +5612,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val navaCmd = navaCategories.flatMap { it.cmds }.firstOrNull { c ->
             navaText.endsWith(c.cmd) || navaText.contains(" " + c.cmd)
         }
-        if (navaCmd?.warn?.isNotEmpty() == true) {
-            appendLog("REMOTE: send_nava rechazado ('${navaCmd.cmd}' requiere CONFIRMAR)")
+        if (navaCmd == null || navaCmd.warn.isNotEmpty()) {
+            appendLog("REMOTE: send_nava rechazado (comando no reconocido o requiere CONFIRMAR)")
             return
         }
         val packet = MeshPacketBuilder.buildTextPacket(navaText, targetNum, 0, pkiEncrypted = true)
