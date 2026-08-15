@@ -645,6 +645,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 .setPositiveButton(R.string.close, null)
                 .show()
                 .let { dialog ->
+                    capDialogScroll(scroll, dialog)
                     demoBtn.setOnClickListener {
                         dialog.dismiss()
                         startDemo()
@@ -2554,6 +2555,20 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         progressLabel = null
     }
 
+    /** Caps a dialog ScrollView at ~70% of the screen so the dialog buttons stay reachable on small screens / large fonts. */
+    private fun capDialogScroll(scroll: ScrollView, dialog: android.app.Dialog, ratio: Double = 0.7) {
+        dialog.setOnShowListener {
+            scroll.post {
+                val maxH = (resources.displayMetrics.heightPixels * ratio).toInt()
+                val lp = scroll.layoutParams
+                if (lp != null && scroll.height > maxH) {
+                    lp.height = maxH
+                    scroll.layoutParams = lp
+                }
+            }
+        }
+    }
+
     /**
      * Shows the disclaimer on first launch. The Accept button is gated by a
      * checkbox the user must tick after reading the notice.
@@ -2615,13 +2630,23 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             addView(footer)
             addView(agree)
         }
+        // Scrollable body so the Accept button never hides on small screens / large fonts.
+        val scroll = ScrollView(this).apply { addView(layout) }
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.disclaimer_title)
-            .setView(layout)
+            .setView(scroll)
             .setPositiveButton(R.string.disclaimer_accept, null)
             .setCancelable(false)
             .create()
         dialog.setOnShowListener {
+            scroll.post {
+                val maxH = (resources.displayMetrics.heightPixels * 0.7).toInt()
+                val lp = scroll.layoutParams
+                if (lp != null && scroll.height > maxH) {
+                    lp.height = maxH
+                    scroll.layoutParams = lp
+                }
+            }
             val btn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
             btn.isEnabled = false
             agree.setOnCheckedChangeListener { _, checked -> btn.isEnabled = checked }
@@ -5014,27 +5039,252 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         showBleDevicePicker()
     }
 
+    private var bleScanCallback: android.bluetooth.le.ScanCallback? = null
+    private var bleBondReceiver: android.content.BroadcastReceiver? = null
+    private var pendingBondDevice: android.bluetooth.BluetoothDevice? = null
+    private var bleScanning = false
+    private var bleDialog: android.app.Dialog? = null
+    private val bleFoundDevices = LinkedHashMap<String, android.bluetooth.BluetoothDevice>()
+    private var bleFoundAdapter: ArrayAdapter<String>? = null
+    private var bleBondedAdapter: ArrayAdapter<String>? = null
+    private var bleBondedList: android.widget.ListView? = null
+    private var bleFoundList: android.widget.ListView? = null
+    private var bleFoundContainer: LinearLayout? = null
+    private var bleFoundHeader: TextView? = null
+
+    /**
+     * Bluetooth picker: paired devices (refreshable) + a continuous scanner for
+     * unpaired devices. Tapping an unpaired device requests bonding (the system
+     * UI asks for confirmation/PIN, shown on the node's OLED); on success the
+     * paired list refreshes and the app connects automatically. On failure the
+     * user can retry or refresh the paired list.
+     */
     private fun showBleDevicePicker() {
-        val devices = bleConnectionManager.scan()
-        if (devices.isEmpty()) {
-            appendLog(getString(R.string.ble_no_devices))
-            return
+        val refreshBtn = com.google.android.material.button.MaterialButton(
+            this, null, com.google.android.material.R.attr.borderlessButtonStyle
+        ).apply {
+            text = getString(R.string.ble_picker_refresh)
+            setOnClickListener { renderBondedList() }
         }
-        val names = devices.map { d -> d.name ?: d.address }
-        MaterialAlertDialogBuilder(this)
+        val bondedHeader = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(20), dp(4), dp(8), dp(4))
+            addView(TextView(this@MainActivity).apply {
+                text = getString(R.string.ble_bonded_section)
+                textSize = 14f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(getColorAttr(com.google.android.material.R.attr.colorPrimary))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+            addView(refreshBtn)
+        }
+        val bondedList = android.widget.ListView(this).apply {
+            dividerHeight = 0
+            setOnItemClickListener { _, _, pos, _ ->
+                val dev = bleConnectionManager.scan().getOrNull(pos) ?: return@setOnItemClickListener
+                connectToBleDevice(dev)
+            }
+        }
+        bleBondedList = bondedList
+        renderBondedList()
+
+        val scanProgress = ProgressBar(this).apply {
+            isIndeterminate = true
+            visibility = android.view.View.GONE
+        }
+        val scanBtn = com.google.android.material.button.MaterialButton(this).apply {
+            text = getString(R.string.ble_scan_button)
+        }
+        scanBtn.setOnClickListener {
+            if (bleScanning) {
+                stopBleScan()
+                scanBtn.text = getString(R.string.ble_scan_button)
+                scanProgress.visibility = android.view.View.GONE
+                bleFoundHeader?.visibility = android.view.View.GONE
+                bleFoundContainer?.visibility = android.view.View.GONE
+            } else {
+                startBleScan(scanBtn, scanProgress)
+            }
+        }
+        val scanRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(20), dp(4), dp(20), dp(4))
+            addView(scanBtn, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            addView(scanProgress)
+        }
+        val foundHeader = TextView(this).apply {
+            text = getString(R.string.ble_found_section)
+            textSize = 14f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(getColorAttr(com.google.android.material.R.attr.colorPrimary))
+            setPadding(dp(20), dp(12), dp(20), dp(4))
+            visibility = android.view.View.GONE
+        }
+        bleFoundHeader = foundHeader
+        val foundList = android.widget.ListView(this).apply {
+            dividerHeight = 0
+            setOnItemClickListener { _, _, pos, _ ->
+                val dev = bleFoundDevices.values.toList().getOrNull(pos) ?: return@setOnItemClickListener
+                requestBond(dev)
+            }
+        }
+        bleFoundList = foundList
+        val foundContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            visibility = android.view.View.GONE
+            addView(foundList)
+        }
+        bleFoundContainer = foundContainer
+
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(bondedHeader)
+            addView(bondedList)
+            addView(scanRow)
+            addView(foundHeader)
+            addView(foundContainer)
+        }
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.ble_picker_title)
-            .setItems(names.toTypedArray()) { _, which ->
-                val device = devices[which]
-                bleTransportActive = true
-                appendLog(getString(R.string.ble_connecting, device.name ?: device.address))
-                if (bleConnectionManager.connect(device)) {
-                    appendLog(getString(R.string.ble_connect_started))
-                } else {
-                    appendLog(getString(R.string.ble_connect_failed))
+            .setView(root)
+            .setNegativeButton(R.string.close, null)
+            .create()
+        dialog.setOnDismissListener {
+            stopBleScan()
+            unregisterBleBondReceiver()
+            bleDialog = null
+            pendingBondDevice = null
+        }
+        dialog.setOnShowListener {
+            resizeBleLists()
+        }
+        bleDialog = dialog
+        dialog.show()
+        resizeBleLists()
+    }
+
+    /** Capped list heights so the dialog never overflows small screens. */
+    private fun resizeBleLists() {
+        fun cap(lv: android.widget.ListView?, count: Int) {
+            if (lv == null) return
+            val h = (Math.min(count, 4) * dp(52)).coerceAtLeast(dp(52))
+            val lp = lv.layoutParams
+            if (lp != null && lp.height != h) {
+                lp.height = h
+                lv.layoutParams = lp
+            }
+        }
+        cap(bleBondedList, bleBondedAdapter?.count ?: 0)
+        cap(bleFoundList, bleFoundAdapter?.count ?: 0)
+    }
+
+    private fun renderBondedList() {
+        val devices = bleConnectionManager.scan()
+        bleBondedAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, devices.map { it.name ?: it.address })
+        bleBondedList?.adapter = bleBondedAdapter
+        resizeBleLists()
+    }
+
+    private fun connectToBleDevice(device: android.bluetooth.BluetoothDevice) {
+        bleTransportActive = true
+        appendLog(getString(R.string.ble_connecting, device.name ?: device.address))
+        if (bleConnectionManager.connect(device)) {
+            appendLog(getString(R.string.ble_connect_started))
+        } else {
+            appendLog(getString(R.string.ble_connect_failed))
+        }
+    }
+
+    private fun startBleScan(btn: com.google.android.material.button.MaterialButton, progress: ProgressBar) {
+        bleFoundDevices.clear()
+        bleFoundAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, emptyList())
+        bleFoundList?.adapter = bleFoundAdapter
+        bleFoundHeader?.visibility = android.view.View.VISIBLE
+        bleFoundContainer?.visibility = android.view.View.VISIBLE
+        progress.visibility = android.view.View.VISIBLE
+        btn.text = getString(R.string.ble_stop_button)
+        val callback = bleConnectionManager.startScan { dev ->
+            runOnUiThread {
+                val name = try { dev.name } catch (e: Exception) { null }
+                if (name.isNullOrBlank()) return@runOnUiThread
+                if (bleConnectionManager.scan().any { it.address == dev.address }) return@runOnUiThread
+                if (!bleFoundDevices.containsKey(dev.address)) {
+                    bleFoundDevices[dev.address] = dev
+                    bleFoundAdapter?.add(name)
+                    resizeBleLists()
                 }
             }
-            .setNegativeButton(R.string.close, null)
-            .show()
+        }
+        if (callback == null) {
+            bleScanning = false
+            progress.visibility = android.view.View.GONE
+            btn.text = getString(R.string.ble_scan_button)
+            appendLog(getString(R.string.ble_scan_unavailable))
+        } else {
+            bleScanning = true
+            bleScanCallback = callback
+            appendLog(getString(R.string.ble_scan_started))
+        }
+    }
+
+    private fun stopBleScan() {
+        if (!bleScanning && bleScanCallback == null) return
+        bleScanning = false
+        bleConnectionManager.stopScan(bleScanCallback)
+        bleScanCallback = null
+        appendLog(getString(R.string.ble_scan_stopped))
+    }
+
+    private fun requestBond(device: android.bluetooth.BluetoothDevice) {
+        pendingBondDevice = device
+        appendLog(getString(R.string.ble_bond_start, device.name ?: device.address))
+        registerBleBondReceiver()
+        if (!bleConnectionManager.createBond(device)) {
+            appendLog(getString(R.string.ble_bond_failed))
+            pendingBondDevice = null
+        }
+    }
+
+    private fun registerBleBondReceiver() {
+        if (bleBondReceiver != null) return
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(context: android.content.Context, intent: android.content.Intent) {
+                val dev: android.bluetooth.BluetoothDevice? =
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE, android.bluetooth.BluetoothDevice::class.java)
+                    } else {
+                        intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE)
+                    }
+                val device = dev ?: return
+                val state = intent.getIntExtra(android.bluetooth.BluetoothDevice.EXTRA_BOND_STATE, android.bluetooth.BluetoothDevice.BOND_NONE)
+                val pending = pendingBondDevice
+                if (pending == null || device.address != pending.address) return
+                when (state) {
+                    android.bluetooth.BluetoothDevice.BOND_BONDED -> {
+                        appendLog(getString(R.string.ble_bond_ok, device.name ?: device.address))
+                        pendingBondDevice = null
+                        renderBondedList()
+                        connectToBleDevice(device)
+                    }
+                    android.bluetooth.BluetoothDevice.BOND_NONE -> {
+                        appendLog(getString(R.string.ble_bond_failed))
+                        pendingBondDevice = null
+                    }
+                }
+            }
+        }
+        val filter = android.content.IntentFilter(android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+        bleBondReceiver = receiver
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(receiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
+    }
+
+    private fun unregisterBleBondReceiver() {
+        bleBondReceiver?.let { runCatching { unregisterReceiver(it) } }
+        bleBondReceiver = null
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

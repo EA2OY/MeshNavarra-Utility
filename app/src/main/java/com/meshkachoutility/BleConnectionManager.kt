@@ -278,6 +278,52 @@ class BleConnectionManager(
     }
 
     /**
+     * Starts a continuous LE scan (no auto-stop: the caller decides when to
+     * stop, matching the "keep searching until I press stop" UX). Results are
+     * delivered on the caller's thread (the ScanCallback binder thread — the
+     * caller must marshal UI updates to the main thread). Returns null when
+     * scanning is unavailable (no adapter / no scanner / Bluetooth off).
+     */
+    fun startScan(onResult: (BluetoothDevice) -> Unit): android.bluetooth.le.ScanCallback? {
+        val scanner = bluetoothAdapter?.bluetoothLeScanner ?: return null
+        val callback = object : android.bluetooth.le.ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: android.bluetooth.le.ScanResult) {
+                onResult(result.device)
+            }
+        }
+        return try {
+            scanner.startScan(callback)
+            callback
+        } catch (e: Exception) {
+            Log.w(TAG, "BLE scan start failed: ${e.message}")
+            null
+        }
+    }
+
+    fun stopScan(callback: android.bluetooth.le.ScanCallback?) {
+        if (callback == null) return
+        try {
+            bluetoothAdapter?.bluetoothLeScanner?.stopScan(callback)
+        } catch (e: Exception) {
+            Log.w(TAG, "BLE scan stop failed: ${e.message}")
+        }
+    }
+
+    /**
+     * Requests pairing with a discovered device. The system UI shows the
+     * confirmation/PIN prompt; the result is delivered via the
+     * ACTION_BOND_STATE_CHANGED broadcast (BOND_BONDED / BOND_NONE).
+     */
+    fun createBond(device: BluetoothDevice): Boolean {
+        return try {
+            if (device.bondState != BluetoothDevice.BOND_BONDED) device.createBond() else true
+        } catch (e: Exception) {
+            Log.w(TAG, "BLE bond request failed: ${e.message}")
+            false
+        }
+    }
+
+    /**
      * Connects to a bonded Meshtastic node. Tears down any previous GATT session
      * and forces a service-cache refresh before reconnecting, so a stale link from
      * a previous process (e.g. right after `adb install -r`) never hangs.
