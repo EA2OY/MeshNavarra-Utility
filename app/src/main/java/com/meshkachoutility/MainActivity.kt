@@ -1710,6 +1710,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoMode = true
         demoSuppressExplainers = true
         demoTotalMs = 52000L
+        resetForDemo()
         demoSetupOverlay()
         val overlay = demoPointerOverlay ?: return
         overlay.visibility = android.view.View.VISIBLE
@@ -1806,6 +1807,44 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoHandler.removeCallbacksAndMessages(null)
         demoPulseAnim?.cancel()
         demoPointerOverlay?.visibility = android.view.View.GONE
+        synchronized(nodeEntries) {
+            demoFakeNodes.forEach { nodeEntries.remove(it) }
+        }
+        demoFakeNodes.clear()
+        refreshNodesList()
+        statusProgress.visibility = android.view.View.GONE
+        statusText.text = getString(R.string.status_disconnected)
+    }
+
+    /**
+     * Brings the app back to a "just opened" state before the tour starts:
+     * first tab, all panels scrolled to the top, dialogs closed and any fake
+     * demo leftovers (nodes, chat, NavaTastic console) removed.
+     */
+    private fun resetForDemo() {
+        demoActiveDialog?.dismiss()
+        demoActiveDialog = null
+        nodePopupDialog?.dismiss()
+        bottomTabs.getTabAt(0)?.select()
+        for (sv in listOf(
+            bpPanel, commandsPanel, adminPanel, nodesPanel, logPanel, debugPanel,
+            chatScroll,
+            findViewById<ScrollView>(R.id.navaControlsScroll),
+            findViewById<ScrollView>(R.id.navaConversationScroll)
+        )) {
+            sv?.scrollTo(0, 0)
+        }
+        synchronized(chatMessages) { chatMessages.clear() }
+        refreshChat()
+        synchronized(navaMessages) { navaMessages.clear() }
+        refreshNava()
+        synchronized(nodeEntries) {
+            demoFakeNodes.forEach { nodeEntries.remove(it) }
+        }
+        demoFakeNodes.clear()
+        refreshNodesList()
+        statusProgress.visibility = android.view.View.GONE
+        statusText.text = getString(R.string.status_disconnected)
     }
 
     private fun demoBalloonText(text: String) {
@@ -1839,6 +1878,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoMode = true
         demoSuppressExplainers = true
         demoTotalMs = 108000L
+        resetForDemo()
         demoSetupOverlay()
         val overlay = demoPointerOverlay ?: return
         overlay.visibility = android.view.View.VISIBLE
@@ -1982,10 +2022,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
-                android.view.Gravity.TOP or android.view.Gravity.END
+                android.view.Gravity.BOTTOM or android.view.Gravity.END
             ).apply {
-                topMargin = dp(8)
-                rightMargin = dp(8)
+                bottomMargin = dp(14)
+                rightMargin = dp(12)
             }
         }
         val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
