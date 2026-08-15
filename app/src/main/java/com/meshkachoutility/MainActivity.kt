@@ -5130,6 +5130,15 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             dividerHeight = 0
             setOnItemClickListener { _, view, pos, _ ->
                 pressFeedback(view)
+                // Stop the scan first: while results keep pouring in the list
+                // re-layouts constantly and the tap may never register / the row
+                // gets recycled. With the scan stopped the pairing order goes out
+                // immediately and the press animation stays visible.
+                if (bleScanning) {
+                    stopBleScan()
+                    scanBtn.text = getString(R.string.ble_scan_button)
+                    scanProgress.visibility = android.view.View.GONE
+                }
                 val dev = bleFoundDevices.values.toList().getOrNull(pos) ?: return@setOnItemClickListener
                 requestBond(dev)
             }
@@ -5210,8 +5219,28 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         }.start()
     }
 
+    private var bleFoundPending = arrayListOf<String>()
+    private var bleFoundBatchScheduled = false
+    private val bleFoundBatchHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    private fun scheduleBleFoundBatch() {
+        if (bleFoundBatchScheduled) return
+        bleFoundBatchScheduled = true
+        bleFoundBatchHandler.postDelayed({ flushBleFoundBatch() }, 400)
+    }
+
+    private fun flushBleFoundBatch() {
+        bleFoundBatchScheduled = false
+        if (bleFoundPending.isEmpty()) return
+        bleFoundPending.forEach { bleFoundAdapter?.add(it) }
+        bleFoundPending.clear()
+        resizeBleLists()
+        if (bleScanning) scheduleBleFoundBatch()
+    }
+
     private fun startBleScan(btn: com.google.android.material.button.MaterialButton, progress: ProgressBar) {
         bleFoundDevices.clear()
+        bleFoundPending.clear()
         bleFoundAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, arrayListOf())
         bleFoundList?.adapter = bleFoundAdapter
         bleFoundHeader?.visibility = android.view.View.VISIBLE
@@ -5225,8 +5254,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 if (bleConnectionManager.scan().any { it.address == dev.address }) return@runOnUiThread
                 if (!bleFoundDevices.containsKey(dev.address)) {
                     bleFoundDevices[dev.address] = dev
-                    bleFoundAdapter?.add(name)
-                    resizeBleLists()
+                    bleFoundPending.add(name)
+                    scheduleBleFoundBatch()
                 }
             }
         }
@@ -5247,6 +5276,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         bleScanning = false
         bleConnectionManager.stopScan(bleScanCallback)
         bleScanCallback = null
+        bleFoundBatchHandler.removeCallbacksAndMessages(null)
+        bleFoundBatchScheduled = false
+        flushBleFoundBatch()
         appendLog(getString(R.string.ble_scan_stopped))
     }
 
