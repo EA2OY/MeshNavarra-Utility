@@ -5064,7 +5064,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             this, null, com.google.android.material.R.attr.borderlessButtonStyle
         ).apply {
             text = getString(R.string.ble_picker_refresh)
-            setOnClickListener { renderBondedList() }
+            setOnClickListener {
+                pressFeedback(this)
+                renderBondedList()
+            }
         }
         val bondedHeader = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -5080,7 +5083,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         }
         val bondedList = android.widget.ListView(this).apply {
             dividerHeight = 0
-            setOnItemClickListener { _, _, pos, _ ->
+            setOnItemClickListener { _, view, pos, _ ->
+                pressFeedback(view)
                 val dev = bleConnectionManager.scan().getOrNull(pos) ?: return@setOnItemClickListener
                 connectToBleDevice(dev)
             }
@@ -5096,6 +5100,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             text = getString(R.string.ble_scan_button)
         }
         scanBtn.setOnClickListener {
+            pressFeedback(scanBtn)
             if (bleScanning) {
                 stopBleScan()
                 scanBtn.text = getString(R.string.ble_scan_button)
@@ -5123,7 +5128,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         bleFoundHeader = foundHeader
         val foundList = android.widget.ListView(this).apply {
             dividerHeight = 0
-            setOnItemClickListener { _, _, pos, _ ->
+            setOnItemClickListener { _, view, pos, _ ->
+                pressFeedback(view)
                 val dev = bleFoundDevices.values.toList().getOrNull(pos) ?: return@setOnItemClickListener
                 requestBond(dev)
             }
@@ -5187,6 +5193,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     }
 
     private fun connectToBleDevice(device: android.bluetooth.BluetoothDevice) {
+        bleDialog?.dismiss() // close the picker: the user already chose / just paired
         bleTransportActive = true
         appendLog(getString(R.string.ble_connecting, device.name ?: device.address))
         if (bleConnectionManager.connect(device)) {
@@ -5194,6 +5201,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         } else {
             appendLog(getString(R.string.ble_connect_failed))
         }
+    }
+
+    /** Quick press feedback (scale) for list rows and new picker buttons. */
+    private fun pressFeedback(v: android.view.View) {
+        v.animate().scaleX(0.9f).scaleY(0.9f).setDuration(80).withEndAction {
+            v.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+        }.start()
     }
 
     private fun startBleScan(btn: com.google.android.material.button.MaterialButton, progress: ProgressBar) {
@@ -5238,13 +5252,40 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun requestBond(device: android.bluetooth.BluetoothDevice) {
         pendingBondDevice = device
-        appendLog(getString(R.string.ble_bond_start, device.name ?: device.address))
         registerBleBondReceiver()
-        startBondPolling(device)
-        if (!bleConnectionManager.createBond(device)) {
-            appendLog(getString(R.string.ble_bond_failed))
-            pendingBondDevice = null
-            stopBondPolling()
+        val state = try {
+            device.bondState
+        } catch (e: Exception) {
+            android.bluetooth.BluetoothDevice.BOND_NONE
+        }
+        when {
+            // Already paired (e.g. the user paired it moments ago): connect directly.
+            state == android.bluetooth.BluetoothDevice.BOND_BONDED -> onBleBonded(device)
+            // A previous attempt got stuck in BONDING (some stacks never show the
+            // PIN prompt again): retry shortly — this re-triggers the system dialog.
+            state == android.bluetooth.BluetoothDevice.BOND_BONDING -> {
+                appendLog(getString(R.string.ble_bond_retry))
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    if (pendingBondDevice?.address == device.address) {
+                        appendLog(getString(R.string.ble_bond_start, device.name ?: device.address))
+                        startBondPolling(device)
+                        if (!bleConnectionManager.createBond(device)) {
+                            appendLog(getString(R.string.ble_bond_failed))
+                            pendingBondDevice = null
+                            stopBondPolling()
+                        }
+                    }
+                }, 400)
+            }
+            else -> {
+                appendLog(getString(R.string.ble_bond_start, device.name ?: device.address))
+                startBondPolling(device)
+                if (!bleConnectionManager.createBond(device)) {
+                    appendLog(getString(R.string.ble_bond_failed))
+                    pendingBondDevice = null
+                    stopBondPolling()
+                }
+            }
         }
     }
 

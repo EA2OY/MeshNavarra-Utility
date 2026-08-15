@@ -35,6 +35,7 @@
     <string name="ble_bond_start">Pairing with %1$s... Accept the system prompt and enter the PIN shown on the node screen.</string>
     <string name="ble_bond_ok">Paired! Connecting to %1$s...</string>
     <string name="ble_bond_failed">Pairing failed. Try again, check the PIN on the node display, or refresh the paired list.</string>
+    <string name="ble_bond_retry">A pairing attempt was stuck — retrying to trigger the PIN prompt.</string>
     <string name="ble_connect_started">Bluetooth connection started. Waiting for GATT...</string>
     <string name="ble_connect_failed">Failed to start Bluetooth connection.</string>
     <string name="ble_permission_denied">Bluetooth permission denied.</string>

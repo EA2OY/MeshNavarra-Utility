@@ -35,6 +35,7 @@
     <string name="ble_bond_start">Vinculando con %1$s... Acepta el diálogo del sistema e introduce el PIN que muestra el nodo.</string>
     <string name="ble_bond_ok">¡Vinculado! Conectando con %1$s...</string>
     <string name="ble_bond_failed">Vinculación fallida. Reinténtalo, revisa el PIN en la pantalla del nodo o actualiza la lista de vinculados.</string>
+    <string name="ble_bond_retry">Había un intento de vinculación atascado — reintentando para mostrar el diálogo del PIN.</string>
     <string name="ble_connect_started">Conexión Bluetooth iniciada. Esperando GATT...</string>
     <string name="ble_connect_failed">No se pudo iniciar la conexión Bluetooth.</string>
     <string name="ble_permission_denied">Permiso Bluetooth denegado.</string>
