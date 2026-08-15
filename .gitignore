@@ -26,3 +26,8 @@ auditoria_*.zip
 # OS
 Thumbs.db
 .DS_Store
+
+# Signing keys (never commit)
+keystore/
+*.jks
+*.keystore

@@ -120,13 +120,14 @@
     <string name="app_author">Tai Soluciones — taisoluciones@gmail.com</string>
     <string name="app_email">taisoluciones@gmail.com</string>
     <string name="app_email_subject">Consulta sobre la app MeshNavarra</string>
-    <string name="app_github_hint">Código fuente: GitHub (Tai Soluciones)</string>
-    <string name="app_version_fork">Versión %1$s · Fork %2$s</string>
+    <string name="app_github_hint">Código fuente: https://github.com/EA2OY/MeshNavarra-Utility</string>
+    <string name="app_github_url">https://github.com/EA2OY/MeshNavarra-Utility</string>
+    <string name="app_version_fork">Versión %1$s · Build %2$s</string>
     <string name="app_license_name">Licenciada bajo GPL-3.0</string>
     <string name="license_button">Ver licencia (GPL-3.0)</string>
     <string name="license_title">GNU General Public License v3.0</string>
     <string name="license_body">MeshNavarra Utility es software libre: puedes redistribuirlo y/o modificarlo bajo los términos de la GNU General Public License publicada por la Free Software Foundation, ya sea la versión 3 de la Licencia o (a tu elección) cualquier versión posterior.\n\nEste programa se distribuye con la esperanza de que sea útil, pero SIN NINGUNA GARANTÍA; sin siquiera la garantía implícita de COMERCIABILIDAD o IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Consulta la GNU General Public License para más detalles.\n\nDeberías haber recibido una copia de la GNU General Public License junto con este programa. Si no, consulta https://www.gnu.org/licenses/.</string>
-    <string name="disclaimer_title">Aviso importante</string>
+    <string name="disclaimer_title">MeshNavarra Utility — Aviso importante</string>
     <string name="disclaimer_body">MeshNavarra Utility es un fork no oficial de Tai Soluciones para administrar nodos Meshtastic.\n\nLa aplicación se proporciona TAL CUAL, sin garantía de ningún tipo, expresa o implícita (incluidas, entre otras, las de comerciabilidad e idoneidad para un fin determinado). Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. En la máxima medida permitida por la ley, el autor no asume ninguna responsabilidad por daños, mal funcionamiento o pérdidas — directos, indirectos o consecuentes — y no podrá efectuarse reclamación alguna contra el autor derivada del uso de este software. Úsala bajo tu propia responsabilidad.\n\nSoftware libre bajo GNU GPL v3.0. El código fuente está disponible en GitHub (ver Contacto).</string>
     <string name="disclaimer_agree">He leído y acepto este aviso</string>
     <string name="disclaimer_accept">Aceptar</string>

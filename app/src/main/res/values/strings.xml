@@ -120,13 +120,14 @@
     <string name="app_author">Tai Soluciones — taisoluciones@gmail.com</string>
     <string name="app_email">taisoluciones@gmail.com</string>
     <string name="app_email_subject">Question about the MeshNavarra app</string>
-    <string name="app_github_hint">Source code: GitHub (Tai Soluciones)</string>
-    <string name="app_version_fork">Version %1$s · Fork %2$s</string>
+    <string name="app_github_hint">Source code: https://github.com/EA2OY/MeshNavarra-Utility</string>
+    <string name="app_github_url">https://github.com/EA2OY/MeshNavarra-Utility</string>
+    <string name="app_version_fork">Version %1$s · Build %2$s</string>
     <string name="app_license_name">Licensed under GPL-3.0</string>
     <string name="license_button">View license (GPL-3.0)</string>
     <string name="license_title">GNU General Public License v3.0</string>
     <string name="license_body">MeshNavarra Utility is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses/.</string>
-    <string name="disclaimer_title">Important notice</string>
+    <string name="disclaimer_title">MeshNavarra Utility — Important notice</string>
     <string name="disclaimer_body">MeshNavarra Utility is an unofficial fork by Tai Soluciones to administer Meshtastic nodes.\n\nThe app is provided AS IS, without warranty of any kind, either express or implied (including but not limited to merchantability and fitness for a particular purpose). Administration commands (reboot, NodeDB wipe, configuration changes) can affect the operation of the nodes. To the maximum extent permitted by law, the author accepts no liability for any damage, malfunction or loss — direct, indirect or consequential — and no claim may be made against the author arising from the use of this software. Use it at your own risk.\n\nFree software under the GNU GPL v3.0. Source code is available on GitHub (see Contact).</string>
     <string name="disclaimer_agree">I have read and accept this notice</string>
     <string name="disclaimer_accept">Accept</string>

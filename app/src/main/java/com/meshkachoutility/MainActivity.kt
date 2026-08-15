@@ -22,6 +22,9 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -322,7 +325,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         const val CHAT_STATUS_ERROR = "error"
     private const val MAX_PICKER_ROWS = 150
     private const val MAX_NODES_TAB_ROWS = 150
-    private const val FORK_DATE = "2026-08-12"
+    private const val BUILD_DATE = "2026-08-15"
     private const val RECONNECT_DELAY_MS = 5000L
     private const val RECONNECT_MAX_ATTEMPTS = 5
     private const val CHAT_AUTOSCROLL_RESUME_MS = 10000L
@@ -345,6 +348,17 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Edge-to-edge (enforced by Android 15 with targetSdk 35): draw behind
+        // the system bars and pad the root so the header and the tab bar never
+        // sit under the status/navigation bars. Base padding keeps the 16dp design.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_root)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val base = (16 * resources.displayMetrics.density).toInt()
+            v.setPadding(base + bars.left, base + bars.top, base + bars.right, base + bars.bottom)
+            insets
+        }
 
         // Binding Material 3 components
         statusText = findViewById(R.id.statusText)
@@ -488,8 +502,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             // Footer with a clickable e-mail (opens the user's mail app with the
             // address pre-filled and a fixed subject) + version + license + source.
             val email = getString(R.string.app_email)
+            val githubUrl = getString(R.string.app_github_url)
             val footerText = getString(R.string.app_author) + "\n" +
-                    getString(R.string.app_version_fork, versionName, FORK_DATE) + "\n" +
+                    getString(R.string.app_version_fork, versionName, BUILD_DATE) + "\n" +
                     getString(R.string.app_license_name) + "\n" +
                     getString(R.string.app_github_hint)
             val footerSpannable = android.text.SpannableString(footerText)
@@ -511,6 +526,23 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                         }
                     },
                     emailAt, emailAt + email.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            val urlAt = footerText.indexOf(githubUrl)
+            if (urlAt >= 0) {
+                footerSpannable.setSpan(
+                    object : android.text.style.ClickableSpan() {
+                        override fun onClick(widget: android.view.View) {
+                            try {
+                                startActivity(
+                                    android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(githubUrl))
+                                )
+                            } catch (e: Exception) {
+                                Toast.makeText(this@MainActivity, getString(R.string.log_error, e.localizedMessage), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                    urlAt, urlAt + githubUrl.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
             val footer = TextView(this).apply {
@@ -2594,8 +2626,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         }
         val footer = TextView(this).apply {
             val email = getString(R.string.app_email)
+            val githubUrl = getString(R.string.app_github_url)
             val ft = getString(R.string.app_author) + "\n" +
-                    getString(R.string.app_version_fork, versionName, FORK_DATE)
+                    getString(R.string.app_version_fork, versionName, BUILD_DATE) + "\n" +
+                    getString(R.string.app_github_hint)
             val sp = android.text.SpannableString(ft)
             val at = ft.indexOf(email)
             if (at >= 0) {
@@ -2615,6 +2649,23 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                         }
                     },
                     at, at + email.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            val urlAt = ft.indexOf(githubUrl)
+            if (urlAt >= 0) {
+                sp.setSpan(
+                    object : android.text.style.ClickableSpan() {
+                        override fun onClick(widget: android.view.View) {
+                            try {
+                                startActivity(
+                                    android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(githubUrl))
+                                )
+                            } catch (e: Exception) {
+                                Toast.makeText(this@MainActivity, getString(R.string.log_error, e.localizedMessage), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                    urlAt, urlAt + githubUrl.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
             text = sp
