@@ -1504,6 +1504,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         buildBottomTabs()
         setupTabSwipe()
         setupTabEdgeHints()
+        // Explicit initial selection: TabLayout auto-selects the first tab while
+        // the listener is not attached yet, leaving every panel hidden. Select
+        // again so the listener fires and the header gets reparented.
+        bottomTabs.getTabAt(0)?.select()
     }
 
     /** (Re)builds the tab bar. The Debug tab only exists when enabled. */
@@ -1542,7 +1546,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
-            override fun onTabReselected(tab: TabLayout.Tab) = Unit
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                attachHeaderToCurrentPanel()
+            }
         }
         tabListener = listener
         bottomTabs.addOnTabSelectedListener(listener)
@@ -1721,9 +1727,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(400) { demoGotoTab(2) }
         at(300) { }
         at(400) { demoMoveTo(targetNodeInput) }
-        at(900) { targetNodeInput.setText("!de00d0") }
+        at(900) { targetNodeInput.setText("!c0ffee") }
         at(600) { demoMoveTo(favoriteInput) }
-        at(900) { favoriteInput.setText("a11ce0") }
+        at(900) { favoriteInput.setText("5eed01") }
         at(700) { demoMoveTo(favoriteButton) }
         at(1000) { favoriteButton.performClick() }
         at(1200) { demoMoveTo(rebootButton) }
@@ -1744,7 +1750,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(400) { demoGotoTab(1) }
         at(300) { }
         at(400) { demoMoveTo(cmdTargetInput) }
-        at(900) { cmdTargetInput.setText("!de00d0") }
+        at(900) { cmdTargetInput.setText("!c0ffee") }
         at(700) { demoMoveTo(cmdTelemetryButton) }
         at(1000) { cmdTelemetryButton.performClick() }
         at(1800) { demoFakeTelemetryResponse() }
@@ -1758,13 +1764,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(400) { demoGotoTab(3) }
         at(300) { }
         at(400) { demoMoveTo(navaTargetInput) }
-        at(900) { navaTargetInput.setText("!de00d0") }
+        at(900) { navaTargetInput.setText("!c0ffee") }
         at(600) { demoMoveTo(navaCategorySpinner) }
         at(1000) { navaCategorySpinner.setSelection(2) }
         at(600) { demoMoveTo(navaCommandSpinner) }
         at(1000) { navaCommandSpinner.setSelection(1) }
         at(600) { demoMoveTo(navaArgInput) }
-        at(900) { navaArgInput.setText("a11ce0") }
+        at(900) { navaArgInput.setText("5eed01") }
         at(700) { demoMoveTo(navaSendButton) }
         at(1000) { navaSendButton.performClick() }
         at(1400) { demoCloseDialog() }
@@ -1853,7 +1859,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(hold(R.string.d2_nodes)) { demoBalloonHide() }
 
         // 2b. Node popup: eleven actions
-        at(300) { showNodeInfoPopup(0xDE00D0L.toInt()) }
+        at(300) { showNodeInfoPopup(0xC0FFEE) }
         at(400) { demoBalloonText(getString(R.string.d2_popup)) }
         at(hold(R.string.d2_popup)) { demoBalloonHide() }
         at(200) { nodePopupDialog?.dismiss() }
@@ -1862,9 +1868,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(400) { demoGotoTab(2) }
         at(500) { demoBalloonText(getString(R.string.d2_admin)) }
         at(300) { demoMoveTo(targetNodeInput) }
-        at(900) { targetNodeInput.setText("!de00d0") }
+        at(900) { targetNodeInput.setText("!c0ffee") }
         at(600) { demoMoveTo(favoriteInput) }
-        at(900) { favoriteInput.setText("a11ce0") }
+        at(900) { favoriteInput.setText("5eed01") }
         at(700) { demoMoveTo(favoriteButton) }
         at(1000) { favoriteButton.performClick() }
         at(500) { demoBalloonHide() }
@@ -1884,7 +1890,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         // 5. Commands (tab 1): telemetry with decoded response
         at(400) { demoGotoTab(1) }
         at(400) { demoMoveTo(cmdTargetInput) }
-        at(900) { cmdTargetInput.setText("!de00d0") }
+        at(900) { cmdTargetInput.setText("!c0ffee") }
         at(700) { demoMoveTo(cmdTelemetryButton) }
         at(1000) { cmdTelemetryButton.performClick() }
         at(1800) { demoFakeTelemetryResponse() }
@@ -1895,7 +1901,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         // 6. NavaTastic CLI (tab 3): remote repeater control, the flagship
         at(400) { demoGotoTab(3) }
         at(400) { demoMoveTo(navaTargetInput) }
-        at(900) { navaTargetInput.setText("!de00d0") }
+        at(900) { navaTargetInput.setText("!c0ffee") }
         at(400) { demoBalloonText(getString(R.string.d2_nava1)) }
         at(300) { demoMoveTo(navaCategorySpinner) }
         at(1000) { navaCategorySpinner.setSelection(2) }
@@ -1904,13 +1910,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         at(400) { demoBalloonHide() }
         at(200) { demoBalloonText(getString(R.string.d2_nava2)) }
         at(600) { demoMoveTo(navaArgInput) }
-        at(900) { navaArgInput.setText("a11ce0") }
+        at(900) { navaArgInput.setText("5eed01") }
         at(700) { demoMoveTo(navaSendButton) }
         at(1000) { navaSendButton.performClick() }
         at(400) { demoBalloonHide() }
         at(200) { demoCloseDialog() }
         at(600) {
-            addNavaMsg(0xDE00D0L.toInt(), "PONG: de00d0 | SNR: 12.3 dB | Bat: 4109 mV | RUIDO: -103 dBm", sent = false, route = "dm")
+            addNavaMsg(0xC0FFEE, "PONG: c0ffee | SNR: 12.3 dB | Bat: 4109 mV | RUIDO: -103 dBm", sent = false, route = "dm")
             demoBalloonText(getString(R.string.d2_pong))
         }
         at(hold(R.string.d2_pong)) { demoBalloonHide() }
@@ -2069,7 +2075,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoHandler.postDelayed({
             statusProgress.visibility = android.view.View.GONE
             statusText.text = getString(R.string.status_demo_connected)
-            localNodeNum = 0xDE00D0L.toInt()
+            localNodeNum = 0xC0FFEE
             appendLog("DEMO >> Conectado a Nodo DEMO (simulación)")
         }, 2500)
     }
@@ -2077,10 +2083,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private fun populateDemoNodes() {
         val now = System.currentTimeMillis()
         val specs = listOf(
-            Triple(0xDE00D0L.toInt(), "REPETIDOR NAVARRA", true),
-            Triple(0xDE00A1L.toInt(), "REPETIDOR II", true),
-            Triple(0xA11CE0L.toInt(), "MANDO RESCATE", false),
-            Triple(0xB0B0A1L.toInt(), "MANDO 2", false)
+            Triple(0xC0FFEE, "REPETIDOR MIRADOR", true),
+            Triple(0xC0FFAB, "REPETIDOR ROBLE", true),
+            Triple(0x5EED01, "MANDO VALLE", false),
+            Triple(0x5EED02, "MANDO MÓVIL", false)
         )
         synchronized(nodeEntries) {
             specs.forEachIndexed { i, (num, name, fav) ->
@@ -2101,7 +2107,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoHandler.postDelayed({ bpAppendStatus(getString(R.string.bp_status_applying, 2, 3, getString(R.string.bp_step_nodeinfo, 259200))) }, 600)
         demoHandler.postDelayed({ bpAppendStatus(getString(R.string.bp_status_applying, 3, 3, getString(R.string.bp_step_position, 259200, getString(R.string.bp_smart_off), 120))) }, 1200)
         demoHandler.postDelayed({
-            bpAppendStatus(getString(R.string.bp_status_done, "0xde00d0"))
+            bpAppendStatus(getString(R.string.bp_status_done, "0xc0ffee"))
             showScrollableDialog(getString(R.string.bp_demo_title), getString(R.string.bp_demo_body))
         }, 1800)
     }
@@ -2119,8 +2125,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private fun demoSeedChat() {
         val now = SimpleDateFormat("HH:mm", Locale.US).format(Date())
         synchronized(chatMessages) {
-            chatMessages.add(ChatMessage(0xDE00A1L.toInt(), "Prueba de enlace, ¿me copias?", 0, now))
-            chatMessages.add(ChatMessage(0xA11CE0L.toInt(), "Copio fuerte y claro.", 0, now))
+            chatMessages.add(ChatMessage(0xC0FFAB, "Prueba de enlace, ¿me copias?", 0, now))
+            chatMessages.add(ChatMessage(0x5EED01, "Copio fuerte y claro.", 0, now))
         }
         refreshChat()
     }
@@ -3028,6 +3034,40 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // Default route is a private DM; Navadmin is opt-in.
         navaRouteDm.isChecked = true
+
+        // Draggable divider between the command controls and the conversation
+        // console: the user resizes both areas to taste; the split persists.
+        val navaDivider = findViewById<android.view.View>(R.id.navaDivider)
+        val navaControlsScrollV = findViewById<ScrollView>(R.id.navaControlsScroll)
+        val navaConversationScrollV = findViewById<ScrollView>(R.id.navaConversationScroll)
+        val prefs = getSharedPreferences("meshkacho", MODE_PRIVATE)
+        fun applyNavaSplit(controlsWeight: Float) {
+            val c = controlsWeight.coerceIn(0.3f, 2.4f)
+            (navaControlsScrollV.layoutParams as LinearLayout.LayoutParams).weight = c
+            (navaConversationScrollV.layoutParams as LinearLayout.LayoutParams).weight = 3f - c
+            navaPanel.requestLayout()
+            prefs.edit().putFloat("nava_split", c).apply()
+        }
+        val saved = prefs.getFloat("nava_split", -1f)
+        if (saved > 0f) applyNavaSplit(saved)
+        var lastDragY = 0f
+        navaDivider.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    lastDragY = event.rawY
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val dy = event.rawY - lastDragY
+                    lastDragY = event.rawY
+                    val total = (navaPanel.height / resources.displayMetrics.density).coerceAtLeast(1f)
+                    val lp = navaControlsScrollV.layoutParams as LinearLayout.LayoutParams
+                    applyNavaSplit(lp.weight + dy / total * 3f)
+                    true
+                }
+                else -> true
+            }
+        }
 
         navaCategorySpinner.adapter = ArrayAdapter(
             this, R.layout.nava_spinner_item,
