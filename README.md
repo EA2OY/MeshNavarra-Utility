@@ -21,11 +21,11 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 | **Log** | Consola persistente de peticiones/respuestas |
 | **Debug** | Herramientas de desarrollo (oculta por defecto): modo de bajo impacto, sensores y baterías de auditoría |
 
-**También incluye**: interfaz bilingüe EN/ES, tema táctico DayNight, ayuda con pulsación larga en todos los botones, manuales en PDF dentro de la app, modo demo con puntero animado para promos, registro de errores a archivo, control remoto (receiver `com.meshkachoutility.REMOTE`) para pruebas scriptadas.
+**También incluye**: interfaz bilingüe EN/ES, tema táctico DayNight, ayuda con pulsación larga en todos los botones, manuales en PDF dentro de la app, **dos demos guiadas** (clásica con puntero y **demo 2 con globos de texto** para grabar vídeos sin voz), nodo destino compartido entre pestañas, registro de errores a archivo, control remoto (receiver `com.meshkachoutility.REMOTE`) para pruebas scriptadas.
 
 ## Requisitos
 
-- Android **8.0+** (API 26) — probada en Android 12 (MIUI) y Android 15 (HyperOS).
+- Android **8.0+** (API 26) — probada en Android 11 (Samsung), Android 12 (MIUI), Android 15 y Android 16 (HyperOS), con soporte edge-to-edge (targetSdk 35).
 - Un nodo Meshtastic con:
   - **USB OTG** (familia nRF52) o **Bluetooth LE** (emparejarlo antes en los ajustes del sistema; los nodos Navarrico usan PIN `654321`).
 - Para la pestaña NavaTastic CLI: un repetidor con el **firmware Navarrico/NavaTastic** (o cualquier nodo estándar para diagnóstico).
@@ -34,9 +34,9 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 
 1. Descarga el último APK desde [Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases).
 2. Permite instalar aplicaciones de fuentes desconocidas en tu dispositivo y abre el APK.
-3. Conecta tu nodo por USB OTG o Bluetooth, o ejecuta el modo demo (Ayuda → "Ejemplo de uso (demo)") para verla en acción sin hardware.
+3. Conecta tu nodo por USB OTG o Bluetooth, o ejecuta un modo demo (Ayuda → "Ejemplo de uso (demo)" o "Tour guiado con globos (demo 2)") para verla en acción sin hardware.
 
-La metadata de empaquetado F-Droid está en [`fdroid/`](fdroid/metadata.yml) (publicación pendiente).
+La metadata de empaquetado F-Droid está en [`fdroid/`](fdroid/metadata.yml) (merge request de inclusión en curso: [#45843](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/45843)).
 
 ## Compilar desde el código
 
@@ -112,11 +112,11 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 | **Log** | Persistent request/response console |
 | **Debug** | Developer tools (hidden by default): low-impact mode, sensor toggles, automated audit batteries |
 
-**Also includes**: bilingual UI (EN/ES), DayNight tactical HUD, long-press help on every button, in-app manuals (PDF), demo mode with animated pointer for promos, crash-to-file logging, remote control (`com.meshkachoutility.REMOTE` receiver) for scripted testing.
+**Also includes**: bilingual UI (EN/ES), DayNight tactical HUD, long-press help on every button, in-app manuals (PDF), **two guided demos** (classic pointer tour + **demo 2 with text balloons** for recording voice-free videos), shared target node across tabs, crash-to-file logging, remote control (`com.meshkachoutility.REMOTE` receiver) for scripted testing.
 
 ## Requirements
 
-- Android **8.0+** (API 26) — tested on Android 12 (MIUI) and Android 15 (HyperOS).
+- Android **8.0+** (API 26) — tested on Android 11 (Samsung), Android 12 (MIUI), Android 15 and Android 16 (HyperOS), with edge-to-edge support (targetSdk 35).
 - A Meshtastic node with:
   - **USB OTG** (nRF52 family) or **Bluetooth LE** (pair it in system settings first; Navarrico nodes use PIN `654321`).
 - For the NavaTastic CLI tab: a repeater running the **Navarrico/NavaTastic firmware** (or any stock node for diagnostics only).
@@ -125,9 +125,9 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 
 1. Download the latest APK from the [Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases) page.
 2. Allow installing apps from unknown sources on your device, then open the APK.
-3. Connect your node via USB OTG or Bluetooth, or run the app in demo mode (Help → "Usage example (demo)") to see it in action without hardware.
+3. Connect your node via USB OTG or Bluetooth, or run a demo tour (Help → "Usage example (demo)" or "Guided tour with balloons (demo 2)") to see it in action without hardware.
 
-F-Droid packaging metadata is included under [`fdroid/`](fdroid/metadata.yml) (publication pending).
+F-Droid packaging metadata is included under [`fdroid/`](fdroid/metadata.yml) (inclusion merge request in progress: [#45843](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/45843)).
 
 ## Build from source
 

@@ -1,0 +1,5 @@
+- Cabecera de conexión scrolleable en todas las pestañas (más espacio de trabajo)
+- Nodo destino compartido entre pestañas con X para limpiar
+- Divisor arrastrable en NavaTastic CLI (comandos vs consola)
+- Demo 2: tour guiado con globos de texto (graba sin voz)
+- Edge-to-edge en Android 15/16, BLE con una sola petición de configuración por conexión

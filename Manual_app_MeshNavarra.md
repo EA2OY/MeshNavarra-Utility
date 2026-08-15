@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.0.0"
+date: "Agosto 2026 · v1.0.2"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.0.0)
+# Manual de Usuario — MeshNavarra Utility (v1.0.2)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.0 (fork 2026-08-12)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.2 (build 2026-08-15)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -26,9 +26,20 @@ MeshNavarra Utility es una app Android que administra nodos de la red Meshtastic
 - **8 pestañas** en la barra inferior: Utilidades, Comandos, Administración, NavaTastic CLI, Chat, Nodos y Log (la pestaña **Debug** es una herramienta de desarrollo **oculta por defecto**).
 - Administración local y remota de nodos (reinicio, NodeDB, favoritos, bloqueos, configuración).
 - **NavaTastic CLI** (la función estrella): control remoto de repetidores con el firmware Navarrico/NavaTastic (`/nava`).
-- Interfaz **bilingüe EN/ES**, ayuda por pulsación larga en todos los controles, manual integrado, **demo guiada** y licencia GPL-3.0.
+- **Nodo destino global**: el nodo elegido en cualquier pestaña se comparte con el resto hasta que se cambie o se borre (X).
+- Interfaz **bilingüe EN/ES**, ayuda por pulsación larga en todos los controles, manual integrado, **dos demos guiadas** y licencia GPL-3.0.
 
 > ⚠️ **No afiliada ni respaldada por el proyecto Meshtastic.** Es un fork/herramienta no oficial.
+
+---
+
+## 📋 1b. Novedades de la versión 1.0.2
+
+- **Cabecera scrolleable**: el bloque superior (estado y conexión) forma parte del contenido de cada pestaña y sube al hacer scroll, dejando más espacio de trabajo.
+- **Nodo destino compartido** entre pestañas con botón **X** para deseleccionar.
+- **Divisor ajustable** en NavaTastic CLI: arrastra la barra de puntos para repartir el espacio entre comandos y consola (se recuerda).
+- **Demo 2 con globos explicativos**: recorrido guiado con textos sobreimpresos, ideal para grabar un vídeo sin voz (solo una pista de audio).
+- Compatibilidad **edge-to-edge** (Android 15/16, targetSdk 35), correcciones de BLE (una sola petición de configuración por conexión) y cierre de auditorías externas.
 
 ---
 
@@ -81,6 +92,10 @@ Si el enlace se cae, la app reconecta automáticamente (5 intentos × 5 s). Al r
 | 7 | **Debug** | Herramientas de desarrollo (oculta por defecto): bajo impacto, sensores y auditorías |
 
 Barra desplazable con flechas de borde; también se navega deslizando. Cada pestaña muestra un popup explicativo las primeras veces.
+
+> **Cabecera scrolleable**: el bloque de estado/conexión vive dentro del contenido de la pestaña activa — al hacer scroll sube con el resto y deja más espacio. Vuelve a aparecer al scrollear arriba.
+
+> **Nodo destino global**: el campo de destino (Administración, Comandos, Utilidades y NavaTastic) es el **mismo para toda la app**. Lo que escribas o elijas en una pestaña aparece en las demás; la **X** del campo lo deselecciona en todas.
 
 ---
 
@@ -204,6 +219,8 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 La pestaña separa las respuestas en **NAVADMIN** y **DM PRIVADO**, con hora y emisor. El historial se guarda en disco y sobrevive a reinicios de la app. Los comandos con `warn` muestran un aviso rojo y bloquean el envío hasta escribir **CONFIRMAR**.
 
+> **Divisor ajustable**: la barra de puntos entre los controles y la conversación se puede arrastrar arriba/abajo para repartir el espacio entre ambas zonas; la proporción se recuerda entre sesiones.
+
 ---
 
 ## 💬 9. Pestaña Chat
@@ -259,18 +276,23 @@ Incluye:
 
 ---
 
-## 🎬 13. Modo demo
+## 🎬 13. Modos demo
 
-Desde Ayuda → **«Ejemplo de uso (demo)»**: recorrido guiado de ~63 s con puntero animado, conexión simulada, nodos/chat/respuestas ficticias y popups reales. Ideal para grabaciones promocionales; no requiere nodo físico. La demo se bloquea si hay una conexión real activa.
+Desde Ayuda hay **dos demos guiadas** (no requieren nodo físico y se bloquean si hay una conexión real activa):
+
+- **«Ejemplo de uso (demo)»**: recorrido clásico de ~52 s con puntero animado, conexión simulada, nodos/chat/respuestas ficticias y popups reales.
+- **«Tour guiado con globos (demo 2)»**: recorrido completo (~90 s) que explica cada función con **globos de texto** sobreimpresos — graba la pantalla y añade solo una pista de audio, no necesita voz.
+
+Ambas empiezan siempre desde un **estado limpio** (como recién abierta la app) y tienen un botón **«Parar demo» abajo a la derecha**. Los datos simulados (nodos ficticios, chat, consola) se eliminan al terminar o parar; tus nodos reales no se tocan.
 
 ---
 
 ## ❓ 14. Ayuda y Contacto
 
 - **Pulsación larga** en cualquier control: burbuja de ayuda breve; al soltar, diálogo completo.
-- **Botón de ayuda** (arriba derecha): manual integrado, licencia GPL-3.0 (texto completo), NavaTastic PDF, demo, auditoría y selector de idioma (EN/ES).
+- **Botón de ayuda** (arriba derecha): manual integrado, licencia GPL-3.0 (texto completo), NavaTastic PDF, las dos demos, y selector de idioma (EN/ES).
 - **Correo**: pulsa `taisoluciones@gmail.com` en Ayuda para abrir tu app de correo con el asunto pre-rellenado «Consulta sobre la app MeshNavarra».
-- **Código fuente**: disponible en GitHub (GPL-3.0).
+- **Código fuente**: enlace clickable a `https://github.com/EA2OY/MeshNavarra-Utility` (Ayuda y aviso de bienvenida).
 
 ---
 

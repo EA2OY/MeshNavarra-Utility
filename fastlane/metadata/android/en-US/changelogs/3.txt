@@ -1,0 +1,5 @@
+- Scrollable connection header in every tab (more workspace)
+- Shared target node across tabs with a clear X
+- Draggable divider in NavaTastic CLI (commands vs console)
+- Demo 2: guided tour with text balloons (record without voice-over)
+- Edge-to-edge on Android 15/16, BLE single config request per connection
