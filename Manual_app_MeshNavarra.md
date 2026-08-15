@@ -59,7 +59,7 @@ MeshNavarra Utility es una app Android que administra nodos de la red Meshtastic
 2. Elige el nodo **ya vinculado** en el selector (ej. `NetT_aca9`, `Meshtastic_ac94`).
 3. La app realiza un handshake de configuración en 2 fases (config+canales → NodeDB) y descarga los nodos.
 
-> 🔑 **Nodos NavaTastic**: el PIN BLE es fijo (**123457**) y se muestra en la pantalla OLED del nodo en cada vinculación. El emparejamiento se hace manualmente con la app oficial; MeshNavarra solo se conecta a dispositivos ya vinculados.
+> 🔑 **Nodos NavaTastic**: el PIN BLE es fijo (**654321**) y se muestra en la pantalla OLED del nodo en cada vinculación. El emparejamiento se hace manualmente con la app oficial; MeshNavarra solo se conecta a dispositivos ya vinculados.
 
 ### 3.3 Auto-reconexión
 
