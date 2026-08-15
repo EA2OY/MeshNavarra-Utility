@@ -9,8 +9,16 @@
     android:padding="16dp"
     android:background="?android:attr/windowBackground">
 
+    <!-- Top area: header + status card (collapsible, scroll-away) -->
+    <LinearLayout
+        android:id="@+id/topArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
     <!-- App header -->
     <LinearLayout
+        android:id="@+id/topHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -58,6 +66,7 @@
 
     <!-- Connection Status Header -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/statusCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -116,6 +125,7 @@
                 app:iconTint="?attr/colorOnPrimary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
     <!-- Tab content panels (bottom tabs, Excel-style) -->
     <FrameLayout
@@ -166,10 +176,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="@string/target_node_id_hint"
-                        app:endIconDrawable="@android:drawable/ic_menu_agenda"
-                        app:endIconMode="custom"
-                        app:endIconTint="?attr/colorPrimary">
+            android:hint="@string/target_node_id_hint"
+            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+            app:startIconTint="?attr/colorPrimary"
+            app:endIconMode="clear_text">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/targetNodeInput"
@@ -529,10 +539,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="12dp"
-                            android:hint="@string/cmd_target_hint"
-                            app:endIconDrawable="@android:drawable/ic_menu_agenda"
-                            app:endIconMode="custom"
-                            app:endIconTint="?attr/colorPrimary">
+            android:hint="@string/cmd_target_hint"
+            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+            app:startIconTint="?attr/colorPrimary"
+            app:endIconMode="clear_text">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/cmdTargetInput"
@@ -758,10 +768,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
-                            android:hint="@string/bp_target_hint"
-                            app:endIconDrawable="@android:drawable/ic_menu_agenda"
-                            app:endIconMode="custom"
-                            app:endIconTint="?attr/colorPrimary">
+            android:hint="@string/bp_target_hint"
+            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+            app:startIconTint="?attr/colorPrimary"
+            app:endIconMode="clear_text">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/bpTargetInput"
@@ -993,10 +1003,11 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+  <ScrollView
+            android:id="@+id/navaControlsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
                 android:fillViewport="false"
                 android:scrollbars="none">
 
@@ -1018,10 +1029,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/nava_target_hint"
-                    app:endIconDrawable="@android:drawable/ic_menu_agenda"
-                    app:endIconMode="custom"
-                    app:endIconTint="?attr/colorPrimary">
+            android:hint="@string/nava_target_hint"
+            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+            app:startIconTint="?attr/colorPrimary"
+            app:endIconMode="clear_text">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/navaTargetInput"
@@ -1235,10 +1246,11 @@
                 android:text="@string/nava_conversation"
                 android:textStyle="bold" />
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
+  <ScrollView
+            android:id="@+id/navaConversationScroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
                 android:scrollbars="none">
 
                 <LinearLayout

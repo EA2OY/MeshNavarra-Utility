@@ -11,6 +11,7 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.FrameLayout
@@ -169,6 +170,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private var chatAutoScrollPaused = false
     private val chatScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private lateinit var chatReplyInput: TextInputEditText
+    private lateinit var topArea: LinearLayout
+    private var syncingTarget = false
     private lateinit var chatPauseButton: MaterialButton
     private lateinit var chatSendButton: MaterialButton
     private lateinit var navaPanel: LinearLayout
@@ -360,6 +363,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             insets
         }
 
+        // The top area (header + status card) is reparented into the selected
+        // panel's scrollable content, so it scrolls away like any other element.
+        topArea = findViewById(R.id.topArea)
+
         // Binding Material 3 components
         statusText = findViewById(R.id.statusText)
         attachDebugTabGesture()
@@ -452,7 +459,22 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         cmdTraceButton = findViewById(R.id.cmdTraceButton)
         cmdSetOwnerButton = findViewById(R.id.cmdSetOwnerButton)
 
+        // Shared target node across tabs: every target field mirrors the others
+        // until the user changes it or clears it with the X.
+        val targetWatcher = object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) = Unit
+            override fun afterTextChanged(s: android.text.Editable?) {
+                syncTargetInputs(s?.toString() ?: "")
+            }
+        }
+        targetNodeInput.addTextChangedListener(targetWatcher)
+        cmdTargetInput.addTextChangedListener(targetWatcher)
+        bpTargetInput.addTextChangedListener(targetWatcher)
+        navaTargetInput.addTextChangedListener(targetWatcher)
+
         setupBottomTabs()
+        attachHeaderToCurrentPanel()
         setupCommands()
         setupNodePickers()
         setupGoodPractices()
@@ -616,6 +638,18 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { setMargins(dp(20), 0, dp(20), dp(8)) }
             }
+            val demo2Btn = MaterialButton(this).apply {
+                text = getString(R.string.cmd_demo2)
+                setIconResource(android.R.drawable.ic_media_play)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    getColorAttr(com.google.android.material.R.attr.colorPrimary)
+                )
+                setTextColor(getColorAttr(com.google.android.material.R.attr.colorOnPrimary))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(dp(20), 0, dp(20), dp(8)) }
+            }
             val audit = MaterialButton(this).apply {
                 text = getString(R.string.cmd_audit)
                 layoutParams = LinearLayout.LayoutParams(
@@ -667,7 +701,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 addView(navaManual)
                 addView(navaManualUso)
                 addView(demoBtn)
-                addView(audit)
+                addView(demo2Btn)
+                if (debugTabEnabled()) addView(audit)
                 addView(langRow)
             }
             val scroll = ScrollView(this).apply { addView(container) }
@@ -681,6 +716,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     demoBtn.setOnClickListener {
                         dialog.dismiss()
                         startDemo()
+                    }
+                    demo2Btn.setOnClickListener {
+                        dialog.dismiss()
+                        startDemo2()
                     }
                     appManual.setOnClickListener {
                         dialog.dismiss()
@@ -1498,6 +1537,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     5 -> refreshNodesList()
                     6 -> refreshLogTab()
                 }
+                attachHeaderToCurrentPanel()
                 showTabExplainer(tab.position)
             }
 
@@ -1554,6 +1594,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      */
     private fun showTabExplainer(position: Int) {
         if (remoteTabSwitch) return
+        if (demoSuppressExplainers) return
         if (initialTabSelected) {
             initialTabSelected = false
             return
@@ -1620,13 +1661,16 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private val demoHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var demoPulseAnim: android.animation.ObjectAnimator? = null
     private var demoProgress: ProgressBar? = null
+    private var demoBalloon: TextView? = null
+    private var demoTotalMs = 65000L
+    private var demoSuppressExplainers = false
     private val demoFakeNodes = mutableListOf<Int>()
 
-    /** Thin bottom progress bar so the person recording can time the narration (~65 s). */
+    /** Thin bottom progress bar so the person recording can time the narration. */
     private val demoProgressTick = object : Runnable {
         override fun run() {
             val p = demoProgress ?: return
-            val next = p.progress + (250 * 100) / 65000
+            val next = p.progress + ((250 * 100) / demoTotalMs).toInt()
             if (next >= 100) {
                 p.progress = 100
                 return
@@ -1651,6 +1695,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         }
         stopDemo() // safe to press the button again: restarts cleanly
         demoMode = true
+        demoSuppressExplainers = true
+        demoTotalMs = 52000L
         demoSetupOverlay()
         val overlay = demoPointerOverlay ?: return
         overlay.visibility = android.view.View.VISIBLE
@@ -1669,11 +1715,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 2. Nodes (tab 5): the mesh, favorites first — the pain the app solves
         at(400) { demoGotoTab(5) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
 
         // 3. Administration (tab 2): mark a FAVORITE from the phone (no computer)
         at(400) { demoGotoTab(2) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
         at(400) { demoMoveTo(targetNodeInput) }
         at(900) { targetNodeInput.setText("!de00d0") }
         at(600) { demoMoveTo(favoriteInput) }
@@ -1686,7 +1732,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 4. Good Practices (tab 0): duty-cycle explanation + apply
         at(400) { demoGotoTab(0) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
         at(400) { demoMoveTo(bpHelpButton) }
         at(1100) { bpHelpButton.performClick() }
         at(2000) { demoCloseDialog() }
@@ -1696,7 +1742,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 5. Commands (tab 1): telemetry + position with decoded responses
         at(400) { demoGotoTab(1) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
         at(400) { demoMoveTo(cmdTargetInput) }
         at(900) { cmdTargetInput.setText("!de00d0") }
         at(700) { demoMoveTo(cmdTelemetryButton) }
@@ -1710,7 +1756,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 6. NavaTastic CLI (tab 3): THE prize — favorites managed remotely over the fleet
         at(400) { demoGotoTab(3) }
-        at(2600) { demoCloseDialog() }
+        at(300) { }
         at(400) { demoMoveTo(navaTargetInput) }
         at(900) { navaTargetInput.setText("!de00d0") }
         at(600) { demoMoveTo(navaCategorySpinner) }
@@ -1725,7 +1771,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 7. Chat (tab 4): live messages + reply
         at(400) { demoGotoTab(4) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
         at(400) { demoSeedChat() }
         at(700) { demoMoveTo(chatReplyInput) }
         at(900) { chatReplyInput.setText("¡Favoritos desde el móvil!") }
@@ -1735,7 +1781,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // 8. Log (tab 6): everything recorded, newest first
         at(400) { demoGotoTab(6) }
-        at(2000) { demoCloseDialog() }
+        at(300) { }
 
         // 9. Finish
         at(400) { demoEnd() }
@@ -1743,9 +1789,152 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun stopDemo() {
         demoMode = false
+        demoSuppressExplainers = false
         demoHandler.removeCallbacksAndMessages(null)
         demoPulseAnim?.cancel()
         demoPointerOverlay?.visibility = android.view.View.GONE
+    }
+
+    private fun demoBalloonText(text: String) {
+        val b = demoBalloon ?: return
+        b.text = text
+        b.visibility = android.view.View.VISIBLE
+        b.alpha = 0f
+        b.animate().alpha(1f).setDuration(160).start()
+    }
+
+    private fun demoBalloonHide() {
+        val b = demoBalloon ?: return
+        b.animate().alpha(0f).setDuration(120).withEndAction {
+            b.visibility = android.view.View.GONE
+            b.alpha = 1f
+        }.start()
+    }
+
+    /**
+     * Demo 2: guided tour with speech-balloon captions. No voice needed:
+     * record the screen and add a music track. Walks every tab and explains
+     * what each feature is for, tapping real controls with simulated responses.
+     * Balloon hold time scales with the text length so it can be read.
+     */
+    private fun startDemo2() {
+        if (usbConnectionManager.isConnected() || bleConnectionManager.isConnected()) {
+            Toast.makeText(this, getString(R.string.demo_blocked_connected), Toast.LENGTH_LONG).show()
+            return
+        }
+        stopDemo()
+        demoMode = true
+        demoSuppressExplainers = true
+        demoTotalMs = 108000L
+        demoSetupOverlay()
+        val overlay = demoPointerOverlay ?: return
+        overlay.visibility = android.view.View.VISIBLE
+        demoProgress?.progress = 0
+        demoHandler.post(demoProgressTick)
+        var t = 0L
+        fun at(delay: Long, run: () -> Unit) {
+            t += delay
+            demoHandler.postDelayed(run, t)
+        }
+        fun hold(resId: Int): Long = (3500L + getString(resId).length * 60L).coerceAtMost(9000L)
+
+        // 1. Connect (fast simulation)
+        at(300) {
+            demoMoveTo(connectButton)
+            demoBalloonText(getString(R.string.d2_connect))
+        }
+        at(hold(R.string.d2_connect)) { demoBalloonHide() }
+        at(200) { demoSimulateConnect() }
+        at(2500) { populateDemoNodes() }
+
+        // 2. Nodes (tab 5): the mesh as cards
+        at(400) { demoGotoTab(5) }
+        at(500) { demoBalloonText(getString(R.string.d2_nodes)) }
+        at(hold(R.string.d2_nodes)) { demoBalloonHide() }
+
+        // 2b. Node popup: eleven actions
+        at(300) { showNodeInfoPopup(0xDE00D0L.toInt()) }
+        at(400) { demoBalloonText(getString(R.string.d2_popup)) }
+        at(hold(R.string.d2_popup)) { demoBalloonHide() }
+        at(200) { nodePopupDialog?.dismiss() }
+
+        // 3. Administration (tab 2): mark a FAVORITE from the phone
+        at(400) { demoGotoTab(2) }
+        at(500) { demoBalloonText(getString(R.string.d2_admin)) }
+        at(300) { demoMoveTo(targetNodeInput) }
+        at(900) { targetNodeInput.setText("!de00d0") }
+        at(600) { demoMoveTo(favoriteInput) }
+        at(900) { favoriteInput.setText("a11ce0") }
+        at(700) { demoMoveTo(favoriteButton) }
+        at(1000) { favoriteButton.performClick() }
+        at(500) { demoBalloonHide() }
+        at(200) { demoCloseDialog() }
+
+        // 4. Utilidades (tab 0): Good Practices + radio presets
+        at(400) { demoGotoTab(0) }
+        at(400) { demoMoveTo(bpHelpButton) }
+        at(1100) { bpHelpButton.performClick() }
+        at(400) { demoBalloonText(getString(R.string.d2_bp)) }
+        at(hold(R.string.d2_bp)) { demoBalloonHide() }
+        at(200) { demoCloseDialog() }
+        at(500) { demoBalloonText(getString(R.string.d2_preset)) }
+        at(300) { demoMoveTo(presetApplyButton) }
+        at(3000) { demoBalloonHide() }
+
+        // 5. Commands (tab 1): telemetry with decoded response
+        at(400) { demoGotoTab(1) }
+        at(400) { demoMoveTo(cmdTargetInput) }
+        at(900) { cmdTargetInput.setText("!de00d0") }
+        at(700) { demoMoveTo(cmdTelemetryButton) }
+        at(1000) { cmdTelemetryButton.performClick() }
+        at(1800) { demoFakeTelemetryResponse() }
+        at(400) { demoBalloonText(getString(R.string.d2_cmd)) }
+        at(hold(R.string.d2_cmd)) { demoBalloonHide() }
+        at(200) { demoCloseDialog() }
+
+        // 6. NavaTastic CLI (tab 3): remote repeater control, the flagship
+        at(400) { demoGotoTab(3) }
+        at(400) { demoMoveTo(navaTargetInput) }
+        at(900) { navaTargetInput.setText("!de00d0") }
+        at(400) { demoBalloonText(getString(R.string.d2_nava1)) }
+        at(300) { demoMoveTo(navaCategorySpinner) }
+        at(1000) { navaCategorySpinner.setSelection(2) }
+        at(600) { demoMoveTo(navaCommandSpinner) }
+        at(1000) { navaCommandSpinner.setSelection(1) }
+        at(400) { demoBalloonHide() }
+        at(200) { demoBalloonText(getString(R.string.d2_nava2)) }
+        at(600) { demoMoveTo(navaArgInput) }
+        at(900) { navaArgInput.setText("a11ce0") }
+        at(700) { demoMoveTo(navaSendButton) }
+        at(1000) { navaSendButton.performClick() }
+        at(400) { demoBalloonHide() }
+        at(200) { demoCloseDialog() }
+        at(600) {
+            addNavaMsg(0xDE00D0L.toInt(), "PONG: de00d0 | SNR: 12.3 dB | Bat: 4109 mV | RUIDO: -103 dBm", sent = false, route = "dm")
+            demoBalloonText(getString(R.string.d2_pong))
+        }
+        at(hold(R.string.d2_pong)) { demoBalloonHide() }
+
+        // 7. Chat (tab 4): live messages + reply with delivery status
+        at(400) { demoGotoTab(4) }
+        at(400) { demoSeedChat() }
+        at(400) { demoBalloonText(getString(R.string.d2_chat)) }
+        at(500) { demoMoveTo(chatReplyInput) }
+        at(900) { chatReplyInput.setText("¡Favoritos desde el móvil!") }
+        at(700) { demoMoveTo(chatSendButton) }
+        at(1000) { chatSendButton.performClick() }
+        at(400) { demoBalloonHide() }
+        at(200) { demoCloseDialog() }
+
+        // 8. Log (tab 6): everything recorded
+        at(400) { demoGotoTab(6) }
+        at(500) { demoBalloonText(getString(R.string.d2_log)) }
+        at(3000) { demoBalloonHide() }
+
+        // 9. Finish
+        at(300) { demoBalloonText(getString(R.string.d2_end)) }
+        at(hold(R.string.d2_end)) { demoBalloonHide() }
+        at(200) { demoEnd() }
     }
 
     private fun demoEnd() {
@@ -1798,12 +1987,35 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 android.view.Gravity.BOTTOM
             ).apply { bottomMargin = dp(2) }
         }
+        val balloon = TextView(this).apply {
+            visibility = android.view.View.GONE
+            setPadding(dp(14), dp(10), dp(14), dp(10))
+            textSize = 17f
+            maxLines = 5
+            setTextColor(getColorAttr(com.google.android.material.R.attr.colorOnSurface))
+            background = android.graphics.drawable.GradientDrawable().apply {
+                cornerRadius = dp(14).toFloat()
+                setColor(withAlpha(getColorAttr(com.google.android.material.R.attr.colorSurface), 0.94f))
+                setStroke(dp(1), getColorAttr(com.google.android.material.R.attr.colorPrimary))
+            }
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                android.view.Gravity.BOTTOM
+            ).apply {
+                bottomMargin = dp(62)
+                leftMargin = dp(12)
+                rightMargin = dp(12)
+            }
+        }
         overlay.addView(pointer)
         overlay.addView(stopBtn)
         overlay.addView(progress)
+        overlay.addView(balloon)
         demoPointerOverlay = overlay
         demoPointer = pointer
         demoProgress = progress
+        demoBalloon = balloon
         decor.addView(
             overlay,
             FrameLayout.LayoutParams(
@@ -1919,6 +2131,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      * quick overview of what it is and how it improves on stock Meshtastic.
      */
     private fun showNavaTasticIntro() {
+        if (demoSuppressExplainers) return
         val textView = TextView(this).apply {
             text = getString(R.string.nava_intro_body)
             textSize = 14f
@@ -2147,6 +2360,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    private fun withAlpha(color: Int, alpha: Float): Int =
+        (color and 0x00FFFFFF) or ((alpha * 255).toInt() shl 24)
     private fun getColorAttr(attr: Int): Int {
         val ta = obtainStyledAttributes(intArrayOf(attr))
         val c = ta.getColor(0, 0)
@@ -2415,12 +2631,12 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      * Favorites are listed first.
      */
     private fun setupNodePickers() {
-        findViewById<TextInputLayout>(R.id.targetNodeInputLayout).setEndIconOnClickListener { showNodePicker(targetNodeInput) }
+        findViewById<TextInputLayout>(R.id.targetNodeInputLayout).setStartIconOnClickListener { showNodePicker(targetNodeInput) }
         findViewById<TextInputLayout>(R.id.favoriteInputLayout).setEndIconOnClickListener { showNodePicker(favoriteInput) }
         findViewById<TextInputLayout>(R.id.ignoredInputLayout).setEndIconOnClickListener { showNodePicker(ignoredInput) }
         findViewById<TextInputLayout>(R.id.removeNodeInputLayout).setEndIconOnClickListener { showNodePicker(removeNodeInput) }
-        findViewById<TextInputLayout>(R.id.cmdTargetInputLayout).setEndIconOnClickListener { showNodePicker(cmdTargetInput) }
-        findViewById<TextInputLayout>(R.id.bpTargetInputLayout).setEndIconOnClickListener { showNodePicker(bpTargetInput) }
+        findViewById<TextInputLayout>(R.id.cmdTargetInputLayout).setStartIconOnClickListener { showNodePicker(cmdTargetInput) }
+        findViewById<TextInputLayout>(R.id.bpTargetInputLayout).setStartIconOnClickListener { showNodePicker(bpTargetInput) }
 
         // Live name lookup: while typing a node ID manually, resolve it against
         // the NodeDB/cache and show the node name so the user cannot mistype.
@@ -2742,7 +2958,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun setupNavaTastic() {
         loadNavaHistory()
-        findViewById<TextInputLayout>(R.id.navaTargetLayout).setEndIconOnClickListener { showNodePicker(navaTargetInput) }
+        findViewById<TextInputLayout>(R.id.navaTargetLayout).setStartIconOnClickListener { showNodePicker(navaTargetInput) }
 
         navaCategories = listOf(
             NavaCat(getString(R.string.nava_cat_diag), listOf(
@@ -3545,6 +3761,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private fun maybeCaptureNavaMessage(packet: org.meshtastic.proto.MeshProtos.MeshPacket, text: String) {
         val onNavadmin = navadminChannelIndex >= 0 && packet.channel == navadminChannelIndex
         val fromTarget = navaTargetNode != -1 && packet.from == navaTargetNode && packet.to != -1
+        if (packet.from == navaTargetNode || onNavadmin) {
+            appendLog("NAVA rx: navadmin=$onNavadmin from=${packet.from} to=${packet.to} ch=${packet.channel} => ${text.take(48)}")
+        }
         if (onNavadmin || fromTarget) {
             val route = if (onNavadmin) "ch" else "dm"
             val now = System.currentTimeMillis()
@@ -6735,6 +6954,38 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun transportLabel(): String =
         getString(if (bleTransportActive) R.string.conn_transport_bt else R.string.conn_transport_usb)
+
+    /**
+     * Moves the top area (app header + status card) into the currently selected
+     * panel's scrollable content, so it scrolls away with the rest of the tab.
+     */
+    private fun attachHeaderToCurrentPanel() {
+        val containers = mapOf(
+            0 to (bpPanel.getChildAt(0) as? ViewGroup),
+            1 to (commandsPanel.getChildAt(0) as? ViewGroup),
+            2 to (adminPanel.getChildAt(0) as? ViewGroup),
+            3 to navaPanel,
+            4 to chatPanel,
+            5 to (nodesPanel.getChildAt(0) as? ViewGroup),
+            6 to (logPanel.getChildAt(0) as? ViewGroup),
+            7 to (debugPanel.getChildAt(0) as? ViewGroup)
+        )
+        val target = containers[bottomTabs.selectedTabPosition] ?: return
+        if (topArea.parent === target) return
+        (topArea.parent as? ViewGroup)?.removeView(topArea)
+        target.addView(topArea, 0)
+    }
+
+    /** One target node for the whole app: every target field mirrors the others. */
+    private fun syncTargetInputs(value: String) {
+        if (syncingTarget) return
+        syncingTarget = true
+        if (targetNodeInput.text?.toString() != value) targetNodeInput.setText(value)
+        if (cmdTargetInput.text?.toString() != value) cmdTargetInput.setText(value)
+        if (bpTargetInput.text?.toString() != value) bpTargetInput.setText(value)
+        if (navaTargetInput.text?.toString() != value) navaTargetInput.setText(value)
+        syncingTarget = false
+    }
 
     /**
      * Schedules the next auto-reconnect attempt. Only fires when a real

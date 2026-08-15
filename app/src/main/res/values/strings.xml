@@ -485,6 +485,20 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_manual_no_viewer">No PDF reader found. Install one to view the manual.</string>
     <string name="nava_manual_open_failed">Could not open the manual.</string>
     <string name="cmd_demo">Usage example (demo)</string>
+    <string name="cmd_demo2">Guided tour with balloons (demo 2)</string>
+    <string name="d2_connect">Connect your node via USB or Bluetooth. The whole mesh is managed from your phone.</string>
+    <string name="d2_nodes">The whole mesh as cards: battery, signal, hops, last heard. Favorites first.</string>
+    <string name="d2_popup">Tap a node: telemetry, position, traceroute… eleven possible actions.</string>
+    <string name="d2_admin">Administration without a computer: favorites, reboots and database cleanup.</string>
+    <string name="d2_bp">ETSI Good Practices in one tap: optimized hops and beacons, within legal limits.</string>
+    <string name="d2_preset">Radio presets: SFN Spain and the stock ones. Full setup in one tap.</string>
+    <string name="d2_cmd">Telemetry, position and traceroute with readable, translated responses.</string>
+    <string name="d2_nava1">NavaTastic CLI: control remote repeaters with end-to-end encrypted messages.</string>
+    <string name="d2_nava2">Safe commands: admins only, plus double confirmation for destructive ones.</string>
+    <string name="d2_pong">The repeater answers: signal, battery and channel noise.</string>
+    <string name="d2_chat">Per-channel chat with delivery status: in transit, delivered or failed.</string>
+    <string name="d2_log">Persistent log: every request and response, with timestamps.</string>
+    <string name="d2_end">MeshNavarra Utility: your mesh, your infrastructure. Free software, GPL-3.0.</string>
     <string name="demo_blocked_connected">Disconnect the real node before starting the demo.</string>    <string name="demo_stop">Stop demo</string>
     <string name="status_demo_connecting">Connecting to DEMO node...</string>
     <string name="status_demo_connected">Connected: DEMO node (simulation)</string>
