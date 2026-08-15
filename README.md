@@ -68,6 +68,17 @@ Ver [SECURITY.md](SECURITY.md) para la política de reportes.
 - Dentro de la app: Ayuda → manuales PDF (manual de la app, comandos NavaTastic, uso NavaTastic 4.2).
 - La referencia de comandos `/nava` vive en el [repo del firmware](https://github.com/EA2OY/NavaTastic).
 
+## 🌐 Ecosistema: MeshNavarra + NavaTastic (proyectos complementarios)
+
+Estos dos proyectos están diseñados para funcionar **en conjunto** y sacar el máximo partido uno del otro:
+
+- **[EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)** — el **firmware del repetidor**: nodo solar de infraestructura con control remoto /nava, seguridad PKI, avisos de sueño/batería y gestión remota de la flota.
+- **MeshNavarra Utility (esta app)** — la **herramienta de administración**: conexión USB OTG/BLE, diagnóstico y configuración del nodo, chat, y la pestaña **NavaTastic CLI** que cubre el catálogo completo de comandos /nava del firmware (diagnóstico por el canal Navadmin, control por DM PKI cifrado).
+
+**Uso recomendado**: instala el firmware NavaTastic en tus repetidores de infraestructura y administra toda la flota desde MeshNavarra Utility. Ninguno de los dos es necesario para el otro — la app también funciona con nodos Meshtastic estándar y el firmware sin la app se gestiona con la app oficial o la CLI — pero juntos ofrecen la experiencia completa.
+
+---
+
 ## Descargo de responsabilidad (Disclaimer)
 
 Esta es una aplicación **no oficial**, sin afiliación con el proyecto Meshtastic ni con el proyecto Navarrico. Se proporciona "tal cual", **sin garantía de ningún tipo**, expresa o implícita — consulte la [LICENSE](LICENSE) (GPL-3.0) completa. No nos hacemos responsables de daños directos, indirectos o consecuentes derivados de su uso. Una mala configuración del nodo (química de batería, umbrales de sueño, reset de fábrica) puede dejarlo inutilizado hasta recuperación física; úsala bajo tu propia responsabilidad.
@@ -147,6 +158,17 @@ See [SECURITY.md](SECURITY.md) for reporting guidelines.
 - [`Manual_app_MeshNavarra.md`](Manual_app_MeshNavarra.md) — full app manual (Spanish).
 - In-app: Help → PDF manuals (app manual, NavaTastic commands, NavaTastic usage 4.2).
 - NavaTastic `/nava` command reference lives in the [firmware repo](https://github.com/EA2OY/NavaTastic).
+
+## 🌐 Ecosystem: MeshNavarra + NavaTastic (complementary projects)
+
+These two projects are designed to work **together** and get the most out of each other:
+
+- **[EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)** — the **repeater firmware**: solar infrastructure node with remote `/nava` control, PKI security, sleep/battery announcements and fleet management.
+- **MeshNavarra Utility (this app)** — the **administration tool**: USB OTG/BLE connection, node diagnostics and configuration, chat, and the **NavaTastic CLI** tab covering the full `/nava` command catalog of the firmware (diagnostics over the Navadmin channel, control over encrypted PKI DMs).
+
+**Recommended usage**: install the NavaTastic firmware on your infrastructure repeaters and administer the whole fleet from MeshNavarra Utility. Neither project requires the other — the app also works with stock Meshtastic nodes, and the firmware can be managed with the official app or the CLI — but together they provide the full experience.
+
+---
 
 ## Disclaimer
 
