@@ -1,0 +1,51 @@
+# Play Store listing — MeshNavarra Utility
+
+## ES — Título (30 chars)
+MeshNavarra Utility
+
+## ES — Descripción corta (80 chars)
+Administra nodos Meshtastic y repetidores NavaTastic por USB y Bluetooth.
+
+## ES — Descripción completa (4000 chars)
+MeshNavarra Utility es una aplicación para gestionar tus nodos Meshtastic desde el móvil, por cable USB OTG o Bluetooth Low Energy. No es oficial y no está afiliada al proyecto Meshtastic.
+
+Qué puedes hacer:
+- Conectar el nodo por USB (cable OTG) o Bluetooth y descargar su base de datos de nodos.
+- Ver todos los nodos de la malla en tarjetas visuales (favoritos primero) con batería, señal, saltos y último contacto.
+- Administración: reiniciar, borrar la base de nodos (conservando favoritos), marcar favorito/ignorar, eliminar nodo y gestionar claves de administrador.
+- Comandos: telemetría, posición, traceroute, cambiar nombre del nodo, mensajes de texto.
+- Chat por canales con estado de entrega de cada mensaje.
+- Buenas prácticas ETSI: presets de radio (SFN España y los oficiales) aplicados con lectura-modificación-escritura segura y copias de respaldo.
+- NavaTastic CLI: control remoto de repetidores con el firmware NavaTastic/Navarrico mediante mensajes cifrados, con confirmación de seguridad para comandos destructivos.
+- Importar nodos por URL y conservar una caché propia.
+- Manual de usuario incluido en la aplicación, en español e inglés.
+
+Sin permisos de red, sin anuncios, sin analíticas. Software libre (GPL-3.0) con el código fuente disponible en GitHub.
+
+## EN — Title (30 chars)
+MeshNavarra Utility
+
+## EN — Short description (80 chars)
+Administer Meshtastic nodes and NavaTastic repeaters over USB and Bluetooth.
+
+## EN — Full description (4000 chars)
+MeshNavarra Utility lets you manage your Meshtastic nodes from your phone, over USB OTG or Bluetooth Low Energy. Unofficial app, not affiliated with the Meshtastic project.
+
+What you can do:
+- Connect the node over USB (OTG cable) or Bluetooth and download its node database.
+- Browse all mesh nodes as visual cards (favorites first) with battery, signal, hops and last-heard.
+- Administration: reboot, wipe the node database (keeping favorites), favorite/ignore, remove node and manage admin keys.
+- Commands: telemetry, position, traceroute, rename node, text messages.
+- Channel chat with per-message delivery status.
+- ETSI good practices: radio presets (SFN Spain and stock) applied with safe read-modify-write and backups.
+- NavaTastic CLI: remote control of repeaters running the NavaTastic/Navarrico firmware via encrypted messages, with a safety gate for destructive commands.
+- Import nodes by URL and keep your own node cache.
+- Built-in user manual, in Spanish and English.
+
+No network permissions, no ads, no analytics. Free software (GPL-3.0), source code on GitHub.
+
+## Categoría sugerida
+Tools / Communication (Comunicación)
+
+## Tags sugeridos
+meshtastic, lora, radio, mesh, navatastic
