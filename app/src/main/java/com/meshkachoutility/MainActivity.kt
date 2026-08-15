@@ -494,6 +494,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         showDisclaimerIfNeeded()
         loadNodeCache()
 
+        // Safety net: the startup reparent must also happen after the first
+        // layout pass, whatever order the early events fired in.
+        topArea.post { attachHeaderToCurrentPanel() }
+
         usbConnectionManager = UsbConnectionManager(this, this)
         bleConnectionManager = BleConnectionManager(this, this, onLog = { appendLog(it) })
 
@@ -1557,6 +1561,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     /** Debug tab is a developer-only tool: hidden unless explicitly enabled. */
     private fun debugTabEnabled(): Boolean =
         getSharedPreferences("meshkacho", MODE_PRIVATE).getBoolean("debug_tab_enabled", false)
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) attachHeaderToCurrentPanel()
+    }
 
     private fun setDebugTabEnabled(enabled: Boolean) {
         getSharedPreferences("meshkacho", MODE_PRIVATE).edit().putBoolean("debug_tab_enabled", enabled).apply()
@@ -7000,12 +7009,19 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      * panel's scrollable content, so it scrolls away with the rest of the tab.
      */
     private fun attachHeaderToCurrentPanel() {
+        if (bottomTabs.selectedTabPosition < 0) {
+            bottomTabs.getTabAt(0)?.select()
+            return
+        }
+        val navaControlsContent =
+            findViewById<ScrollView>(R.id.navaControlsScroll)?.getChildAt(0) as? ViewGroup
+        val chatContent = chatScroll.getChildAt(0) as? ViewGroup
         val containers = mapOf(
             0 to (bpPanel.getChildAt(0) as? ViewGroup),
             1 to (commandsPanel.getChildAt(0) as? ViewGroup),
             2 to (adminPanel.getChildAt(0) as? ViewGroup),
-            3 to navaPanel,
-            4 to chatPanel,
+            3 to navaControlsContent,
+            4 to chatContent,
             5 to (nodesPanel.getChildAt(0) as? ViewGroup),
             6 to (logPanel.getChildAt(0) as? ViewGroup),
             7 to (debugPanel.getChildAt(0) as? ViewGroup)
