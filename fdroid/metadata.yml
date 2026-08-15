@@ -1,30 +1,22 @@
-# F-Droid metadata — MeshNavarra Utility
-# Submit as a PR to https://github.com/f-droid/fdroiddata
-# (file: metadata/com.meshkachoutility.yml)
-
 Categories:
   - Connectivity
   - Science & Education
-
 License: GPL-3.0-or-later
-
 AuthorName: Tai Soluciones
 AuthorEmail: taisoluciones@gmail.com
 AuthorWebSite: https://github.com/EA2OY/MeshNavarra-Utility
-
 WebSite: https://github.com/EA2OY/MeshNavarra-Utility
 SourceCode: https://github.com/EA2OY/MeshNavarra-Utility
 IssueTracker: https://github.com/EA2OY/MeshNavarra-Utility/issues
 
 Name: MeshNavarra Utility
 AutoName: MeshNavarra Utility
-
 Summary: Administer Meshtastic and NavaTastic nodes over USB/BLE
 Description: |-
   MeshNavarra Utility is an unofficial Android tool to administer Meshtastic
   nodes over USB serial (OTG) and Bluetooth LE. It includes a NodeDB browser
   with favorites, read-modify-write "good practices" presets, one-tap radio
-  presets (SFN España / stock), a persistent chat by channel with delivery
+  presets (SFN Espa�a / stock), a persistent chat by channel with delivery
   status, an import-by-URL node cache, and the NavaTastic CLI: remote control
   of repeaters running the Navarrico/NavaTastic firmware (read-only via the
   Navadmin channel, control via PKI-encrypted DMs), with an inline safety
