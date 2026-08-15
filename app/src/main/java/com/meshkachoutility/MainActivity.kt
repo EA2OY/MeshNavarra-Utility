@@ -5151,6 +5151,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             .create()
         dialog.setOnDismissListener {
             stopBleScan()
+            stopBondPolling()
             unregisterBleBondReceiver()
             bleDialog = null
             pendingBondDevice = null
@@ -5180,7 +5181,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun renderBondedList() {
         val devices = bleConnectionManager.scan()
-        bleBondedAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, devices.map { it.name ?: it.address })
+        bleBondedAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, devices.map { it.name ?: it.address }.toMutableList())
         bleBondedList?.adapter = bleBondedAdapter
         resizeBleLists()
     }
@@ -5197,7 +5198,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     private fun startBleScan(btn: com.google.android.material.button.MaterialButton, progress: ProgressBar) {
         bleFoundDevices.clear()
-        bleFoundAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, emptyList())
+        bleFoundAdapter = ArrayAdapter(this, R.layout.nava_spinner_item, arrayListOf())
         bleFoundList?.adapter = bleFoundAdapter
         bleFoundHeader?.visibility = android.view.View.VISIBLE
         bleFoundContainer?.visibility = android.view.View.VISIBLE
@@ -5239,10 +5240,64 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         pendingBondDevice = device
         appendLog(getString(R.string.ble_bond_start, device.name ?: device.address))
         registerBleBondReceiver()
+        startBondPolling(device)
         if (!bleConnectionManager.createBond(device)) {
             appendLog(getString(R.string.ble_bond_failed))
             pendingBondDevice = null
+            stopBondPolling()
         }
+    }
+
+    /**
+     * Bond detection is belt-and-braces: the ACTION_BOND_STATE_CHANGED broadcast
+     * plus a poll of bondState (every 500 ms, 60 s deadline). Some vendors
+     * (Samsung/MIUI) deliver the broadcast late or never, so the poller is the
+     * reliable path; it also covers the case where the system dialog is still
+     * showing while the user enters the PIN.
+     */
+    private var bondPoller: Runnable? = null
+    private val bondPollHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var bondPollDeadline = 0L
+
+    private fun startBondPolling(device: android.bluetooth.BluetoothDevice) {
+        stopBondPolling()
+        bondPollDeadline = System.currentTimeMillis() + 60000L
+        val runnable = object : Runnable {
+            override fun run() {
+                val pending = pendingBondDevice ?: return
+                val state = try {
+                    pending.bondState
+                } catch (e: Exception) {
+                    android.bluetooth.BluetoothDevice.BOND_NONE
+                }
+                when {
+                    state == android.bluetooth.BluetoothDevice.BOND_BONDED -> onBleBonded(pending)
+                    System.currentTimeMillis() > bondPollDeadline -> onBleBondFailed(pending)
+                    else -> bondPollHandler.postDelayed(this, 500)
+                }
+            }
+        }
+        bondPoller = runnable
+        bondPollHandler.postDelayed(runnable, 500)
+    }
+
+    private fun stopBondPolling() {
+        bondPoller?.let { bondPollHandler.removeCallbacks(it) }
+        bondPoller = null
+    }
+
+    private fun onBleBonded(device: android.bluetooth.BluetoothDevice) {
+        appendLog(getString(R.string.ble_bond_ok, device.name ?: device.address))
+        stopBondPolling()
+        pendingBondDevice = null
+        renderBondedList()
+        connectToBleDevice(device)
+    }
+
+    private fun onBleBondFailed(device: android.bluetooth.BluetoothDevice) {
+        appendLog(getString(R.string.ble_bond_failed))
+        stopBondPolling()
+        pendingBondDevice = null
     }
 
     private fun registerBleBondReceiver() {
@@ -5260,16 +5315,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 val pending = pendingBondDevice
                 if (pending == null || device.address != pending.address) return
                 when (state) {
-                    android.bluetooth.BluetoothDevice.BOND_BONDED -> {
-                        appendLog(getString(R.string.ble_bond_ok, device.name ?: device.address))
-                        pendingBondDevice = null
-                        renderBondedList()
-                        connectToBleDevice(device)
-                    }
-                    android.bluetooth.BluetoothDevice.BOND_NONE -> {
-                        appendLog(getString(R.string.ble_bond_failed))
-                        pendingBondDevice = null
-                    }
+                    android.bluetooth.BluetoothDevice.BOND_BONDED -> onBleBonded(device)
+                    android.bluetooth.BluetoothDevice.BOND_NONE -> onBleBondFailed(device)
                 }
             }
         }
