@@ -496,7 +496,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
         // Safety net: the startup reparent must also happen after the first
         // layout pass, whatever order the early events fired in.
-        topArea.post { attachHeaderToCurrentPanel() }
+        topArea.post {
+            if (bottomTabs.selectedTabPosition >= 0) {
+                applyTabVisibility(bottomTabs.selectedTabPosition)
+            }
+        }
 
         usbConnectionManager = UsbConnectionManager(this, this)
         bleConnectionManager = BleConnectionManager(this, this, onLog = { appendLog(it) })
@@ -1528,14 +1532,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         if (debugTabEnabled()) bottomTabs.addTab(bottomTabs.newTab().setText(R.string.tab_debug))
         val listener = object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                bpPanel.visibility = if (tab.position == 0) android.view.View.VISIBLE else android.view.View.GONE
-                commandsPanel.visibility = if (tab.position == 1) android.view.View.VISIBLE else android.view.View.GONE
-                adminPanel.visibility = if (tab.position == 2) android.view.View.VISIBLE else android.view.View.GONE
-                navaPanel.visibility = if (tab.position == 3) android.view.View.VISIBLE else android.view.View.GONE
-                chatPanel.visibility = if (tab.position == 4) android.view.View.VISIBLE else android.view.View.GONE
-                nodesPanel.visibility = if (tab.position == 5) android.view.View.VISIBLE else android.view.View.GONE
-                logPanel.visibility = if (tab.position == 6) android.view.View.VISIBLE else android.view.View.GONE
-                debugPanel.visibility = if (tab.position == 7) android.view.View.VISIBLE else android.view.View.GONE
+                applyTabVisibility(tab.position)
                 when (tab.position) {
                     3 -> {
                         refreshNava()
@@ -1545,13 +1542,12 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     5 -> refreshNodesList()
                     6 -> refreshLogTab()
                 }
-                attachHeaderToCurrentPanel()
                 showTabExplainer(tab.position)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
             override fun onTabReselected(tab: TabLayout.Tab) {
-                attachHeaderToCurrentPanel()
+                applyTabVisibility(tab.position)
             }
         }
         tabListener = listener
@@ -1564,7 +1560,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) attachHeaderToCurrentPanel()
+        if (hasFocus && bottomTabs.selectedTabPosition >= 0) {
+            applyTabVisibility(bottomTabs.selectedTabPosition)
+        }
     }
 
     private fun setDebugTabEnabled(enabled: Boolean) {
@@ -7008,8 +7006,22 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      * Moves the top area (app header + status card) into the currently selected
      * panel's scrollable content, so it scrolls away with the rest of the tab.
      */
+    private fun applyTabVisibility(pos: Int) {
+        bpPanel.visibility = if (pos == 0) android.view.View.VISIBLE else android.view.View.GONE
+        commandsPanel.visibility = if (pos == 1) android.view.View.VISIBLE else android.view.View.GONE
+        adminPanel.visibility = if (pos == 2) android.view.View.VISIBLE else android.view.View.GONE
+        navaPanel.visibility = if (pos == 3) android.view.View.VISIBLE else android.view.View.GONE
+        chatPanel.visibility = if (pos == 4) android.view.View.VISIBLE else android.view.View.GONE
+        nodesPanel.visibility = if (pos == 5) android.view.View.VISIBLE else android.view.View.GONE
+        logPanel.visibility = if (pos == 6) android.view.View.VISIBLE else android.view.View.GONE
+        debugPanel.visibility = if (pos == 7) android.view.View.VISIBLE else android.view.View.GONE
+        attachHeaderToCurrentPanel()
+    }
+
     private fun attachHeaderToCurrentPanel() {
-        if (bottomTabs.selectedTabPosition < 0) {
+        val pos = bottomTabs.selectedTabPosition
+        if (pos < 0) {
+            appendLog("HEADER: pos<0 -> select(0)")
             bottomTabs.getTabAt(0)?.select()
             return
         }
@@ -7026,10 +7038,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             6 to (logPanel.getChildAt(0) as? ViewGroup),
             7 to (debugPanel.getChildAt(0) as? ViewGroup)
         )
-        val target = containers[bottomTabs.selectedTabPosition] ?: return
+        val target = containers[pos] ?: return
         if (topArea.parent === target) return
         (topArea.parent as? ViewGroup)?.removeView(topArea)
         target.addView(topArea, 0)
+        appendLog("HEADER: pos=$pos -> ${target.javaClass.simpleName} (panelVisible=${(target.parent as? android.view.View)?.visibility})")
     }
 
     /** One target node for the whole app: every target field mirrors the others. */
