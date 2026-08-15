@@ -1,0 +1,28 @@
+# Gradle / Android
+.gradle/
+build/
+app/build/
+.kotlin/
+local.properties
+*.iml
+.idea/
+
+# Local toolchains / binaries
+jdk-17/
+*.apk
+*.aab
+
+# Session artifacts (never push: may contain node keys / personal data)
+testplan/
+Cerebro_MeshKachoUtility/
+snap-*.zip
+*.bak-*
+allcode.md
+auditoria_*.zip
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store

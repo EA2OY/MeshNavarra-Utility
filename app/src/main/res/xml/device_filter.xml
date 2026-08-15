@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 Tai Soluciones - taisoluciones@gmail.com -->
+<resources>
+    <!-- Silicon Labs CP210x (Vendor ID: 0x10C4 = 4292) -->
+    <usb-device vendor-id="4292" />
+
+    <!-- WCH CH340, CH341, CH9102 (Vendor ID: 0x1A86 = 6790) -->
+    <usb-device vendor-id="6790" />
+
+    <!-- FTDI (Vendor ID: 0x0403 = 1027) -->
+    <usb-device vendor-id="1027" />
+</resources>
