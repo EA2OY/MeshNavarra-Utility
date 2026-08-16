@@ -5,6 +5,7 @@
 [![Licencia: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Android: 8.0+](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://developer.android.com/studio)
 [![Lenguaje: Kotlin](https://img.shields.io/badge/Kotlin-2.1-purple.svg)](https://kotlinlang.org)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Apoyar%20el%20proyecto-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/ea2oy)
 
 Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por USB OTG y Bluetooth LE — con una pestaña estrella de **control remoto NavaTastic CLI** para repetidores con el firmware Navarrico/NavaTastic (repo hermano: [EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)).
 
@@ -79,6 +80,12 @@ Estos dos proyectos están diseñados para funcionar **en conjunto** y sacar el 
 
 **Uso recomendado**: instala el firmware NavaTastic en tus repetidores de infraestructura y administra toda la flota desde MeshNavarra Utility. Ninguno de los dos es necesario para el otro — la app también funciona con nodos Meshtastic estándar y el firmware sin la app se gestiona con la app oficial o la CLI — pero juntos ofrecen la experiencia completa.
 
+## ☕ Apoyar el proyecto
+
+Si MeshNavarra Utility te resulta útil para gestionar tus nodos y repetidores, puedes apoyar el desarrollo y mantenimiento continuo invitándome a un café:
+
+[![Apoyar en Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ea2oy)
+
 ---
 
 ## Descargo de responsabilidad (Disclaimer)
@@ -97,7 +104,8 @@ Contacto: taisoluciones@gmail.com
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Android: 8.0+](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://developer.android.com/studio)
-[![Language: Kotlin](https://img.shields.io/badge/Kotlin-2.1-purple.svg)](https://kotlinlang.org)
+[![Language: Kotlin](https://img.shields.io/badge/Language-Kotlin%202.1-purple.svg)](https://kotlinlang.org)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20the%20project-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/ea2oy)
 
 Unofficial Android app to administer **Meshtastic** nodes — USB serial and Bluetooth LE — with a flagship **NavaTastic CLI** remote-control tab for repeaters running the Navarrico/NavaTastic firmware (see the companion repo [EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)).
 
@@ -169,6 +177,12 @@ These two projects are designed to work **together** and get the most out of eac
 - **MeshNavarra Utility (this app)** — the **administration tool**: USB OTG/BLE connection, node diagnostics and configuration, chat, and the **NavaTastic CLI** tab covering the full `/nava` command catalog of the firmware (diagnostics over the Navadmin channel, control over encrypted PKI DMs).
 
 **Recommended usage**: install the NavaTastic firmware on your infrastructure repeaters and administer the whole fleet from MeshNavarra Utility. Neither project requires the other — the app also works with stock Meshtastic nodes, and the firmware can be managed with the official app or the CLI — but together they provide the full experience.
+
+## ☕ Support the project
+
+If MeshNavarra Utility helps you manage your nodes and repeaters, you can support ongoing development and maintenance by buying me a coffee:
+
+[![Support on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ea2oy)
 
 ---
 
