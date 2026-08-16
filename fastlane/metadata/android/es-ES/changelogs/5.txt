@@ -1,0 +1,1 @@
+- Corregidos caracteres mojibake en las tarjetas y el popup de nodos (emojis de batería, nombre, llave, roles y hardware)

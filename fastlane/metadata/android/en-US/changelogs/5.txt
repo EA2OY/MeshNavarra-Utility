@@ -1,0 +1,1 @@
+- Fixed mojibake characters in the node cards and node popup (battery, name, key, role and hardware emojis)
