@@ -2382,7 +2382,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         col.addView(id)
 
         val details = buildString {
-            append("ðŸ”‹ ")
+            append("\uD83D\uDD0B ")
             append(if (entry.battery in 1..100) "${entry.battery}%" else "—")
             append("  ⚡")
             append(if (entry.voltage > 0) String.format(Locale.US, "%.2fV", entry.voltage) else "—")
@@ -6708,7 +6708,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val bat = when {
             dm == null || !dm.hasBatteryLevel() -> getString(R.string.log_telemetry_na)
             dm.batteryLevel == 0 || dm.batteryLevel > 100 -> getString(R.string.node_popup_powered)
-            else -> "ðŸ”‹ ${dm.batteryLevel}%"
+            else -> "\uD83D\uDD0B ${dm.batteryLevel}%"
         }
         val volt = dm?.takeIf { it.hasVoltage() }?.let { String.format(Locale.US, "%.2f V", it.voltage) } ?: getString(R.string.log_telemetry_na)
         val snr = entry?.let { String.format(Locale.US, "%.1f dB", it.snr) } ?: getString(R.string.log_telemetry_na)
@@ -6724,32 +6724,32 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val airUtil = dm?.takeIf { it.hasAirUtilTx() }?.let { String.format(Locale.US, "%.2f%%", it.airUtilTx) } ?: ""
         return buildString {
             append("$roleEmoji $role$star\n")
-            append("ðŸ“› $name\n")
+            append("\uD83D\uDCDB $name\n")
             if (aka.isNotEmpty()) append("🔔 $aka · $id\n")
-            if (hw.isNotEmpty()) append("ðŸ”§ $hw $hwEmoji\n")
+            if (hw.isNotEmpty()) append("\uD83D\uDD27 $hw $hwEmoji\n")
             append("📍 $lat, $lon · $alt\n")
             append("$bat · $volt\n")
             append("📶 SNR $snr · 🎯 $hops saltos\n")
             append("🕐 último: $since\n")
-            append("ðŸ— $pubkey\n")
+            append("\uD83D\uDDDD $pubkey\n")
             if (chUtil.isNotEmpty()) append("📡 canal $chUtil · TX $airUtil\n")
         }
     }
 
     private fun nodeRoleEmoji(role: String): String = when {
         role.contains("ROUTER") -> "📡"
-        role.contains("REPEATER") -> "ðŸ”"
-        role.contains("CLIENT_MUTE") -> "ðŸ”‡"
-        role.contains("CLIENT") -> "ðŸ“±"
-        role.contains("SENSOR") -> "ðŸŒ¡"
-        else -> "ðŸ”˜"
+        role.contains("REPEATER") -> "\uD83D\uDD01"
+        role.contains("CLIENT_MUTE") -> "\uD83D\uDD07"
+        role.contains("CLIENT") -> "\uD83D\uDCF1"
+        role.contains("SENSOR") -> "\uD83C\uDF21"
+        else -> "\uD83D\uDD18"
     }
 
     private fun nodeHwEmoji(hw: String): String = when {
-        hw.contains("NRF52") -> "ðŸ§ "
+        hw.contains("NRF52") -> "\uD83E\uDDE0"
         hw.contains("ESP32") -> "🖥"
-        hw.contains("HELTEC") -> "ðŸ›°"
-        hw.contains("TBEAM") || hw.contains("RAK") -> "ðŸŒ"
+        hw.contains("HELTEC") -> "\uD83D\uDEF0"
+        hw.contains("TBEAM") || hw.contains("RAK") -> "\uD83C\uDF10"
         hw.contains("SOLAR") -> "☀"
         else -> ""
     }
