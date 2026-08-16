@@ -3052,7 +3052,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("db_purge", "db_purge", "none", "dm", getString(R.string.nava_desc_db_purge), warn = getString(R.string.nava_warn_db_purge)),
                 NavaCmd("db_clear", "db_clear", "none", "dm", getString(R.string.nava_desc_db_clear), warn = getString(R.string.nava_warn_db_clear)),
                 NavaCmd("reboot", "reboot", "none", "dm", getString(R.string.nava_desc_reboot)),
-                NavaCmd("factory_reset", "factory_reset", "none", "dm", getString(R.string.nava_desc_factory_reset), warn = getString(R.string.nava_warn_factory_reset))
+                NavaCmd("factory_reset", "factory_reset", "none", "dm", getString(R.string.nava_desc_factory_reset), warn = getString(R.string.nava_warn_factory_reset)),
+                NavaCmd("full_reset", "full_reset", "none", "dm", getString(R.string.nava_desc_full_reset), warn = getString(R.string.nava_warn_full_reset)),
+                NavaCmd("wipe", "wipe", "none", "dm", getString(R.string.nava_desc_wipe), warn = getString(R.string.nava_warn_wipe))
             )),
             NavaCat(getString(R.string.nava_cat_power), listOf(
                 NavaCmd("set_chem", "set_chem", "select", "dm", getString(R.string.nava_desc_set_chem), listOf("lipo", "nimh", "sodium", "lifepo4"), warn = getString(R.string.nava_warn_set_chem)),
@@ -3061,9 +3063,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("storm", "storm", "number", "dm", getString(R.string.nava_desc_storm), warn = getString(R.string.nava_warn_storm)),
                 NavaCmd("storm test1", "storm test1", "none", "dm", getString(R.string.nava_desc_storm_test1), warn = getString(R.string.nava_warn_storm_test1)),
                 NavaCmd("storm test2", "storm test2", "none", "dm", getString(R.string.nava_desc_storm_test2), warn = getString(R.string.nava_warn_storm_test2)),
-                NavaCmd("txoff", "txoff", "none", "dm", getString(R.string.nava_desc_txoff)),
+                NavaCmd("txoff", "txoff", "none", "dm", getString(R.string.nava_desc_txoff), warn = getString(R.string.nava_warn_txoff)),
                 NavaCmd("txon", "txon", "none", "dm", getString(R.string.nava_desc_txon)),
-                NavaCmd("ble", "ble", "onoff", "dm", getString(R.string.nava_desc_ble)),
+                NavaCmd("ble", "ble", "onoff", "dm", getString(R.string.nava_desc_ble), warn = getString(R.string.nava_warn_ble)),
                 NavaCmd("sleepmsg", "sleepmsg", "onoff", "dm", getString(R.string.nava_desc_sleepmsg))
             )),
             NavaCat(getString(R.string.nava_cat_tx), listOf(
@@ -3075,7 +3077,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             )),
             NavaCat(getString(R.string.nava_cat_util), listOf(
                 NavaCmd("bell", "bell", "none", "dm", getString(R.string.nava_desc_bell)),
-                NavaCmd("admin_ls", "admin_ls", "none", "dm", getString(R.string.nava_desc_admin_ls))
+                NavaCmd("admin_ls", "admin_ls", "none", "dm", getString(R.string.nava_desc_admin_ls)),
+                NavaCmd("keys_ls", "keys_ls", "none", "dm", getString(R.string.nava_desc_keys_ls)),
+                NavaCmd("keys_clear", "keys_clear", "none", "dm", getString(R.string.nava_desc_keys_clear), warn = getString(R.string.nava_warn_keys_clear))
             ))
         )
 

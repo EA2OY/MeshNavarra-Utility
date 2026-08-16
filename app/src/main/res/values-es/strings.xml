@@ -555,18 +555,22 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_fav_auto">Auto-favoritiza routers directos (bypass de saltos) y los registra en RAM. Activado por defecto. Uso: fav auto [on|off] (sin argumento muestra el estado).</string>
     <string name="nava_query_blank">— Consultar —</string>
     <string name="nava_desc_set_name">Cambia el nombre (admite comillas). Uso: set_name "Largo" "Corto"</string>
-    <string name="nava_desc_set_role">Cambia el rol de hardware. Opciones: client, mute, router.</string>
+    <string name="nava_desc_set_role">Cambia el rol de hardware (client/mute/router). SEMI-PERMANENTE: se guarda en /resilience.bin y sobrevive al factory reset; solo nrf erase restaura el rol del perfil.</string>
     <string name="nava_desc_set_mqtt">Activa/desactiva MQTT. Opciones: on, off.</string>
     <string name="nava_desc_set_tz">Zona horaria POSIX. Uso: set_tz "&lt;tz&gt;"</string>
     <string name="nava_desc_set_hops">Límite de saltos LoRa [1-7].</string>
     <string name="nava_desc_set_txpower">Potencia TX [0-12] (Promicro/E22P). En la Faketec HT-RA62 es [0-22].</string>
     <string name="nava_desc_db_purge">Expulsa nodos temporales conservando favoritos y admins.</string>
     <string name="nava_warn_db_purge">Vaciarás los nodos temporales aprendidos (se re-aprenderán con el tráfico). Favoritos y admins se conservan.</string>
-    <string name="nava_desc_db_clear">Vacía la base de nodos. Reenviar un comando PKI para re-acreditar admin.</string>
+    <string name="nava_desc_db_clear">Vacía la base de nodos (nuclear). Borra también TU entrada del repetidor: fuerza tu propio NodeInfo (broadcast, NO DM) antes de volver a mandar /nava.</string>
     <string name="nava_warn_db_clear">Vacía TODA la base de nodos del repetidor: perderás rutas y contactos aprendidos. Tendrás que re-acreditar admin reenviando un comando PKI. Irreversible.</string>
     <string name="nava_desc_reboot">Reinicio diferido a 3s (el ACK sale antes).</string>
-    <string name="nava_desc_factory_reset">Reset de fábrica de emergencia restaurando canales de rescate.</string>
+    <string name="nava_desc_factory_reset">Reset de fábrica de emergencia restaurando canales de rescate. Regenera el par PKI (los peers fallan DM hasta re-aprender). Tus claves admin sobreviven (F20).</string>
     <string name="nava_warn_factory_reset">Reseteo de fábrica: borra TODA la configuración y restaura canales de rescate. El repetidor dejará de atender NavaTastic hasta reconfigurarlo por red de rescate o físicamente. Irreversible.</string>
+    <string name="nava_desc_full_reset">Reset completo: configuración + semi-persistentes a defaults CONSERVANDO el par PKI, los bonds BLE y tus claves admin. Revert remoto sin PC y sin romper la malla.</string>
+    <string name="nava_warn_full_reset">Reset completo: restaura configuración y /resilience.bin a defaults. Conserva par PKI, bonds BLE y claves admin. Rol y ajustes de energía vuelven a los defaults del perfil.</string>
+    <string name="nava_desc_wipe">Purga de compromiso: erase total + par PKI NUEVO + bonds BLE y claves admin persistidas borradas (queda solo la del proyecto — rescate garantizado). Equivalente remoto de nrf erase.</string>
+    <string name="nava_warn_wipe">WIPE: borrado total con par PKI NUEVO. Los peers fallarán el DM PKI hasta re-aprender la clave nueva. Solo queda la clave de rescate del proyecto. No hay vuelta atrás remota.</string>
     <string name="nava_desc_set_chem">Cambia química de batería y ajusta corte/OCV/LPCOMP. Persiste en /resilience.bin. Cortes: lipo 3500, nimh 3400, sodium 2600, lifepo4 2800.</string>
     <string name="nava_warn_set_chem">Cambia la química de la batería: modifica el voltaje de corte, la curva OCV y el disparo de apagado. Elegir mal la química puede agotar o dañar la batería y dejar el nodo inoperativo hasta reajustarlo físicamente.</string>
     <string name="nava_desc_set_vbat">Corte de apagado por batería en mV [2400-3600].</string>
@@ -580,8 +584,10 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_storm_test2">Prueba rápida de modo tormenta: 120 segundos.</string>
     <string name="nava_warn_storm_test2">El modo tormenta apaga la radio y hiberna el nodo 120 segundos. Si el temporizador falla, el nodo queda dormido hasta intervención física.</string>
     <string name="nava_desc_txoff">Apaga TX tras 3s (mantiene RX).</string>
+    <string name="nava_warn_txoff">El TX apagado persiste en el nodo; rollback SOLO con nrf erase.</string>
     <string name="nava_desc_txon">Reactiva TX.</string>
     <string name="nava_desc_ble">Apaga/enciende Bluetooth; programa reinicio real (se lee al boot).</string>
+    <string name="nava_warn_ble">BLE on/off persiste en el nodo y programa un reinicio; rollback SOLO con nrf erase.</string>
     <string name="nava_desc_sleepmsg">Activa/desactiva los avisos de sueño/despertar ([Sueño]/[Vivo]/[Listo]/[Boot]) por el canal Navadmin. Persiste en /resilience.bin. Sin argumento muestra el estado actual.</string>
     <string name="nava_desc_msg">Difunde mensaje en Canal 0 firmado por el repetidor. Uso: msg "texto"</string>
     <string name="nava_desc_pos">Fuerza emisión de posición.</string>
@@ -590,4 +596,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_power">Métricas del sensor de potencia I2C (INA219/260): V, mA, mW.</string>
     <string name="nava_desc_bell">Alarma acústica para localización.</string>
     <string name="nava_desc_admin_ls">Muestra las 3 claves criptográficas de admin en base64.</string>
+    <string name="nava_desc_keys_ls">Lista las claves admin PERSISTIDAS en /resilience.bin (las que volverán tras un factory/full reset).</string>
+    <string name="nava_desc_keys_clear">Borra SOLO la copia persistida de las claves admin (la configuración actual no se toca y no reinicia). Después, el próximo factory/full reset dejará solo la clave del proyecto.</string>
+    <string name="nava_warn_keys_clear">keys_clear: borrar la copia persistida de claves admin es permanente. Quitar una clave en la app NO la purga del nodo — reaparece tras el próximo reset. Este comando borra TODAS las copias persistidas.</string>
 </resources>

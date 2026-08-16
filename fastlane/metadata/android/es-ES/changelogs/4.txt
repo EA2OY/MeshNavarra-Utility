@@ -1,0 +1,4 @@
+- Catálogo NavaTastic sincronizado con Eclipse V3 (4.3.2): nuevos comandos full_reset, wipe, keys_ls y keys_clear
+- Compuerta CONFIRMAR añadida a ble y txoff (ajustes persistentes, rollback solo con nrf erase)
+- Descripciones de comandos actualizadas (factory_reset/db_clear/set_role)
+- Manuales NavaTastic embebidos actualizados a Eclipse V3

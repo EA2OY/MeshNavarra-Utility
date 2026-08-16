@@ -555,18 +555,22 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_fav_auto">Auto-favorites direct routers (hop bypass) and registers them in RAM. Default ON. Usage: fav auto [on|off] (no argument shows the state).</string>
     <string name="nava_query_blank">— Query —</string>
     <string name="nava_desc_set_name">Changes the name (supports quotes). Usage: set_name "Long" "Short"</string>
-    <string name="nava_desc_set_role">Changes the hardware role. Options: client, mute, router.</string>
+    <string name="nava_desc_set_role">Changes the hardware role (client/mute/router). SEMI-PERMANENT: saved in /resilience.bin and survives factory reset; only nrf erase restores the profile role.</string>
     <string name="nava_desc_set_mqtt">Turns MQTT on/off. Options: on, off.</string>
     <string name="nava_desc_set_tz">POSIX time zone. Usage: set_tz "&lt;tz&gt;"</string>
     <string name="nava_desc_set_hops">LoRa hop limit [1-7].</string>
     <string name="nava_desc_set_txpower">TX power [0-12] (Promicro/E22P). On the Faketec HT-RA62 it is [0-22].</string>
     <string name="nava_desc_db_purge">Evicts temporary nodes keeping favorites and admins.</string>
     <string name="nava_warn_db_purge">You will clear the learned temporary nodes (they re-learn with traffic). Favorites and admins are kept.</string>
-    <string name="nava_desc_db_clear">Empties the node database. Resend a PKI command to re-accredit admin.</string>
+    <string name="nava_desc_db_clear">Empties the node database (nuclear). It also removes YOUR entry from the repeater: force your own NodeInfo (broadcast, NOT DM) before sending any /nava again.</string>
     <string name="nava_warn_db_clear">Empties the ENTIRE repeater node database: you lose learned routes and contacts. You must re-accredit admin by resending a PKI command. Irreversible.</string>
     <string name="nava_desc_reboot">Delayed reboot in 3 s (the ACK goes out first).</string>
-    <string name="nava_desc_factory_reset">Emergency factory reset restoring rescue channels.</string>
+    <string name="nava_desc_factory_reset">Emergency factory reset restoring rescue channels. Regenerates the PKI keypair (peers fail DM until they re-learn). Your admin keys survive (F20).</string>
     <string name="nava_warn_factory_reset">Factory reset: wipes ALL configuration and restores rescue channels. The repeater will stop serving NavaTastic until reconfigured via the rescue network or physically. Irreversible.</string>
+    <string name="nava_desc_full_reset">Full reset: configuration + semi-persistent settings back to defaults, KEEPING the PKI keypair, BLE bonds and your admin keys. Remote revert without a PC and without breaking the mesh.</string>
+    <string name="nava_warn_full_reset">Full reset: restores configuration and /resilience.bin to defaults. Keeps PKI keypair, BLE bonds and admin keys. Role and energy settings return to profile defaults.</string>
+    <string name="nava_desc_wipe">Compromise purge: total erase + NEW PKI keypair + BLE bonds and persisted admin keys deleted (only the project rescue key remains). Remote equivalent of nrf erase.</string>
+    <string name="nava_warn_wipe">WIPE: total erase with a NEW PKI keypair. Peers will fail PKI DM until they re-learn the new key. Only the project rescue key remains. There is no remote undo.</string>
     <string name="nava_desc_set_chem">Changes battery chemistry and adjusts cutoff/OCV/LPCOMP. Persists in /resilience.bin. Cutoffs: lipo 3500, nimh 3400, sodium 2600, lifepo4 2800.</string>
     <string name="nava_warn_set_chem">Changes battery chemistry: modifies the cutoff voltage, OCV curve and power-off trigger. A wrong chemistry can drain or damage the battery and leave the node unusable until physically adjusted.</string>
     <string name="nava_desc_set_vbat">Battery power-off cutoff in mV [2400-3600].</string>
@@ -580,8 +584,10 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_storm_test2">Quick storm mode test: 120 seconds.</string>
     <string name="nava_warn_storm_test2">Storm mode switches the radio off and hibernates the node for 120 seconds. If the timer fails, the node stays asleep until physical intervention.</string>
     <string name="nava_desc_txoff">Turns TX off after 3 s (keeps RX).</string>
+    <string name="nava_warn_txoff">TX off persists in the node; rollback ONLY with nrf erase.</string>
     <string name="nava_desc_txon">Re-enables TX.</string>
     <string name="nava_desc_ble">Turns Bluetooth off/on; schedules a real reboot (read at boot).</string>
+    <string name="nava_warn_ble">BLE on/off persists in the node and schedules a reboot; rollback ONLY with nrf erase.</string>
     <string name="nava_desc_sleepmsg">Turns sleep/wake announcements ([Sueño]/[Vivo]/[Listo]/[Boot]) on the Navadmin channel on/off. Persists in /resilience.bin. No argument shows the current state.</string>
     <string name="nava_desc_msg">Broadcasts a message on channel 0 signed by the repeater. Usage: msg "text"</string>
     <string name="nava_desc_pos">Forces a position transmission.</string>
@@ -590,4 +596,7 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_power">I2C power sensor metrics (INA219/260): V, mA, mW.</string>
     <string name="nava_desc_bell">Acoustic alarm for locating.</string>
     <string name="nava_desc_admin_ls">Shows the 3 admin crypto keys in base64.</string>
+    <string name="nava_desc_keys_ls">Lists the admin keys PERSISTED in /resilience.bin (the ones that come back after a factory/full reset).</string>
+    <string name="nava_desc_keys_clear">Erases ONLY the persisted copy of the admin keys (current config and keys are untouched; no reboot). After this, the next factory/full reset leaves only the project key.</string>
+    <string name="nava_warn_keys_clear">keys_clear: deleting the persisted admin-key copy is permanent. Removing a key in the app does NOT purge it from the node — it returns after the next reset. This command deletes ALL persisted copies.</string>
 </resources>

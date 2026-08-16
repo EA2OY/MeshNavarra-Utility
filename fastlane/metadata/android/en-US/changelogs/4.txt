@@ -1,0 +1,4 @@
+- NavaTastic catalog synced to Eclipse V3 (4.3.2): new full_reset, wipe, keys_ls and keys_clear commands
+- CONFIRMAR gate added to ble and txoff (persistent settings, nrf-erase-only rollback)
+- Updated command descriptions (factory_reset/db_clear/set_role)
+- Bundled NavaTastic manuals updated to Eclipse V3
