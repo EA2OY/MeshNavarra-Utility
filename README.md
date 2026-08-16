@@ -1,5 +1,7 @@
 # MeshNavarra Utility
 
+![MeshNavarra Utility — cabecera](logo_meshnavarra_github.jpg)
+
 [![Licencia: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Android: 8.0+](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://developer.android.com/studio)
 [![Lenguaje: Kotlin](https://img.shields.io/badge/Kotlin-2.1-purple.svg)](https://kotlinlang.org)
