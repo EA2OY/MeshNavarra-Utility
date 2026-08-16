@@ -9,23 +9,6 @@ WebSite: https://github.com/EA2OY/MeshNavarra-Utility
 SourceCode: https://github.com/EA2OY/MeshNavarra-Utility
 IssueTracker: https://github.com/EA2OY/MeshNavarra-Utility/issues
 
-Name: MeshNavarra Utility
-AutoName: MeshNavarra Utility
-Summary: Administer Meshtastic and NavaTastic nodes over USB/BLE
-Description: |-
-  MeshNavarra Utility is an unofficial Android tool to administer Meshtastic
-  nodes over USB serial (OTG) and Bluetooth LE. It includes a NodeDB browser
-  with favorites, read-modify-write "good practices" presets, one-tap radio
-  presets (SFN España / stock), a persistent chat by channel with delivery
-  status, an import-by-URL node cache, and the NavaTastic CLI: remote control
-  of repeaters running the Navarrico/NavaTastic firmware (read-only via the
-  Navadmin channel, control via PKI-encrypted DMs), with an inline safety
-  gate (CONFIRMAR) for destructive commands.
-
-  Bilingual EN/ES, no network permissions, no analytics, GPL-3.0.
-
-  NOTE: This app is NOT affiliated with or endorsed by the Meshtastic project.
-
 RepoType: git
 Repo: https://github.com/EA2OY/MeshNavarra-Utility
 
