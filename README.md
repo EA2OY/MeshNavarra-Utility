@@ -18,7 +18,7 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 | **Utilidades** | Buenas Prácticas (read-modify-write consciente del duty cycle ETSI EN 300 220) + presets de radio en un toque (SFN Spain 869.618 MHz + presets de módem estándar) |
 | **Commands** | Telemetría, posición, traceroute, cambiar owner + popups con respuesta decodificada |
 | **Administration** | Info de nodo, reboot, limpiar NodeDB (conservando favoritos), favorito/bloqueado, eliminar nodo, claves admin (PKI), Convertir en Nodo Maestro |
-| **NavaTastic CLI** | Control remoto de repetidores Navarrico/NavaTastic: diagnóstico (canal Navadmin, solo lectura) + control por DM cifrado PKI, con compuerta de seguridad CONFIRMAR para comandos destructivos |
+| **NavaTastic CLI** | Control remoto de repetidores Navarrico/NavaTastic (soporte completo Frente F21/F22): canales secundarios (slots 2-7), redirección CLI, silenciamiento Navadmin, pasarelas MQTT, posición fija y cadencias de difusión (pos_clear, set_pos_tx, set_nodeinfo_tx, set_telem_tx), diagnósticos 100% en RAM (stats/log), lista negra (ign clear ⚠) y control por DM cifrado PKI con compuerta CONFIRMAR |
 | **Chat** | Historial persistente por canal, indicador de entrega (⟳ en camino / ✓ entregado / ✗ error + reenviar) |
 | **Nodes** | Tarjetas de nodo (favoritos primero), caché propia persistente (sobrevive al NodeDB de 80 entradas del nodo), búsqueda inteligente, importar nodos por URL, popup de nodo con 11 acciones |
 | **Log** | Consola persistente de peticiones/respuestas |
@@ -116,7 +116,7 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 | **Utilidades** | Good Practices (ETSI EN 300 220 duty-cycle aware read-modify-write) + one-tap radio presets (SFN Spain 869.618 MHz + stock modem presets) |
 | **Commands** | Telemetry, position, traceroute, set owner + decoded response popups |
 | **Administration** | Get node info, reboot, wipe NodeDB (keep favorites), set favorite/ignored, remove node, admin keys (PKI), Convert to Master Node |
-| **NavaTastic CLI** | Remote `/nava` control of Navarrico/NavaTastic repeaters: diagnostics (Navadmin channel, read-only) + control over encrypted PKI DM, with CONFIRMAR safety gate for destructive commands |
+| **NavaTastic CLI** | Remote control of Navarrico/NavaTastic repeaters (full Frente F21/F22 support): secondary channels (slots 2-7), CLI redirection, Navadmin muting, per-channel MQTT, static position & broadcast cadences (pos_clear, set_pos_tx, set_nodeinfo_tx, set_telem_tx), 100% RAM diagnostics (stats/log), blacklist purge (ign clear ⚠) and PKI-encrypted DM control with CONFIRMAR safety gate |
 | **Chat** | Persistent per-channel history, delivery indicator (⟳ enroute / ✓ delivered / ✗ error + resend) |
 | **Nodes** | Visual node cards (favorites first), own persistent cache (survives the node's 80-entry NodeDB), smart search, import nodes by shared URL, rich node popup with 11 request actions |
 | **Log** | Persistent request/response console |

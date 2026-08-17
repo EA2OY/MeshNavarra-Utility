@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.0.2"
+date: "Agosto 2026 · v1.0.5"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.0.2)
+# Manual de Usuario — MeshNavarra Utility (v1.0.5)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.2 (build 2026-08-15)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.5 (build 2026-08-17)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -25,7 +25,7 @@ MeshNavarra Utility es una app Android que administra nodos de la red Meshtastic
 - Conexión **USB OTG** (framed serial) y **Bluetooth LE** (GATT, descarga rápida de la NodeDB).
 - **8 pestañas** en la barra inferior: Utilidades, Comandos, Administración, NavaTastic CLI, Chat, Nodos y Log (la pestaña **Debug** es una herramienta de desarrollo **oculta por defecto**).
 - Administración local y remota de nodos (reinicio, NodeDB, favoritos, bloqueos, configuración).
-- **NavaTastic CLI** (la función estrella): control remoto de repetidores con el firmware Navarrico/NavaTastic (`/nava`).
+- **NavaTastic CLI** (la función estrella): control remoto integral de repetidores con el firmware Navarrico/NavaTastic (`/nava`), con soporte ampliado para Frente F21/F22.
 - **Nodo destino global**: el nodo elegido en cualquier pestaña se comparte con el resto hasta que se cambie o se borre (X).
 - Interfaz **bilingüe EN/ES**, ayuda por pulsación larga en todos los controles, manual integrado, **dos demos guiadas** y licencia GPL-3.0.
 
@@ -33,13 +33,13 @@ MeshNavarra Utility es una app Android que administra nodos de la red Meshtastic
 
 ---
 
-## 📋 1b. Novedades de la versión 1.0.2
+## 📋 1b. Novedades de la versión 1.0.5 (Frente F21/F22)
 
-- **Cabecera scrolleable**: el bloque superior (estado y conexión) forma parte del contenido de cada pestaña y sube al hacer scroll, dejando más espacio de trabajo.
-- **Nodo destino compartido** entre pestañas con botón **X** para deseleccionar.
-- **Divisor ajustable** en NavaTastic CLI: arrastra la barra de puntos para repartir el espacio entre comandos y consola (se recuerda).
-- **Demo 2 con globos explicativos**: recorrido guiado con textos sobreimpresos, ideal para grabar un vídeo sin voz (solo una pista de audio).
-- Compatibilidad **edge-to-edge** (Android 15/16, targetSdk 35), correcciones de BLE (una sola petición de configuración por conexión) y cierre de auditorías externas.
+- **Soporte integral NavaTastic F21/F22**: 21 nuevos comandos en NavaTastic CLI distribuidos en categorías temáticas especializadas.
+- **Canales secundarios y Redirección CLI**: gestión remota de slots 2-7 (`ch_ls`, `ch_set`, `ch_del`, `ch_url`, `ch_reset`), redirección de consola (`set_cli_chan`) y silenciamiento de rescate (`navadmin_mute`).
+- **Asistente generador de claves PSK**: generación aleatoria con un toque de claves seguras Base64 (AES-128 / AES-256 / Default).
+- **Control granular de infraestructura y difusión**: pasarelas MQTT por canal (`ch_mqtt`, `set_ok_to_mqtt`), posición fija (`set_pos`, `pos_clear`) y cadencias de transmisión (`set_pos_tx`, `set_nodeinfo_tx`, `set_telem_tx`, `set_beacon`, `set_pin`).
+- **Diagnósticos 100% en RAM**: auditoría de extremos térmicos/batería/tráfico (`stats`), buffer circular forense (`log`), modo silencioso de prueba (`mute`) y ráfaga periódica de radio (`test_tx`).
 
 ---
 
@@ -196,24 +196,48 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 | `/nava reset_reason` | Motivo del último reinicio |
 | `/nava noise` | Piso de ruido instantáneo |
 | `/nava bat` | Química, voltaje, % OCV y estado TX |
+| `/nava stats` | Auditoría en RAM (temps min/max/act, batería mínima, paquetes RX/TX/Rout) |
+| `/nava log [1-15]` | Buffer circular de eventos en RAM (1-15 líneas) |
 | `/nava help` / `/nava help <cmd>` | Glosario / ayuda de un comando |
 | `/nava route !ID` / `/nava trace !ID` | Ruta / traceroute a un nodo |
 
-**🚫 Bloqueos (solo DM)**: `ign ls` · `ign add !ID` · `ign rm !ID`
+**📻 Canales y CLI (solo DM)**:
+- `ch_ls`: Lista los 8 slots de canales (0-7), roles, marcas CLI, nombres, crypto y MQTT.
+- `ch_set <slot 2-7> <nombre> <psk_base64>`: Configura canal secundario privado (asistente de claves integrado).
+- `ch_del <slot 2-7>` ⚠: Deshabilita canal y libera persistencia.
+- `ch_url [slot 0-7]`: Genera URL canónica de Meshtastic (`meshtastic.org/e/#...`).
+- `ch_reset` ⚠: Restaura la tabla de canales a valores de fábrica.
+- `set_cli_chan <slot 1-7>`: Redirige la escucha de NavaCLI y avisos solares al slot indicado.
+- `navadmin_mute [on|off]`: Silencia o activa el canal de rescate (Slot 1 Navadmin).
 
-**⭐ Favoritos (solo DM)**: `fav ls` · `fav add !ID` · `fav rm !ID` · **`fav auto [on|off]`** (auto-favoriteo de routers directos; sin argumento muestra el estado)
+**🌐 Infraestructura y Difusión (solo DM)**:
+- `ch_mqtt <slot 0-7> [up|down|both|off]`: Compuerta MQTT individual por canal.
+- `set_ok_to_mqtt [on|off]`: Bandera global OK_TO_MQTT en paquetes para pasarelas.
+- `set_pos <lat> <lon> [alt]`: Coordenadas geográficas estáticas fijas.
+- `pos_clear`: Borra la posición fija guardada.
+- `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h).
+- `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h).
+- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 15 min).
+- `set_beacon [1-1440]`: Cadencia de balizas NodeInfo/Posición.
+- `set_pin <6_digitos>`: PIN Bluetooth fijo persistente.
+- `mute [1-1440|off]`: Silenciado temporal de reenvío LoRa en RAM.
+- `test_tx [5-30]`: Ráfaga de prueba RF periódica para alineación.
+
+**🚫 Bloqueos (solo DM)**: `ign ls` · `ign add !ID` ⚠ · `ign rm !ID` · `ign clear` ⚠
+
+**⭐ Favoritos (solo DM)**: `fav ls` · `fav add !ID` · `fav rm !ID` · `fav auto [on|off]`
 
 **⚙️ Configuración (solo DM)**: `set_name` · `set_role` · `set_mqtt` · `set_tz` · `set_hops` · `set_txpower`
 
-**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` · `factory_reset` ⚠
+**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠
 
-**🔋 Energía (solo DM)**: `set_chem` ⚠ · `set_vbat` ⚠ · `set_vwake` ⚠ · `storm [1-720]` ⚠ · `storm test1/test2` ⚠ · `txoff` ⚠ · `txon` · `ble [on/off]` ⚠
+**🔋 Energía (solo DM)**: `set_chem` ⚠ · `set_vbat` ⚠ · `set_vwake` ⚠ · `storm [1-720]` ⚠ · `storm test1/test2` ⚠ · `txoff` ⚠ · `txon` · `ble [on/off]` ⚠ · `sleepmsg [on/off]`
 
-**📡 Transmisión (solo DM)**: `msg` · `pos` · `nodeinfo` · `sendtel` · `power`
+**📡 Transmisión (solo DM)**: `msg` · `pos` · `nodeinfo` · `sendtel` · `power` · `test_tx`
 
-**🔔 Utilidades (solo DM)**: `bell` · `admin_ls`
+**🔔 Utilidades (solo DM)**: `bell` · `admin_ls` · `keys_ls` · `keys_clear` ⚠
 
-> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`) advierten: el rollback solo es posible con `nrf erase`.
+> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos.
 
 ### 8.5 La conversación
 

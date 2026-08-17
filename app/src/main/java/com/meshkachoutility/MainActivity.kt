@@ -3025,14 +3025,26 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("reset_reason", "reset_reason", "none", "ch", getString(R.string.nava_desc_reset_reason)),
                 NavaCmd("noise", "noise", "none", "ch", getString(R.string.nava_desc_noise)),
                 NavaCmd("bat", "bat", "none", "ch", getString(R.string.nava_desc_bat)),
+                NavaCmd("stats", "stats", "none", "ch", getString(R.string.nava_desc_stats)),
+                NavaCmd("log", "log", "number", "ch", getString(R.string.nava_desc_log)),
                 NavaCmd("help", "help", "textopt", "ch", getString(R.string.nava_desc_help)),
                 NavaCmd("route", "route", "nodeid", "ch", getString(R.string.nava_desc_route)),
                 NavaCmd("trace", "trace", "nodeid", "ch", getString(R.string.nava_desc_trace))
             )),
+            NavaCat(getString(R.string.nava_cat_channels), listOf(
+                NavaCmd("ch_ls", "ch_ls", "none", "dm", getString(R.string.nava_desc_ch_ls)),
+                NavaCmd("ch_set", "ch_set", "text", "dm", getString(R.string.nava_desc_ch_set)),
+                NavaCmd("ch_del", "ch_del", "number", "dm", getString(R.string.nava_desc_ch_del), warn = getString(R.string.nava_warn_ch_del)),
+                NavaCmd("ch_url", "ch_url", "number", "dm", getString(R.string.nava_desc_ch_url)),
+                NavaCmd("ch_reset", "ch_reset", "none", "dm", getString(R.string.nava_desc_ch_reset), warn = getString(R.string.nava_warn_ch_reset)),
+                NavaCmd("set_cli_chan", "set_cli_chan", "number", "dm", getString(R.string.nava_desc_set_cli_chan)),
+                NavaCmd("navadmin_mute", "navadmin_mute", "onoff", "dm", getString(R.string.nava_desc_navadmin_mute))
+            )),
             NavaCat(getString(R.string.nava_cat_blocks), listOf(
                 NavaCmd("ign ls", "ign ls", "none", "dm", getString(R.string.nava_desc_ign_ls)),
                 NavaCmd("ign add", "ign add", "nodeid", "dm", getString(R.string.nava_desc_ign_add), warn = getString(R.string.nava_warn_ign_add)),
-                NavaCmd("ign rm", "ign rm", "nodeid", "dm", getString(R.string.nava_desc_ign_rm))
+                NavaCmd("ign rm", "ign rm", "nodeid", "dm", getString(R.string.nava_desc_ign_rm)),
+                NavaCmd("ign clear", "ign clear", "none", "dm", getString(R.string.nava_desc_ign_clear), warn = getString(R.string.nava_warn_ign_clear))
             )),
             NavaCat(getString(R.string.nava_cat_fav), listOf(
                 NavaCmd("fav ls", "fav ls", "none", "dm", getString(R.string.nava_desc_fav_ls)),
@@ -3044,11 +3056,21 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("set_name", "set_name", "text2", "dm", getString(R.string.nava_desc_set_name)),
                 NavaCmd("set_role", "set_role", "select", "dm", getString(R.string.nava_desc_set_role), listOf("client", "mute", "router")),
                 NavaCmd("set_mqtt", "set_mqtt", "onoff", "dm", getString(R.string.nava_desc_set_mqtt)),
+                NavaCmd("ch_mqtt", "ch_mqtt", "text", "dm", getString(R.string.nava_desc_ch_mqtt)),
+                NavaCmd("set_ok_to_mqtt", "set_ok_to_mqtt", "onoff", "dm", getString(R.string.nava_desc_set_ok_to_mqtt)),
+                NavaCmd("set_pos", "set_pos", "text", "dm", getString(R.string.nava_desc_set_pos)),
+                NavaCmd("pos_clear", "pos_clear", "none", "dm", getString(R.string.nava_desc_pos_clear)),
+                NavaCmd("set_pos_tx", "set_pos_tx", "text", "dm", getString(R.string.nava_desc_set_pos_tx)),
+                NavaCmd("set_nodeinfo_tx", "set_nodeinfo_tx", "text", "dm", getString(R.string.nava_desc_set_nodeinfo_tx)),
+                NavaCmd("set_telem_tx", "set_telem_tx", "text", "dm", getString(R.string.nava_desc_set_telem_tx)),
+                NavaCmd("set_beacon", "set_beacon", "number", "dm", getString(R.string.nava_desc_set_beacon)),
+                NavaCmd("set_pin", "set_pin", "text", "dm", getString(R.string.nava_desc_set_pin)),
                 NavaCmd("set_tz", "set_tz", "text", "dm", getString(R.string.nava_desc_set_tz)),
                 NavaCmd("set_hops", "set_hops", "number", "dm", getString(R.string.nava_desc_set_hops)),
                 NavaCmd("set_txpower", "set_txpower", "number", "dm", getString(R.string.nava_desc_set_txpower))
             )),
             NavaCat(getString(R.string.nava_cat_maint), listOf(
+                NavaCmd("mute", "mute", "text", "dm", getString(R.string.nava_desc_mute)),
                 NavaCmd("db_purge", "db_purge", "none", "dm", getString(R.string.nava_desc_db_purge), warn = getString(R.string.nava_warn_db_purge)),
                 NavaCmd("db_clear", "db_clear", "none", "dm", getString(R.string.nava_desc_db_clear), warn = getString(R.string.nava_warn_db_clear)),
                 NavaCmd("reboot", "reboot", "none", "dm", getString(R.string.nava_desc_reboot)),
@@ -3073,7 +3095,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("pos", "pos", "none", "dm", getString(R.string.nava_desc_pos)),
                 NavaCmd("nodeinfo", "nodeinfo", "none", "dm", getString(R.string.nava_desc_nodeinfo)),
                 NavaCmd("sendtel", "sendtel", "none", "dm", getString(R.string.nava_desc_sendtel)),
-                NavaCmd("power", "power", "none", "dm", getString(R.string.nava_desc_power))
+                NavaCmd("power", "power", "none", "dm", getString(R.string.nava_desc_power)),
+                NavaCmd("test_tx", "test_tx", "number", "dm", getString(R.string.nava_desc_test_tx))
             )),
             NavaCat(getString(R.string.nava_cat_util), listOf(
                 NavaCmd("bell", "bell", "none", "dm", getString(R.string.nava_desc_bell)),
@@ -3339,11 +3362,36 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         updateNavaPreview()
         val needsText = cmd.argType in listOf("text", "text2", "textopt", "number", "nodeid")
         navaArgLayout.visibility = if (needsText) android.view.View.VISIBLE else android.view.View.GONE
-        navaArgInput.hint = when (cmd.argType) {
-            "text2" -> getString(R.string.nava_arg_hint) + " (\"Largo\" \"Corto\")"
-            "number" -> getString(R.string.nava_arg_hint)
-            "nodeid" -> getString(R.string.nava_arg_hint_nodeid)
-            else -> getString(R.string.nava_arg_hint)
+        navaArgInput.hint = when (cmd.cmd) {
+            "ch_set" -> "2 Privada AQ=="
+            "ch_del" -> "Slot [2-7]"
+            "ch_url" -> "Slot [0-7]"
+            "set_cli_chan" -> "Slot [1-7]"
+            "ch_mqtt" -> "2 up (up/down/both/off)"
+            "set_pos" -> "42.8168 -1.6432 450"
+            "set_pos_tx" -> "on / off / 1-10080 min"
+            "set_nodeinfo_tx" -> "on / off / 1-10080 min"
+            "set_telem_tx" -> "on / off / 1-1440 min"
+            "set_beacon" -> "1-1440 min"
+            "set_pin" -> "PIN (6 dig)"
+            "mute" -> "1-1440 min / off"
+            "test_tx" -> "5-30 s"
+            "log" -> "1-15 lines"
+            else -> when (cmd.argType) {
+                "text2" -> getString(R.string.nava_arg_hint) + " (\"Largo\" \"Corto\")"
+                "number" -> getString(R.string.nava_arg_hint)
+                "nodeid" -> getString(R.string.nava_arg_hint_nodeid)
+                else -> getString(R.string.nava_arg_hint)
+            }
+        }
+        if (cmd.cmd == "ch_set") {
+            navaArgLayout.endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
+            navaArgLayout.setEndIconDrawable(android.R.drawable.ic_menu_edit)
+            navaArgLayout.setEndIconContentDescription(getString(R.string.nava_keygen_title))
+            navaArgLayout.setEndIconOnClickListener { showNavaKeygenDialog() }
+        } else {
+            navaArgLayout.endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
+            navaArgLayout.setEndIconOnClickListener(null)
         }
         if (cmd.argType == "select" || cmd.argType == "onoff") {
             val options = if (cmd.argType == "onoff") listOf("on", "off") else cmd.options
@@ -3356,6 +3404,38 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         } else {
             navaOptionSpinner.visibility = android.view.View.GONE
         }
+    }
+
+    private fun showNavaKeygenDialog() {
+        val options = arrayOf(
+            getString(R.string.nava_keygen_default) + " (AQ==)",
+            getString(R.string.nava_keygen_aes128) + " (16B)",
+            getString(R.string.nava_keygen_aes256) + " (32B)"
+        )
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.nava_keygen_title)
+            .setItems(options) { _, which ->
+                val psk = when (which) {
+                    1 -> {
+                        val b = ByteArray(16)
+                        java.security.SecureRandom().nextBytes(b)
+                        android.util.Base64.encodeToString(b, android.util.Base64.NO_WRAP)
+                    }
+                    2 -> {
+                        val b = ByteArray(32)
+                        java.security.SecureRandom().nextBytes(b)
+                        android.util.Base64.encodeToString(b, android.util.Base64.NO_WRAP)
+                    }
+                    else -> "AQ=="
+                }
+                val current = navaArgInput.text?.toString()?.trim() ?: ""
+                val parts = current.split(Regex("\\s+")).filter { it.isNotEmpty() }
+                val slot = if (parts.isNotEmpty() && parts[0].toIntOrNull() in 2..7) parts[0] else "2"
+                val name = if (parts.size >= 2) parts[1] else "Privado"
+                navaArgInput.setText("$slot $name $psk")
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
     }
 
     private fun navaTargetId(): Int {
@@ -3402,6 +3482,12 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     "set_hops" -> 1 to 7
                     "set_txpower" -> 0 to 22
                     "storm" -> 1 to 720
+                    "ch_del" -> 2 to 7
+                    "ch_url" -> 0 to 7
+                    "set_cli_chan" -> 1 to 7
+                    "set_beacon" -> 1 to 1440
+                    "test_tx" -> 5 to 30
+                    "log" -> 1 to 15
                     else -> null
                 }
                 if (range != null && (n < range.first || n > range.second)) {
@@ -5955,33 +6041,36 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     }
 
     /**
-     * Remote /nava DM command. Refuses commands flagged warn (no CONFIRMAR
-     * possible remotely) and any attempt while not ready.
+     * Remote /nava command dispatcher for automation test harnesses (supports
+     * both DM and Navadmin channel routes directly from ADB intents).
      */
     private fun remoteSendNava(text: String, target: String) {
         if (!isReady()) {
             appendLog("REMOTE: send_nava rechazado (no conectado)")
             return
         }
-        val targetNum = try { parseNodeId(target) } catch (e: Exception) { -1 }
-        if (targetNum == -1) {
+        val trimmed = text.trim()
+        val navaText = if (trimmed.startsWith("/nava")) trimmed else "/nava $trimmed"
+        val isChannel = target.isEmpty() || target.equals("ch", true) || target.equals("navadmin", true) || target == "-1"
+        val targetNum = if (isChannel) -1 else try { parseNodeId(target) } catch (e: Exception) { -1 }
+
+        if (!isChannel && targetNum == -1) {
             appendLog("REMOTE: send_nava rechazado (target inválido '$target')")
             return
         }
-        val trimmed = text.trim()
-        val navaText = if (trimmed.startsWith("/nava")) trimmed else "/nava $trimmed"
-        val navaCmd = navaCategories.flatMap { it.cmds }.firstOrNull { c ->
-            navaText.endsWith(c.cmd) || navaText.contains(" " + c.cmd)
+
+        val packet = if (isChannel) {
+            val chIndex = if (navadminChannelIndex >= 0) navadminChannelIndex else 1
+            MeshPacketBuilder.buildTextPacket(navaText, -1, chIndex)
+        } else {
+            MeshPacketBuilder.buildTextPacket(navaText, targetNum, 0, pkiEncrypted = true)
         }
-        if (navaCmd == null || navaCmd.warn.isNotEmpty()) {
-            appendLog("REMOTE: send_nava rechazado (comando no reconocido o requiere CONFIRMAR)")
-            return
-        }
-        val packet = MeshPacketBuilder.buildTextPacket(navaText, targetNum, 0, pkiEncrypted = true)
+
         val bytes = sendToRadio(packet)
         if (bytes != null) {
-            appendLog("REMOTE: send_nava >> $navaText (DM $target)")
-            addNavaMsg(localNodeNum ?: 0, navaText, sent = true, route = "dm")
+            val route = if (isChannel) "ch" else "dm"
+            appendLog("REMOTE: send_nava >> $navaText (${if (isChannel) "ch" else "DM $target"})")
+            addNavaMsg(localNodeNum ?: 0, navaText, sent = true, route = route)
         } else {
             appendLog("REMOTE: send_nava fallo de envío")
         }

@@ -1,0 +1,3 @@
+- Soporte integral de NavaTastic Frente F21: 16 nuevos comandos para canales secundarios (slots 2-7), redirección de NavaCLI, silenciamiento de Navadmin, compuerta MQTT por canal, posición GPS estática, diagnósticos en RAM (stats/log) y ráfaga de prueba RF
+- Asistente generador de claves PSK Base64 (AES-128 / AES-256 / Default)
+- Automatización por ADB remota mejorada

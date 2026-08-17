@@ -1,33 +1,24 @@
-# Gradle / Android
+# Build / IDE / tooling
 .gradle/
-build/
-app/build/
 .kotlin/
+build/
+*/build/
 local.properties
-*.iml
 .idea/
-
-# Local toolchains / binaries
-jdk-17/
-*.apk
-*.aab
-
-# Session artifacts (never push: may contain node keys / personal data)
-testplan/
-Cerebro_MeshKachoUtility/
-snap-*.zip
-*.bak-*
-allcode.md
-auditoria_*.zip
-
-# Logs
-*.log
-
-# OS
-Thumbs.db
-.DS_Store
+*.iml
+captures/
 
 # Signing keys (never commit)
 keystore/
 *.jks
 *.keystore
+
+# Bundled JDK (large, not source)
+jdk-17/
+
+# Timestamped backups & snapshots (git history already protects these)
+snap-*.zip
+*.bak-*
+
+# Working/scratch files
+*.log

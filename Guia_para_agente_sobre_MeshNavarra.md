@@ -1,7 +1,7 @@
 # Guía para agente sobre MeshNavarra Utility (repo de la app)
 
 Único punto de entrada para cualquier agente de IA o humano que retome este repositorio.
-**La app MeshNavarra Utility administra nodos Meshtastic; el firmware de los repetidores (NavaTastic) vive en su propio repo** (`<firmware repo — read-only>`, SOLO LECTURA).
+**La app MeshNavarra Utility administra nodos Meshtastic; el firmware de los repetidores (NavaTastic) vive en su propio repo** (`C:\NavaTastic Codigo completo`, SOLO LECTURA).
 
 ---
 
@@ -12,7 +12,7 @@
 3. **Filtrado de ruido**: no devolver salidas crudas de terminal ni diffs completos — solo líneas de error relevantes y fragmentos modificados.
 4. **Código mínimo**: solución con menos líneas y **cero dependencias nuevas**; verificar primero si la funcionalidad ya existe en el proyecto.
 5. **Handover**: actualizar `Cerebro_MeshKachoUtility\cerebro.md` (state log + errores→soluciones + pendientes) **sobre la marcha**, y refrescar el bloque §4 HANDOVER tras cada tarea. El brain se ha vaciado 2 veces por fallos de PowerShell: **verificar el tamaño del archivo inmediatamente después de cualquier escritura**.
-6. **Autorización de proyectos**: solo se escribe en `<local project root>`. `<firmware repo — read-only>`, `C:\Firmware Navarrico 4.3`, `Desktop\firmware` y `Desktop\Meshtastic-Android-snapshot` son **SOLO LECTURA** (referencias). Cualquier cambio fuera requiere orden explícita y puntual del operador.
+6. **Autorización de proyectos**: solo se escribe en `C:\Users\Jesus\Desktop\MeshKachoUtility`. `C:\NavaTastic Codigo completo`, `C:\Firmware Navarrico 4.3`, `Desktop\firmware` y `Desktop\Meshtastic-Android-snapshot` son **SOLO LECTURA** (referencias). Cualquier cambio fuera requiere orden explícita y puntual del operador.
 7. **Backup/rollback**: ejecutar `powershell -ExecutionPolicy Bypass -File backup.ps1` **al inicio de sesión y tras CADA tarea** (baks rodantes 60 + snaps rodantes 30). Rollback: listar `snap-*.zip`/`cerebro.md.bak-*` y restaurar el más cercano al momento indicado.
 8. **Preservar el trabajo existente**: en docs/cerebro AÑADIR (errores + soluciones) en vez de reescribir; no destruir contexto útil.
 9. **Commits**: locales por hito solo cuando el operador lo pida o por patrón de sesión establecido; revisar siempre `git status`/`git diff` antes.
@@ -50,14 +50,14 @@ Repos públicos: app = `github.com/EA2OY/MeshNavarra-Utility` · firmware = `git
 ## 3. Cómo compilar, testear e instalar
 
 ```powershell
-$env:JAVA_HOME = "<local project root>\jdk-17\jdk-17.0.10+7"
+$env:JAVA_HOME = "c:\Users\Jesus\Desktop\MeshKachoUtility\jdk-17\jdk-17.0.10+7"
 .\gradlew.bat assembleDebug --no-daemon --console=plain          # BUILD SUCCESSFUL
 .\gradlew.bat testDebugUnitTest --no-daemon --console=plain      # 24 tests
 ```
 
 - APK: `app\build\outputs\apk\debug\app-debug.apk`.
 - adb (NO en PATH): `& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"`.
-- Dispositivos de test (WiFi ADB): **Galaxy A10** `<IP>:5555` (Android 11, test) · **Mi 10** `<IP>:5555` (nodo A/test) · **Poco F6** `<IP>:5555` (**principal del operador**).
+- Dispositivos de test (WiFi ADB): **Galaxy A10** `192.168.3.193:5555` (Android 11, test) · **Mi 10** `192.168.3.141:5555` (nodo A/test) · **Poco F6** `192.168.3.206:5555` (**principal del operador**).
 - Instalar + lanzar: `adb -s <ip>:5555 install -r app\build\outputs\apk\debug\app-debug.apk` → `adb -s <ip>:5555 shell am force-stop com.meshkachoutility` → `adb -s <ip>:5555 shell monkey -p com.meshkachoutility -c android.intent.category.LAUNCHER 1`.
 - **Remote control** (test scriptado): `adb shell am broadcast -n com.meshkachoutility/.RemoteControlReceiver -a com.meshkachoutility.REMOTE --es cmd <tab|state|send_nava|request|nodes|fav|ign|remove|chat|audit|audit_stop|debug_tab|import_url> [--es arg ".."]`. OJO: `--es arg` con espacios TRUNCA desde PowerShell; broadcasts implícitos bloqueados en background — usar SIEMPRE `-n` explícito.
 - Verificación de UI: `adb shell screencap -p /sdcard/x.png` + `pull` (nunca `exec-out >` con PowerShell, corrompe binarios).
@@ -81,7 +81,7 @@ $env:JAVA_HOME = "<local project root>\jdk-17\jdk-17.0.10+7"
 
 ## 6. LO QUE NO HACER (para no cagarla)
 
-1. **No tocar código del firmware** (`<firmware repo — read-only>`, `C:\Firmware Navarrico 4.3`, `Desktop\firmware`) — SOLO LECTURA.
+1. **No tocar código del firmware** (`C:\NavaTastic Codigo completo`, `C:\Firmware Navarrico 4.3`, `Desktop\firmware`) — SOLO LECTURA.
 2. **No renombrar el package** (`com.meshkachoutility`, `MeshKachoUtilityApp`, `Theme.MeshKachoUtility`) — huérfano la app instalada en los 3 teléfonos.
 3. **No saltarse la compuerta CONFIRMAR** ni eliminar `warn` de comandos destructivos NavaTastic.
 4. **No escribir `set_config` parcial**: toda escritura de configuración es **read-modify-write** (un set_config parcial borra la sección en firmware real).

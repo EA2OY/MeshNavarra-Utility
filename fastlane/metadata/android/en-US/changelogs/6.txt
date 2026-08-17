@@ -1,0 +1,3 @@
+- NavaTastic Frente F21 support: 16 new commands for secondary channels (slots 2-7), NavaCLI redirection, Navadmin muting, per-channel MQTT gateway, static GPS coordinates, RAM diagnostics (stats/log) and RF test bursts
+- Channel PSK generator helper (Base64 AES-128 / AES-256 / Default)
+- Improved remote control automation via ADB

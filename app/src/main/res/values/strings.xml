@@ -281,6 +281,7 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_navadmin_disable_sent">Channel slot %1$d disabled; creating Navadmin next.</string>
     <string name="nava_conversation">Conversation (Navadmin + DM)</string>
     <string name="nava_cat_diag">Diagnostics</string>
+    <string name="nava_cat_channels">Channels &amp; CLI</string>
     <string name="nava_cat_blocks">Block management</string>
     <string name="nava_cat_fav">Favorites</string>
     <string name="nava_cat_config">Configuration</string>
@@ -599,4 +600,33 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_keys_ls">Lists the admin keys PERSISTED in /resilience.bin (the ones that come back after a factory/full reset).</string>
     <string name="nava_desc_keys_clear">Erases ONLY the persisted copy of the admin keys (current config and keys are untouched; no reboot). After this, the next factory/full reset leaves only the project key.</string>
     <string name="nava_warn_keys_clear">keys_clear: deleting the persisted admin-key copy is permanent. Removing a key in the app does NOT purge it from the node — it returns after the next reset. This command deletes ALL persisted copies.</string>
+    <string name="nava_desc_ch_ls">Lists the 8 channel slots (0-7), role, CLI channel (*), name, crypto type and MQTT gateway.</string>
+    <string name="nava_desc_ch_set">Configures a secondary private channel. Usage: ch_set &lt;slot 2-7&gt; &lt;name&gt; &lt;psk_base64&gt; (supports AQ==, 16B AES-128 or 32B AES-256 in Base64).</string>
+    <string name="nava_desc_ch_del">Disables the secondary channel and frees persistence. Usage: ch_del &lt;slot 2-7&gt;</string>
+    <string name="nava_warn_ch_del">Disables the secondary channel and deletes its configuration from persistence.</string>
+    <string name="nava_desc_ch_url">Generates the canonical Meshtastic URL (meshtastic.org/e/#...) to import channels into the mobile app. Usage: ch_url [slot 0-7]</string>
+    <string name="nava_desc_ch_reset">Restores default channel table (Slot 0 SFNarrow, Slot 1 Navadmin, Slots 2-7 disabled, CLI on Slot 1). Survives via /resilience.bin.</string>
+    <string name="nava_warn_ch_reset">Restores default channel configuration. All custom secondary channels (slots 2-7) will be deleted.</string>
+    <string name="nava_desc_set_cli_chan">Redirects NavaCLI listening and solar cycle announcements to the chosen slot [1-7]. Usage: set_cli_chan &lt;slot 1-7&gt;</string>
+    <string name="nava_desc_navadmin_mute">Mutes or unmutes the public rescue channel (Slot 1 Navadmin) for invisible operation. Options: on, off.</string>
+    <string name="nava_desc_ch_mqtt">Configures individual MQTT gateway for the channel. Options: up (uplink only), down (downlink only), both (bidirectional), off (isolated). Usage: ch_mqtt &lt;slot 0-7&gt; [up|down|both|off]</string>
+    <string name="nava_desc_set_ok_to_mqtt">Sets the global OK_TO_MQTT packet flag, authorizing third-party gateways to forward packets to internet. Options: on, off.</string>
+    <string name="nava_desc_set_pos">Sets fixed geographic coordinates without physical GPS module. Usage: set_pos &lt;lat&gt; &lt;lon&gt; [alt]</string>
+    <string name="nava_desc_set_beacon">Configures NodeInfo and Position periodic beacon interval in minutes [1-1440]. Usage: set_beacon &lt;minutes&gt;</string>
+    <string name="nava_desc_set_pin">Sets custom 6-digit fixed Bluetooth pairing PIN. Persists in /resilience.bin. Usage: set_pin &lt;6_digits&gt;</string>
+    <string name="nava_desc_mute">Temporary LoRa silence mode: stops repeating third-party packets for X minutes [1-1440|off] (100% in RAM). Usage: mute [minutes|off]</string>
+    <string name="nava_desc_stats">RAM audit report: min/max/act CPU temperatures, min battery voltage, RX/TX/Routed packets and Auto-Fav counts (100% in RAM).</string>
+    <string name="nava_desc_test_tx">Transmits a RF test beacon burst (1 pkt/s for 5-30 s) to measure RSSI/SNR and align antennas. Usage: test_tx &lt;seconds 5-30&gt;</string>
+    <string name="nava_desc_log">Shows the last 1-15 entries of the RAM circular forensic event log. Usage: log [lines 1-15]</string>
+    <string name="nava_desc_pos_clear">Clears saved static coordinates, leaving the repeater without fixed position.</string>
+    <string name="nava_desc_set_pos_tx">Controls periodic spontaneous fleet position broadcast. Options: on, off, minutes (1-10080, default 72h).</string>
+    <string name="nava_desc_set_nodeinfo_tx">Controls periodic fleet NodeInfo broadcast. Options: on, off, minutes (1-10080, default 72h).</string>
+    <string name="nava_desc_set_telem_tx">Regulates environment and battery telemetry report cadence. Options: on, off, minutes (1-1440, default 15 min).</string>
+    <string name="nava_desc_ign_clear">Clears the persistent blacklist of blocked nodes completely.</string>
+    <string name="nava_warn_ign_clear">Clearing the blacklist deletes all blocked nodes from persistent memory.</string>
+    <string name="nava_keygen_btn">Key Gen</string>
+    <string name="nava_keygen_title">Generate Channel PSK (Base64)</string>
+    <string name="nava_keygen_default">Default (AQ== / 1 byte)</string>
+    <string name="nava_keygen_aes128">Random AES-128 (16 bytes)</string>
+    <string name="nava_keygen_aes256">Random AES-256 (32 bytes)</string>
 </resources>

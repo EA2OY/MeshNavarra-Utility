@@ -1,7 +1,6 @@
-# PowerShell script to build the MeshNavarra Utility debug APK.
-# Uses the bundled JDK 17 at jdk-17\jdk-17.0.10+7 (download with download_jdk.ps1).
+# PowerShell script to build the MeshKachoUtility debug APK
 
-$env:JAVA_HOME = Join-Path $PSScriptRoot "jdk-17\jdk-17.0.10+7"
+$env:JAVA_HOME = "c:\Users\Jesus\Desktop\MeshKachoUtility\jdk-17\jdk-17.0.10+7"
 Write-Host "Set JAVA_HOME to: $env:JAVA_HOME"
 
 Write-Host "Running gradlew.bat assembleDebug..."
