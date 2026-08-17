@@ -5464,23 +5464,33 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     }
 
     /**
-     * Connects to a node over Bluetooth: requests BLE permissions, lists bonded
+     * Connects to a node over Bluetooth: checks/requests BLE permissions, lists bonded
      * devices and connects to the chosen one.
      */
     private fun connectViaBluetooth() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            requestPermissions(
-                arrayOf(
-                    android.Manifest.permission.BLUETOOTH_SCAN,
-                    android.Manifest.permission.BLUETOOTH_CONNECT
-                ),
-                REQ_BLE_PERMISSIONS
-            )
-            // continue in onRequestPermissionsResult
+            val hasScan = checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            val hasConnect = checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (hasScan && hasConnect) {
+                showBleDevicePicker()
+            } else {
+                requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.BLUETOOTH_SCAN,
+                        android.Manifest.permission.BLUETOOTH_CONNECT
+                    ),
+                    REQ_BLE_PERMISSIONS
+                )
+            }
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQ_BLE_PERMISSIONS)
+            val hasLocation = checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (hasLocation) {
+                showBleDevicePicker()
+            } else {
+                requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQ_BLE_PERMISSIONS)
+            }
             return
         }
         showBleDevicePicker()

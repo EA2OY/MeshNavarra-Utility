@@ -8,7 +8,9 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothStatusCodes
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -98,7 +100,7 @@ class BleConnectionManager(
      *
      * Idempotent: onServicesDiscovered and onMtuChanged can both fire for the
      * same session; only the first call notifies the listener (a second
-     * onConnected() would schedule a duplicate sendWantConfig → duplicate
+     * onConnected() would schedule a duplicate sendWantConfig -> duplicate
      * want_config + reset of the in-flight download counters).
      */
     private fun completeConnect() {
@@ -111,30 +113,36 @@ class BleConnectionManager(
 
     private val gattCallback = object : BluetoothGattCallback() {
 
-        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+        override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
+            if (g != this@BleConnectionManager.gatt) {
+                // Stale callback from an old/closed session: ignore and close it
+                try { g.close() } catch (_: Exception) {}
+                return
+            }
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                onLog("BLE connection error: $status")
+                onLog("BLE connection status: $status")
             }
             when (newState) {
                 BluetoothGatt.STATE_CONNECTED -> {
                     onLog("BLE GATT connected. Discovering services...")
-                    gatt.discoverServices()
+                    g.discoverServices()
                 }
                 BluetoothGatt.STATE_DISCONNECTED -> {
-                    onLog("BLE GATT disconnected")
+                    onLog("BLE GATT disconnected (status=$status)")
                     closeInternal()
                     listener.onDisconnected()
                 }
             }
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+        override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
+            if (g != this@BleConnectionManager.gatt) return
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 onLog("BLE service discovery failed: $status")
                 listener.onError(IllegalStateException("BLE service discovery failed ($status)"))
                 return
             }
-            val service = gatt.getService(MESH_SERVICE_UUID)
+            val service = g.getService(MESH_SERVICE_UUID)
             if (service == null) {
                 onLog("Meshtastic BLE service not found")
                 listener.onError(IllegalStateException("Meshtastic BLE service not found"))
@@ -151,11 +159,11 @@ class BleConnectionManager(
             }
 
             // Enable notifications on FROMNUM before any handshake traffic.
-            gatt.setCharacteristicNotification(fromNumChar, true)
+            g.setCharacteristicNotification(fromNumChar, true)
             val cccd = fromNumChar?.getDescriptor(CCCD_UUID)
             if (cccd != null) {
                 cccd.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                gatt.writeDescriptor(cccd)
+                g.writeDescriptor(cccd)
             } else {
                 onLog("FROMNUM has no CCCD descriptor")
             }
@@ -165,64 +173,95 @@ class BleConnectionManager(
             // reconnect that skips the MTU callback (same-device re-bond) never ends
             // up half-connected; onMtuChanged just updates the negotiated size.
             completeConnect()
-            if (!mtuNegotiated && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (!mtuNegotiated && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mtuNegotiated = true
                 try {
-                    gatt.requestMtu(512)
+                    g.requestMtu(512)
                 } catch (e: Exception) {
                     onLog("BLE requestMtu failed: ${e.message}")
                 }
             }
         }
 
-        override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
+        override fun onMtuChanged(g: BluetoothGatt, mtu: Int, status: Int) {
+            if (g != this@BleConnectionManager.gatt) return
             onLog("BLE MTU negotiated: $mtu (status=$status)")
             completeConnect()
         }
 
         override fun onDescriptorWrite(
-            gatt: BluetoothGatt,
+            g: BluetoothGatt,
             descriptor: BluetoothGattDescriptor,
             status: Int
         ) {
+            if (g != this@BleConnectionManager.gatt) return
             onLog("BLE FROMNUM notify descriptor write: ${if (status == BluetoothGatt.GATT_SUCCESS) "OK" else "FAILED($status)"}")
         }
 
         override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
+            g: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic
         ) {
+            if (g != this@BleConnectionManager.gatt) return
             if (characteristic.uuid == FROMNUM_UUID) {
                 onLog("BLE FROMNUM notify received")
                 triggerDrain()
             }
         }
 
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt,
+        // API 33+ callback overload
+        override fun onCharacteristicChanged(
+            g: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
+        ) {
+            if (g != this@BleConnectionManager.gatt) return
+            if (characteristic.uuid == FROMNUM_UUID) {
+                onLog("BLE FROMNUM notify received")
+                triggerDrain()
+            }
+        }
+
+        // Legacy onCharacteristicRead (API < 33)
+        @Deprecated("Deprecated in Java")
+        override fun onCharacteristicRead(
+            g: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            if (g != this@BleConnectionManager.gatt) return
+            processCharacteristicRead(characteristic, characteristic.value, status)
+        }
+
+        // API 33+ onCharacteristicRead
+        override fun onCharacteristicRead(
+            g: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
+            status: Int
+        ) {
+            if (g != this@BleConnectionManager.gatt) return
+            processCharacteristicRead(characteristic, value, status)
+        }
+
+        private fun processCharacteristicRead(
+            characteristic: BluetoothGattCharacteristic,
+            data: ByteArray?,
             status: Int
         ) {
             pendingRead = false
             if (characteristic.uuid != FROMRADIO_UUID) return
-            // Any GATT read activity means the session is alive — refresh the stall
-            // heartbeat so the watchdog only trips on a truly frozen link.
             lastDataTimestamp = System.currentTimeMillis()
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 onLog("BLE FROMRADIO read failed: $status")
-                // transient — retry shortly
                 handler.postDelayed({ triggerDrain() }, TRANSIENT_RETRY_MS)
                 return
             }
-            val data = characteristic.value
             if (data != null && data.isNotEmpty()) {
                 onLog("BLE FROMRADIO read: ${data.size} bytes")
                 listener.onDataReceived(data)
                 triggerDrain() // keep draining queued packets (like the official client)
             } else {
-                // Empty read: during the config handshake the firmware gates FROMNUM
-                // notifications, so keep draining proactively. In steady state, stop
-                // and wait for the next FROMNUM notify so writes are not starved.
                 if (configDraining) {
                     handler.postDelayed({ triggerDrain() }, EMPTY_RETRY_MS)
                 }
@@ -230,10 +269,11 @@ class BleConnectionManager(
         }
 
         override fun onCharacteristicWrite(
-            gatt: BluetoothGatt,
+            g: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
+            if (g != this@BleConnectionManager.gatt) return
             if (characteristic.uuid == TORADIO_UUID) {
                 onLog("BLE TORADIO write result: ${if (status == BluetoothGatt.GATT_SUCCESS) "OK" else "FAILED($status)"}")
                 if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -268,29 +308,19 @@ class BleConnectionManager(
     }
 
     /**
-     * Returns bonded LE devices (Meshtastic nodes are paired in system settings).
-     * Some stacks (MIUI/HyperOS, Samsung) report the peer type as UNKNOWN or
-     * DUAL instead of LE — filtering strictly on DEVICE_TYPE_LE would hide valid
-     * nodes on those phones. Deduplicates by MAC address.
+     * Returns bonded devices (Meshtastic nodes are paired in system settings).
+     * Deduplicates by MAC address without restrictive type filters that could
+     * exclude valid nodes on custom OEM Bluetooth stacks.
      */
     fun scan(): List<BluetoothDevice> {
         val seen = HashSet<String>()
         return bluetoothAdapter?.bondedDevices
-            ?.filter {
-                it.type == BluetoothDevice.DEVICE_TYPE_LE ||
-                    it.type == BluetoothDevice.DEVICE_TYPE_DUAL ||
-                    it.type == BluetoothDevice.DEVICE_TYPE_UNKNOWN
-            }
             ?.filter { seen.add(it.address) }
             ?.toList() ?: emptyList()
     }
 
     /**
-     * Starts a continuous LE scan (no auto-stop: the caller decides when to
-     * stop, matching the "keep searching until I press stop" UX). Results are
-     * delivered on the caller's thread (the ScanCallback binder thread — the
-     * caller must marshal UI updates to the main thread). Returns null when
-     * scanning is unavailable (no adapter / no scanner / Bluetooth off).
+     * Starts a continuous LE scan. Results are delivered via callback.
      */
     fun startScan(onResult: (BluetoothDevice) -> Unit): android.bluetooth.le.ScanCallback? {
         val scanner = bluetoothAdapter?.bluetoothLeScanner ?: return null
@@ -318,9 +348,7 @@ class BleConnectionManager(
     }
 
     /**
-     * Requests pairing with a discovered device. The system UI shows the
-     * confirmation/PIN prompt; the result is delivered via the
-     * ACTION_BOND_STATE_CHANGED broadcast (BOND_BONDED / BOND_NONE).
+     * Requests pairing with a discovered device.
      */
     fun createBond(device: BluetoothDevice): Boolean {
         return try {
@@ -332,59 +360,48 @@ class BleConnectionManager(
     }
 
     /**
-     * Connects to a bonded Meshtastic node. Tears down any previous GATT session
-     * and forces a service-cache refresh before reconnecting, so a stale link from
-     * a previous process (e.g. right after `adb install -r`) never hangs.
-     *
-     * Vendor-safety: the refresh + re-connect is deferred ~150 ms after the
-     * previous GATT is closed (some stacks release the session asynchronously
-     * and break an immediate reconnect), and the service-cache refresh only runs
-     * on reconnects to the same device — a fresh connect does not refresh.
+     * Connects to a Meshtastic node via Bluetooth LE using explicit TRANSPORT_LE.
+     * Tears down any previous GATT session cleanly without race conditions.
      */
-    private var sessionCount = 0
-
     fun connect(device: BluetoothDevice): Boolean {
         return try {
             bondRequested = false
             connectCompleted = false
-            val doRefresh = lastDevice?.address == device.address && sessionCount > 0
             lastDevice = device
-            sessionCount++
             mtuNegotiated = false
             stallHandler.removeCallbacksAndMessages(null)
-            if (doRefresh) refreshGattCache()
-            tearDownGattSilently()
-            handler.postDelayed({ connectGattNow(device) }, 150)
-            true
+            
+            // Clean up old session synchronously
+            val oldGatt = gatt
+            gatt = null
+            isConnected = false
+            pendingRead = false
+            toRadioChar = null
+            fromRadioChar = null
+            fromNumChar = null
+            
+            if (oldGatt != null) {
+                try { oldGatt.disconnect() } catch (e: Exception) { Log.w(TAG, "Error disconnecting old GATT", e) }
+                try { oldGatt.close() } catch (e: Exception) { Log.w(TAG, "Error closing old GATT", e) }
+            }
+
+            onLog("BLE connectGatt initiating (${device.address}, TRANSPORT_LE)...")
+            val newGatt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                device.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+            } else {
+                device.connectGatt(context, false, gattCallback)
+            }
+            gatt = newGatt
+            if (newGatt == null) {
+                onLog("BLE connectGatt returned null")
+                false
+            } else {
+                true
+            }
         } catch (e: Exception) {
             onLog("BLE connect failed: ${e.message}")
             listener.onError(e)
             false
-        }
-    }
-
-    private fun connectGattNow(device: BluetoothDevice) {
-        try {
-            gatt = device.connectGatt(context, false, gattCallback)
-            if (gatt == null) onLog("BLE connectGatt returned null")
-        } catch (e: Exception) {
-            onLog("BLE connectGatt failed: ${e.message}")
-            listener.onError(e)
-        }
-    }
-
-    /**
-     * Invokes the hidden `BluetoothGatt.refresh()` via reflection to drop a stale
-     * service cache (the official client does the same after firmware updates).
-     */
-    private fun refreshGattCache() {
-        try {
-            val old = gatt ?: return
-            val m = BluetoothGatt::class.java.getMethod("refresh")
-            m.isAccessible = true
-            m.invoke(old)
-        } catch (e: Exception) {
-            Log.w(TAG, "BLE gatt refresh unavailable: ${e.message}")
         }
     }
 
@@ -393,21 +410,15 @@ class BleConnectionManager(
         isConnected = false
         connectCompleted = false
         pendingRead = false
-        handler.removeCallbacksAndMessages(null)
-        try {
-            gatt?.disconnect()
-        } catch (e: Exception) {
-            Log.w(TAG, "Error disconnecting GATT", e)
-        }
-        try {
-            gatt?.close()
-        } catch (e: Exception) {
-            Log.w(TAG, "Error closing GATT", e)
-        }
+        val oldGatt = gatt
         gatt = null
         toRadioChar = null
         fromRadioChar = null
         fromNumChar = null
+        if (oldGatt != null) {
+            try { oldGatt.disconnect() } catch (e: Exception) { Log.w(TAG, "Error disconnecting GATT", e) }
+            try { oldGatt.close() } catch (e: Exception) { Log.w(TAG, "Error closing GATT", e) }
+        }
         if (wasConnected) {
             listener.onDisconnected()
         }
@@ -415,8 +426,7 @@ class BleConnectionManager(
 
     /**
      * Arms a stall watchdog while the config/NodeDB handshake runs: if no
-     * FROMRADIO bytes arrive within [STALL_TIMEOUT_MS], the session is considered
-     * hung and we force a teardown + reconnect (instead of waiting forever).
+     * FROMRADIO bytes arrive within [STALL_TIMEOUT_MS], the drain is re-kicked.
      */
     fun armStallWatchdog() {
         stallHandler.removeCallbacksAndMessages(null)
@@ -434,10 +444,7 @@ class BleConnectionManager(
         if (!stallWatchdogArmed || !isConnected) return
         val elapsed = System.currentTimeMillis() - lastDataTimestamp
         if (elapsed >= STALL_TIMEOUT_MS) {
-            // The link may be alive but a single GATT read got stuck (pendingRead
-            // never cleared). Reset the read latch and re-kick the drain instead of
-            // tearing down — tearing down caused the endless reconnect/download loop.
-            onLog("BLE stall detected (no data for $elapsed ms) — resetting drain and re-kicking")
+            onLog("BLE stall detected (no data for $elapsed ms) - resetting drain and re-kicking")
             pendingRead = false
             triggerDrain()
             lastDataTimestamp = System.currentTimeMillis()
@@ -463,9 +470,7 @@ class BleConnectionManager(
     }
 
     /**
-     * Writes a raw (unframed) ToRadio protobuf packet. Uses write-with-response
-     * (reliable): a fire-and-forget write can be silently dropped on a freshly
-     * reconnected session, which would leave the handshake permanently stalled.
+     * Writes a raw (unframed) ToRadio protobuf packet. Uses write-with-response (reliable).
      */
     fun write(data: ByteArray): Boolean {
         val g = gatt ?: return false
@@ -473,16 +478,14 @@ class BleConnectionManager(
         if (!isConnected) return false
         return try {
             synchronized(writeLock) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    // API 33+: overload without shared mutable state (avoids the
-                    // classic .value race when writes are issued back to back).
-                    g.writeCharacteristic(ch, data, android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val status = g.writeCharacteristic(ch, data, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                    status == BluetoothStatusCodes.SUCCESS
                 } else {
                     ch.value = data
                     g.writeCharacteristic(ch)
                 }
             }
-            true
         } catch (e: Exception) {
             onLog("BLE write error: ${e.message}")
             listener.onError(e)
