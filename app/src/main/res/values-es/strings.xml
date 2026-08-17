@@ -629,4 +629,15 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_keygen_default">Por defecto (AQ== / 1 byte)</string>
     <string name="nava_keygen_aes128">AES-128 aleatoria (16 bytes)</string>
     <string name="nava_keygen_aes256">AES-256 aleatoria (32 bytes)</string>
+    <string name="log_clear">Borrar registros</string>
+    <string name="help_clear_log">Borra la consola de registros y limpia el archivo de registro en disco.</string>
+    <string name="log_cleared">Registros borrados.</string>
+    <string name="disconnect_usb">Desconectar USB</string>
+    <string name="help_disconnect_usb">Desconecta la conexión USB OTG y detiene la reconexión automática.</string>
+    <string name="disconnect_ble">Desconectar Bluetooth</string>
+    <string name="help_disconnect_ble">Desconecta la sesión Bluetooth Low Energy y cierra el enlace GATT.</string>
+    <string name="usb_not_connected">El puerto USB no está conectado actualmente.</string>
+    <string name="ble_not_connected">Bluetooth no está conectado actualmente.</string>
+    <string name="log_usb_disconnected_manual">USB desconectado por el usuario.</string>
+    <string name="log_ble_disconnected_manual">Bluetooth desconectado por el usuario.</string>
 </resources>

@@ -6,7 +6,7 @@
 [![Android: 8.0+](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://developer.android.com/studio)
 [![Lenguaje: Kotlin](https://img.shields.io/badge/Kotlin-2.1-purple.svg)](https://kotlinlang.org)
 [![Última versión](https://img.shields.io/github/v/release/EA2OY/MeshNavarra-Utility?color=blue&label=Release)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest)
-[![Descargar APK](https://img.shields.io/badge/Descargar-APK%20v1.0.6-success?logo=android)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.6.apk)
+[![Descargar APK](https://img.shields.io/badge/Descargar-APK%20v1.0.7-success?logo=android)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.7.apk)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Apoyar%20el%20proyecto-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/ea2oy)
 
 Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por USB OTG y Bluetooth LE — con una pestaña estrella de **control remoto NavaTastic CLI** para repetidores con el firmware Navarrico/NavaTastic (repo hermano: [EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)).
@@ -23,10 +23,10 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 | **NavaTastic CLI** | Control remoto de repetidores Navarrico/NavaTastic (soporte completo Frente F21/F22): canales secundarios (slots 2-7), redirección CLI, silenciamiento Navadmin, pasarelas MQTT, posición fija y cadencias de difusión (pos_clear, set_pos_tx, set_nodeinfo_tx, set_telem_tx), diagnósticos 100% en RAM (stats/log), lista negra (ign clear ⚠) y control por DM cifrado PKI con compuerta CONFIRMAR |
 | **Chat** | Historial persistente por canal, indicador de entrega (⟳ en camino / ✓ entregado / ✗ error + reenviar) |
 | **Nodes** | Tarjetas de nodo (favoritos primero), caché propia persistente (sobrevive al NodeDB de 80 entradas del nodo), búsqueda inteligente, importar nodos por URL, popup de nodo con 11 acciones |
-| **Log** | Consola persistente de peticiones/respuestas |
+| **Log** | Consola persistente de peticiones/respuestas con botón de borrado de registros |
 | **Debug** | Herramientas de desarrollo (oculta por defecto): modo de bajo impacto, sensores y baterías de auditoría |
 
-**También incluye**: interfaz bilingüe EN/ES, tema táctico DayNight, ayuda con pulsación larga en todos los botones, manuales en PDF dentro de la app, **dos demos guiadas** (clásica con puntero y **demo 2 con globos de texto** para grabar vídeos sin voz), nodo destino compartido entre pestañas, registro de errores a archivo, control remoto (receiver `com.meshkachoutility.REMOTE`) para pruebas scriptadas.
+**También incluye**: botones de desconexión rápida (USB y Bluetooth), interfaz bilingüe EN/ES, tema táctico DayNight, ayuda con pulsación larga en todos los botones, manuales en PDF dentro de la app, **dos demos guiadas** (clásica con puntero y **demo 2 con globos de texto** para grabar vídeos sin voz), nodo destino compartido entre pestañas, registro de errores a archivo, control remoto (receiver `com.meshkachoutility.REMOTE`) para pruebas scriptadas.
 
 ## Requisitos
 
@@ -37,7 +37,7 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 
 ## Instalación
 
-1. Descarga el último APK oficial desde **[Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases)** o directamente con este enlace: **[Descargar MeshNavarra-Utility-v1.0.6.apk](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.6.apk)**.
+1. Descarga el último APK oficial desde **[Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases)** o directamente con este enlace: **[Descargar MeshNavarra-Utility-v1.0.7.apk](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.7.apk)**.
 2. Permite instalar aplicaciones de fuentes desconocidas en tu dispositivo y abre el APK.
 3. Conecta tu nodo por USB OTG o Bluetooth, o ejecuta un modo demo (Ayuda → "Ejemplo de uso (demo)" o "Tour guiado con globos (demo 2)") para verla en acción sin hardware.
 
@@ -108,7 +108,7 @@ Contacto: taisoluciones@gmail.com
 [![Android: 8.0+](https://img.shields.io/badge/Android-8.0%2B-green.svg)](https://developer.android.com/studio)
 [![Language: Kotlin](https://img.shields.io/badge/Language-Kotlin%202.1-purple.svg)](https://kotlinlang.org)
 [![Latest Release](https://img.shields.io/github/v/release/EA2OY/MeshNavarra-Utility?color=blue&label=Release)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest)
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.0.6-success?logo=android)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.6.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.0.7-success?logo=android)](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.7.apk)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20the%20project-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/ea2oy)
 
 Unofficial Android app to administer **Meshtastic** nodes — USB serial and Bluetooth LE — with a flagship **NavaTastic CLI** remote-control tab for repeaters running the Navarrico/NavaTastic firmware (see the companion repo [EA2OY/NavaTastic](https://github.com/EA2OY/NavaTastic)).
@@ -123,10 +123,10 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 | **NavaTastic CLI** | Remote control of Navarrico/NavaTastic repeaters (full Frente F21/F22 support): secondary channels (slots 2-7), CLI redirection, Navadmin muting, per-channel MQTT, static position & broadcast cadences (pos_clear, set_pos_tx, set_nodeinfo_tx, set_telem_tx), 100% RAM diagnostics (stats/log), blacklist purge (ign clear ⚠) and PKI-encrypted DM control with CONFIRMAR safety gate |
 | **Chat** | Persistent per-channel history, delivery indicator (⟳ enroute / ✓ delivered / ✗ error + resend) |
 | **Nodes** | Visual node cards (favorites first), own persistent cache (survives the node's 80-entry NodeDB), smart search, import nodes by shared URL, rich node popup with 11 request actions |
-| **Log** | Persistent request/response console |
+| **Log** | Persistent request/response console with clear log button |
 | **Debug** | Developer tools (hidden by default): low-impact mode, sensor toggles, automated audit batteries |
 
-**Also includes**: bilingual UI (EN/ES), DayNight tactical HUD, long-press help on every button, in-app manuals (PDF), **two guided demos** (classic pointer tour + **demo 2 with text balloons** for recording voice-free videos), shared target node across tabs, crash-to-file logging, remote control (`com.meshkachoutility.REMOTE` receiver) for scripted testing.
+**Also includes**: dedicated quick-disconnect buttons (USB & Bluetooth), bilingual UI (EN/ES), DayNight tactical HUD, long-press help on every button, in-app manuals (PDF), **two guided demos** (classic pointer tour + **demo 2 with text balloons** for recording voice-free videos), shared target node across tabs, crash-to-file logging, remote control (`com.meshkachoutility.REMOTE` receiver) for scripted testing.
 
 ## Requirements
 
@@ -137,7 +137,7 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 
 ## Installation
 
-1. Download the latest official APK from the **[Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases)** page or directly via this link: **[Download MeshNavarra-Utility-v1.0.6.apk](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.6.apk)**.
+1. Download the latest official APK from the **[Releases](https://github.com/EA2OY/MeshNavarra-Utility/releases)** page or directly via this link: **[Download MeshNavarra-Utility-v1.0.7.apk](https://github.com/EA2OY/MeshNavarra-Utility/releases/latest/download/MeshNavarra-Utility-v1.0.7.apk)**.
 2. Allow installing apps from unknown sources on your device, then open the APK.
 3. Connect your node via USB OTG or Bluetooth, or run a demo tour (Help → "Usage example (demo)" or "Guided tour with balloons (demo 2)") to see it in action without hardware.
 

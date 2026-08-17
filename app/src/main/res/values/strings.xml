@@ -629,4 +629,15 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_keygen_default">Default (AQ== / 1 byte)</string>
     <string name="nava_keygen_aes128">Random AES-128 (16 bytes)</string>
     <string name="nava_keygen_aes256">Random AES-256 (32 bytes)</string>
+    <string name="log_clear">Clear logs</string>
+    <string name="help_clear_log">Clears the persistent log console and wipes on-disk log entries.</string>
+    <string name="log_cleared">Log console cleared.</string>
+    <string name="disconnect_usb">Disconnect USB</string>
+    <string name="help_disconnect_usb">Disconnects the USB OTG connection and cancels auto-reconnection.</string>
+    <string name="disconnect_ble">Disconnect Bluetooth</string>
+    <string name="help_disconnect_ble">Disconnects the Bluetooth Low Energy session and closes the GATT link.</string>
+    <string name="usb_not_connected">USB is not currently connected.</string>
+    <string name="ble_not_connected">Bluetooth is not currently connected.</string>
+    <string name="log_usb_disconnected_manual">USB disconnected by user.</string>
+    <string name="log_ble_disconnected_manual">Bluetooth disconnected by user.</string>
 </resources>

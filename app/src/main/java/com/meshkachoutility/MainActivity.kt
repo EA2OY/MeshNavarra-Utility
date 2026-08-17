@@ -80,8 +80,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private lateinit var statusText: TextView
     private lateinit var statusProgress: ProgressBar
     private lateinit var connectBluetoothButton: Button
+    private lateinit var disconnectBluetoothButton: MaterialButton
     private lateinit var logText: TextView
     private lateinit var connectButton: Button
+    private lateinit var disconnectUsbButton: MaterialButton
+    private lateinit var clearLogButton: MaterialButton
     private lateinit var helpButton: MaterialButton
     private lateinit var targetNodeInput: TextInputEditText
     private lateinit var queryNodeButton: MaterialButton
@@ -372,8 +375,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         attachDebugTabGesture()
         statusProgress = findViewById(R.id.statusProgress)
         connectBluetoothButton = findViewById(R.id.connectBluetoothButton)
+        disconnectBluetoothButton = findViewById(R.id.disconnectBluetoothButton)
         logText = findViewById(R.id.logText)
         connectButton = findViewById(R.id.connectButton)
+        disconnectUsbButton = findViewById(R.id.disconnectUsbButton)
         helpButton = findViewById(R.id.helpButton)
         targetNodeInput = findViewById(R.id.targetNodeInput)
         queryNodeButton = findViewById(R.id.queryNodeButton)
@@ -416,6 +421,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         nodesImportInput = findViewById(R.id.nodesImportInput)
         nodesImportButton = findViewById(R.id.nodesImportButton)
         logPanel = findViewById(R.id.logPanel)
+        clearLogButton = findViewById(R.id.clearLogButton)
         logFileText = findViewById(R.id.logFileText)
         bpPanel = findViewById(R.id.bpPanel)
         bpHelpButton = findViewById(R.id.bpHelpButton)
@@ -490,6 +496,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 cancelReconnect()
                 connectViaBluetooth()
             }
+        }
+        disconnectBluetoothButton.setOnClickListener {
+            pressFeedback(disconnectBluetoothButton)
+            disconnectBluetooth()
         }
         showDisclaimerIfNeeded()
         loadNodeCache()
@@ -776,6 +786,16 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 appendLog(getString(R.string.log_requesting_usb_permission, device.deviceName))
                 usbConnectionManager.requestPermission(device)
             }
+        }
+
+        disconnectUsbButton.setOnClickListener {
+            pressFeedback(disconnectUsbButton)
+            disconnectUsb()
+        }
+
+        clearLogButton.setOnClickListener {
+            pressFeedback(clearLogButton)
+            clearLogs()
         }
 
         // Query Node / Get Info logic (equivalent to `meshtastic --info`)
@@ -2294,6 +2314,65 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     }
 
     /**
+     * Clears the log file on disk and resets the in-memory log buffer and view.
+     */
+    private fun clearLogs() {
+        runOnUiThread {
+            try {
+                val baseDir = getExternalFilesDir(null) ?: filesDir
+                val file = File(baseDir, MeshKachoUtilityApp.LOG_DIR + File.separator + "app_log.txt")
+                if (file.exists()) {
+                    file.writeText("")
+                }
+                logText.text = ""
+                logFileText.text = getString(R.string.log_empty)
+                Toast.makeText(this, getString(R.string.log_cleared), Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to clear log file", e)
+                Toast.makeText(this, getString(R.string.log_error, e.localizedMessage), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    /**
+     * Disconnects the active USB OTG session and cancels pending reconnection attempts.
+     */
+    private fun disconnectUsb() {
+        if (demoMode) {
+            demoEnd()
+            return
+        }
+        userInitiatedDisconnect = true
+        cancelReconnect()
+        if (usbConnectionManager.isConnected()) {
+            usbConnectionManager.disconnect()
+            appendLog(getString(R.string.log_usb_disconnected_manual))
+        } else {
+            Toast.makeText(this, getString(R.string.usb_not_connected), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Disconnects the active Bluetooth Low Energy session and tears down the GATT link.
+     */
+    private fun disconnectBluetooth() {
+        if (demoMode) {
+            demoEnd()
+            return
+        }
+        userInitiatedDisconnect = true
+        cancelReconnect()
+        if (bleConnectionManager.isConnected()) {
+            bleConnectionManager.disconnect()
+            bleTransportActive = false
+            appendLog(getString(R.string.log_ble_disconnected_manual))
+            onDisconnected()
+        } else {
+            Toast.makeText(this, getString(R.string.ble_not_connected), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
      * Refreshes the full node list shown in the "Nodes" tab as visual cards
      * (favorites first), similar to the Meshtastic app.
      */
@@ -2429,12 +2508,12 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
      */
     private fun applyPressAnimations() {
         val buttons = listOf(
-            helpButton, connectButton, connectBluetoothButton, queryNodeButton, rebootButton, wipeNodeDbButton,
-            factoryResetButton, favoriteButton, unsetFavoriteButton, ignoredButton, unsetIgnoredButton,
-            removeNodeButton, adminKeyAddButton, masterConvertButton, sendCmdButton, cmdTelemetryButton,
-            cmdPositionButton, cmdTraceButton, cmdSetOwnerButton, bpApplyButton, bpBackupButton, bpRestoreButton,
-            chatSendButton, nodesImportButton, hopApplyButton, freqApplyButton, navadminTestButton,
-            navadminTestStopButton, presetApplyButton, chatPauseButton, navaSendButton
+            helpButton, connectButton, disconnectUsbButton, connectBluetoothButton, disconnectBluetoothButton,
+            queryNodeButton, rebootButton, wipeNodeDbButton, factoryResetButton, favoriteButton, unsetFavoriteButton,
+            ignoredButton, unsetIgnoredButton, removeNodeButton, adminKeyAddButton, masterConvertButton, sendCmdButton,
+            cmdTelemetryButton, cmdPositionButton, cmdTraceButton, cmdSetOwnerButton, bpApplyButton, bpBackupButton,
+            bpRestoreButton, chatSendButton, nodesImportButton, hopApplyButton, freqApplyButton, navadminTestButton,
+            navadminTestStopButton, presetApplyButton, chatPauseButton, navaSendButton, clearLogButton
         )
         val longPressTimeout = android.view.ViewConfiguration.getLongPressTimeout().toLong()
         for (b in buttons) {
@@ -2635,7 +2714,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private val buttonHelps: Map<Int, Int> by lazy {
         mapOf(
             R.id.connectButton to R.string.help_connect_usb,
+            R.id.disconnectUsbButton to R.string.help_disconnect_usb,
             R.id.connectBluetoothButton to R.string.help_connect_ble,
+            R.id.disconnectBluetoothButton to R.string.help_disconnect_ble,
             R.id.queryNodeButton to R.string.help_query_node,
             R.id.rebootButton to R.string.help_reboot,
             R.id.wipeNodeDbButton to R.string.help_wipe,
@@ -2663,13 +2744,16 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             R.id.hopApplyButton to R.string.help_hop_apply,
             R.id.freqApplyButton to R.string.help_freq_apply,
             R.id.navadminTestButton to R.string.help_audit_run,
-            R.id.navadminTestStopButton to R.string.help_audit_stop
+            R.id.navadminTestStopButton to R.string.help_audit_stop,
+            R.id.clearLogButton to R.string.help_clear_log
         )
     }
 
     private fun showButtonHelp(button: android.view.View) {
-        val title = (button as? MaterialButton)?.text?.toString()
-            ?.takeIf { it.isNotBlank() } ?: getString(R.string.help_generic_title)
+        val title = (button as? MaterialButton)?.let { mb ->
+            mb.text?.toString()?.takeIf { it.isNotBlank() }
+                ?: mb.contentDescription?.toString()?.takeIf { it.isNotBlank() }
+        } ?: getString(R.string.help_generic_title)
         val body = buttonHelps[button.id]?.let { getString(it) } ?: getString(R.string.help_generic)
         MaterialAlertDialogBuilder(this)
             .setTitle(title)

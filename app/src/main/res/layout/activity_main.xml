@@ -98,31 +98,85 @@
                 android:indeterminate="true"
                 android:visibility="gone" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/connectButton"
-                style="@style/Widget.Material3.Button.TonalButton"
+            <!-- USB Connection Row -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/discover_connect"
-                app:icon="@drawable/ic_usb"
-                app:iconSize="28dp"
-                app:iconTint="?attr/colorOnSecondaryContainer" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/connectBluetoothButton"
-                style="@style/Widget.Material3.Button"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/connectButton"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/discover_connect"
+                    app:icon="@drawable/ic_usb"
+                    app:iconSize="28dp"
+                    app:iconTint="?attr/colorOnSecondaryContainer" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/disconnectUsbButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/disconnect_usb"
+                    android:letterSpacing="0"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="14dp"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_link_off"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
+                    app:iconTint="?attr/colorError"
+                    app:strokeColor="?attr/colorError" />
+            </LinearLayout>
+
+            <!-- Bluetooth Connection Row -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:letterSpacing="0"
-                android:text="@string/discover_connect_ble"
-                android:textAllCaps="false"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:backgroundTint="?attr/colorPrimary"
-                app:icon="@drawable/ic_bluetooth"
-                app:iconTint="?attr/colorOnPrimary" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/connectBluetoothButton"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0"
+                    android:text="@string/discover_connect_ble"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:icon="@drawable/ic_bluetooth"
+                    app:iconTint="?attr/colorOnPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/disconnectBluetoothButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/disconnect_ble"
+                    android:letterSpacing="0"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="14dp"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_link_off"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="22dp"
+                    app:iconTint="?attr/colorError"
+                    app:strokeColor="?attr/colorError" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
@@ -705,15 +759,36 @@
             android:scrollbars="none"
             android:visibility="gone">
 
-            <TextView
-                android:id="@+id/logFileText"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:fontFamily="monospace"
-                android:textColor="?attr/colorOnBackground"
-                android:textSize="12sp"
-                android:text="" />
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/clearLogButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0"
+                    android:text="@string/log_clear"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/colorError"
+                    app:icon="@drawable/ic_delete"
+                    app:iconSize="20dp"
+                    app:iconTint="?attr/colorError"
+                    app:strokeColor="?attr/colorError" />
+
+                <TextView
+                    android:id="@+id/logFileText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="?attr/colorOnBackground"
+                    android:textSize="12sp"
+                    android:text="" />
+            </LinearLayout>
         </ScrollView>
 
         <!-- Panel 5: Good Practices (remote config batch) -->
