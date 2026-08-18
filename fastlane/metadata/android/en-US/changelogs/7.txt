@@ -1,0 +1,3 @@
+- Critical Bluetooth LE connection fix: eliminated GATT teardown race condition, forced TRANSPORT_LE on Android 6.0+, and protected against orphaned callbacks
+- Package APK size optimization and reduction
+- Extended NavaTastic F21/F22 command catalog: broadcast cadences for position/telemetry and blacklist purge (ign clear)

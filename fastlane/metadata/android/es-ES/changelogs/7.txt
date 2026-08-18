@@ -1,0 +1,3 @@
+- Corrección crítica de conexión Bluetooth LE: eliminación de condición de carrera en GATT, forzado de TRANSPORT_LE en Android 6.0+ y protección contra callbacks huérfanos
+- Optimización y reducción de peso del paquete APK
+- Ampliación de comandos NavaTastic F21/F22: cadencias de difusión de posición/telemetría y purga de lista negra (ign clear)

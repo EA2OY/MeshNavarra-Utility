@@ -1,0 +1,4 @@
+- Botón para borrar registros en la pestaña Log (limpieza de consola y archivo en disco)
+- Botones de desconexión rápida dedicados para enlaces USB OTG y Bluetooth LE
+- Ayudas contextuales por pulsación larga e información táctil animada
+- Compatibilidad mejorada para compilación en entornos Linux / F-Droid CI

@@ -1,0 +1,4 @@
+- Clear logs button in Log tab (clears both UI view and persistent log file on disk)
+- Dedicated quick-disconnect buttons for USB OTG and Bluetooth LE sessions
+- Contextual long-press help and tactile touch animations
+- Improved Linux / F-Droid CI build compatibility
