@@ -15,9 +15,10 @@ Repo: https://github.com/EA2OY/MeshNavarra-Utility
 Builds:
   - versionName: 1.0.7
     versionCode: 8
-    commit: 7224258534f377628a04974d1a8b92b648c99dcb
+    commit: f736742d3f3ecfa930f3dc79442214e20f91069f
     gradle:
       - yes
+    output: app/build/outputs/apk/release/app-release-unsigned.apk
 
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
