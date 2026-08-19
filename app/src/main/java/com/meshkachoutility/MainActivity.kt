@@ -11,7 +11,14 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.FrameLayout
@@ -22,6 +29,12 @@ import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import android.content.ContentValues
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -75,6 +88,17 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private var usbPermRequestedThisCycle = false
     private var appInBackground = false
     private var usbPermPending = false
+
+    private var pendingDownloadAssetName: String? = null
+    private val createDocumentLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri: Uri? ->
+        val assetName = pendingDownloadAssetName ?: return@registerForActivityResult
+        pendingDownloadAssetName = null
+        if (uri != null) {
+            saveAssetToUri(assetName, uri)
+        }
+    }
 
     private lateinit var streamApiUnframer: StreamApiUnframer
     private lateinit var statusText: TextView
@@ -740,16 +764,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                         startDemo2()
                     }
                     appManual.setOnClickListener {
-                        dialog.dismiss()
-                        openBundledPdf("Manual_app_MeshNavarra.pdf")
+                        showManualActionDialog(getString(R.string.cmd_app_manual), "Manual_app_MeshNavarra.pdf")
                     }
                     navaManual.setOnClickListener {
-                        dialog.dismiss()
-                        openBundledPdf("Manual_NavaTastic.pdf")
+                        showManualActionDialog(getString(R.string.cmd_nava_manual), "Manual_NavaTastic.pdf")
                     }
                     navaManualUso.setOnClickListener {
-                        dialog.dismiss()
-                        openBundledPdf("Manual_uso_NavaTastic_4.2.pdf")
+                        showManualActionDialog(getString(R.string.cmd_nava_manual_uso), "Manual_uso_NavaTastic_4.2.pdf")
                     }
                     licenseBtn.setOnClickListener {
                         dialog.dismiss()
@@ -1568,6 +1589,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
             override fun onTabReselected(tab: TabLayout.Tab) {
                 applyTabVisibility(tab.position)
+                showCinematicTabExplainer(tab.position, forceShow = true)
             }
         }
         tabListener = listener
@@ -1620,47 +1642,428 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     /** Suppresses tab explainer/intro popups while a remote tab switch runs. */
     private var remoteTabSwitch = false
 
+    data class CinematicSlide(
+        val punchlineRes: Int,
+        val descRes: Int,
+        val promptText: String,
+        val outputText: String
+    )
+
+    data class CinematicTabContent(
+        val tabPosition: Int,
+        val iconRes: Int,
+        val titleRes: Int,
+        val badgeRes: Int,
+        val slides: List<CinematicSlide>,
+        val technicalDetailsRes: Int
+    )
+
+    private fun getCinematicTabContent(position: Int): CinematicTabContent? = when (position) {
+        0 -> CinematicTabContent(
+            tabPosition = 0,
+            iconRes = R.drawable.ic_bolt,
+            titleRes = R.string.tab_info_title_gp,
+            badgeRes = R.string.cinematic_badge_gp,
+            slides = listOf(
+                CinematicSlide(R.string.slide_gp_1_punch, R.string.slide_gp_1_desc, getString(R.string.slide_gp_1_prompt), getString(R.string.slide_gp_1_output)),
+                CinematicSlide(R.string.slide_gp_2_punch, R.string.slide_gp_2_desc, getString(R.string.slide_gp_2_prompt), getString(R.string.slide_gp_2_output)),
+                CinematicSlide(R.string.slide_gp_3_punch, R.string.slide_gp_3_desc, getString(R.string.slide_gp_3_prompt), getString(R.string.slide_gp_3_output)),
+                CinematicSlide(R.string.slide_gp_4_punch, R.string.slide_gp_4_desc, getString(R.string.slide_gp_4_prompt), getString(R.string.slide_gp_4_output)),
+                CinematicSlide(R.string.slide_gp_5_punch, R.string.slide_gp_5_desc, getString(R.string.slide_gp_5_prompt), getString(R.string.slide_gp_5_output)),
+                CinematicSlide(R.string.slide_gp_6_punch, R.string.slide_gp_6_desc, getString(R.string.slide_gp_6_prompt), getString(R.string.slide_gp_6_output)),
+                CinematicSlide(R.string.slide_gp_7_punch, R.string.slide_gp_7_desc, getString(R.string.slide_gp_7_prompt), getString(R.string.slide_gp_7_output)),
+                CinematicSlide(R.string.slide_gp_8_punch, R.string.slide_gp_8_desc, getString(R.string.slide_gp_8_prompt), getString(R.string.slide_gp_8_output)),
+                CinematicSlide(R.string.slide_gp_9_punch, R.string.slide_gp_9_desc, getString(R.string.slide_gp_9_prompt), getString(R.string.slide_gp_9_output)),
+                CinematicSlide(R.string.slide_gp_10_punch, R.string.slide_gp_10_desc, getString(R.string.slide_gp_10_prompt), getString(R.string.slide_gp_10_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_gp
+        )
+        1 -> CinematicTabContent(
+            tabPosition = 1,
+            iconRes = R.drawable.ic_terminal,
+            titleRes = R.string.tab_info_title_cmd,
+            badgeRes = R.string.cinematic_badge_cmd,
+            slides = listOf(
+                CinematicSlide(R.string.slide_cmd_1_punch, R.string.slide_cmd_1_desc, getString(R.string.slide_cmd_1_prompt), getString(R.string.slide_cmd_1_output)),
+                CinematicSlide(R.string.slide_cmd_2_punch, R.string.slide_cmd_2_desc, getString(R.string.slide_cmd_2_prompt), getString(R.string.slide_cmd_2_output)),
+                CinematicSlide(R.string.slide_cmd_3_punch, R.string.slide_cmd_3_desc, getString(R.string.slide_cmd_3_prompt), getString(R.string.slide_cmd_3_output)),
+                CinematicSlide(R.string.slide_cmd_4_punch, R.string.slide_cmd_4_desc, getString(R.string.slide_cmd_4_prompt), getString(R.string.slide_cmd_4_output)),
+                CinematicSlide(R.string.slide_cmd_5_punch, R.string.slide_cmd_5_desc, getString(R.string.slide_cmd_5_prompt), getString(R.string.slide_cmd_5_output)),
+                CinematicSlide(R.string.slide_cmd_6_punch, R.string.slide_cmd_6_desc, getString(R.string.slide_cmd_6_prompt), getString(R.string.slide_cmd_6_output)),
+                CinematicSlide(R.string.slide_cmd_7_punch, R.string.slide_cmd_7_desc, getString(R.string.slide_cmd_7_prompt), getString(R.string.slide_cmd_7_output)),
+                CinematicSlide(R.string.slide_cmd_8_punch, R.string.slide_cmd_8_desc, getString(R.string.slide_cmd_8_prompt), getString(R.string.slide_cmd_8_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_cmd
+        )
+        2 -> CinematicTabContent(
+            tabPosition = 2,
+            iconRes = R.drawable.ic_shield,
+            titleRes = R.string.tab_info_title_admin,
+            badgeRes = R.string.cinematic_badge_admin,
+            slides = listOf(
+                CinematicSlide(R.string.slide_admin_1_punch, R.string.slide_admin_1_desc, getString(R.string.slide_admin_1_prompt), getString(R.string.slide_admin_1_output)),
+                CinematicSlide(R.string.slide_admin_2_punch, R.string.slide_admin_2_desc, getString(R.string.slide_admin_2_prompt), getString(R.string.slide_admin_2_output)),
+                CinematicSlide(R.string.slide_admin_3_punch, R.string.slide_admin_3_desc, getString(R.string.slide_admin_3_prompt), getString(R.string.slide_admin_3_output)),
+                CinematicSlide(R.string.slide_admin_4_punch, R.string.slide_admin_4_desc, getString(R.string.slide_admin_4_prompt), getString(R.string.slide_admin_4_output)),
+                CinematicSlide(R.string.slide_admin_5_punch, R.string.slide_admin_5_desc, getString(R.string.slide_admin_5_prompt), getString(R.string.slide_admin_5_output)),
+                CinematicSlide(R.string.slide_admin_6_punch, R.string.slide_admin_6_desc, getString(R.string.slide_admin_6_prompt), getString(R.string.slide_admin_6_output)),
+                CinematicSlide(R.string.slide_admin_7_punch, R.string.slide_admin_7_desc, getString(R.string.slide_admin_7_prompt), getString(R.string.slide_admin_7_output)),
+                CinematicSlide(R.string.slide_admin_8_punch, R.string.slide_admin_8_desc, getString(R.string.slide_admin_8_prompt), getString(R.string.slide_admin_8_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_admin
+        )
+        3 -> CinematicTabContent(
+            tabPosition = 3,
+            iconRes = R.drawable.ic_terminal,
+            titleRes = R.string.tab_info_title_nava,
+            badgeRes = R.string.cinematic_badge_nava,
+            slides = listOf(
+                CinematicSlide(R.string.slide_nava_1_punch, R.string.slide_nava_1_desc, getString(R.string.slide_nava_1_prompt), getString(R.string.slide_nava_1_output)),
+                CinematicSlide(R.string.slide_nava_2_punch, R.string.slide_nava_2_desc, getString(R.string.slide_nava_2_prompt), getString(R.string.slide_nava_2_output)),
+                CinematicSlide(R.string.slide_nava_3_punch, R.string.slide_nava_3_desc, getString(R.string.slide_nava_3_prompt), getString(R.string.slide_nava_3_output)),
+                CinematicSlide(R.string.slide_nava_4_punch, R.string.slide_nava_4_desc, getString(R.string.slide_nava_4_prompt), getString(R.string.slide_nava_4_output)),
+                CinematicSlide(R.string.slide_nava_5_punch, R.string.slide_nava_5_desc, getString(R.string.slide_nava_5_prompt), getString(R.string.slide_nava_5_output)),
+                CinematicSlide(R.string.slide_nava_6_punch, R.string.slide_nava_6_desc, getString(R.string.slide_nava_6_prompt), getString(R.string.slide_nava_6_output)),
+                CinematicSlide(R.string.slide_nava_7_punch, R.string.slide_nava_7_desc, getString(R.string.slide_nava_7_prompt), getString(R.string.slide_nava_7_output)),
+                CinematicSlide(R.string.slide_nava_8_punch, R.string.slide_nava_8_desc, getString(R.string.slide_nava_8_prompt), getString(R.string.slide_nava_8_output)),
+                CinematicSlide(R.string.slide_nava_9_punch, R.string.slide_nava_9_desc, getString(R.string.slide_nava_9_prompt), getString(R.string.slide_nava_9_output)),
+                CinematicSlide(R.string.slide_nava_10_punch, R.string.slide_nava_10_desc, getString(R.string.slide_nava_10_prompt), getString(R.string.slide_nava_10_output)),
+                CinematicSlide(R.string.slide_nava_11_punch, R.string.slide_nava_11_desc, getString(R.string.slide_nava_11_prompt), getString(R.string.slide_nava_11_output)),
+                CinematicSlide(R.string.slide_nava_12_punch, R.string.slide_nava_12_desc, getString(R.string.slide_nava_12_prompt), getString(R.string.slide_nava_12_output)),
+                CinematicSlide(R.string.slide_nava_13_punch, R.string.slide_nava_13_desc, getString(R.string.slide_nava_13_prompt), getString(R.string.slide_nava_13_output)),
+                CinematicSlide(R.string.slide_nava_14_punch, R.string.slide_nava_14_desc, getString(R.string.slide_nava_14_prompt), getString(R.string.slide_nava_14_output)),
+                CinematicSlide(R.string.slide_nava_15_punch, R.string.slide_nava_15_desc, getString(R.string.slide_nava_15_prompt), getString(R.string.slide_nava_15_output)),
+                CinematicSlide(R.string.slide_nava_16_punch, R.string.slide_nava_16_desc, getString(R.string.slide_nava_16_prompt), getString(R.string.slide_nava_16_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_nava
+        )
+        4 -> CinematicTabContent(
+            tabPosition = 4,
+            iconRes = R.drawable.ic_chat,
+            titleRes = R.string.tab_info_title_chat,
+            badgeRes = R.string.cinematic_badge_chat,
+            slides = listOf(
+                CinematicSlide(R.string.slide_chat_1_punch, R.string.slide_chat_1_desc, getString(R.string.slide_chat_1_prompt), getString(R.string.slide_chat_1_output)),
+                CinematicSlide(R.string.slide_chat_2_punch, R.string.slide_chat_2_desc, getString(R.string.slide_chat_2_prompt), getString(R.string.slide_chat_2_output)),
+                CinematicSlide(R.string.slide_chat_3_punch, R.string.slide_chat_3_desc, getString(R.string.slide_chat_3_prompt), getString(R.string.slide_chat_3_output)),
+                CinematicSlide(R.string.slide_chat_4_punch, R.string.slide_chat_4_desc, getString(R.string.slide_chat_4_prompt), getString(R.string.slide_chat_4_output)),
+                CinematicSlide(R.string.slide_chat_5_punch, R.string.slide_chat_5_desc, getString(R.string.slide_chat_5_prompt), getString(R.string.slide_chat_5_output)),
+                CinematicSlide(R.string.slide_chat_6_punch, R.string.slide_chat_6_desc, getString(R.string.slide_chat_6_prompt), getString(R.string.slide_chat_6_output)),
+                CinematicSlide(R.string.slide_chat_7_punch, R.string.slide_chat_7_desc, getString(R.string.slide_chat_7_prompt), getString(R.string.slide_chat_7_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_chat
+        )
+        5 -> CinematicTabContent(
+            tabPosition = 5,
+            iconRes = R.drawable.ic_nodes,
+            titleRes = R.string.tab_info_title_nodes,
+            badgeRes = R.string.cinematic_badge_nodes,
+            slides = listOf(
+                CinematicSlide(R.string.slide_nodes_1_punch, R.string.slide_nodes_1_desc, getString(R.string.slide_nodes_1_prompt), getString(R.string.slide_nodes_1_output)),
+                CinematicSlide(R.string.slide_nodes_2_punch, R.string.slide_nodes_2_desc, getString(R.string.slide_nodes_2_prompt), getString(R.string.slide_nodes_2_output)),
+                CinematicSlide(R.string.slide_nodes_3_punch, R.string.slide_nodes_3_desc, getString(R.string.slide_nodes_3_prompt), getString(R.string.slide_nodes_3_output)),
+                CinematicSlide(R.string.slide_nodes_4_punch, R.string.slide_nodes_4_desc, getString(R.string.slide_nodes_4_prompt), getString(R.string.slide_nodes_4_output)),
+                CinematicSlide(R.string.slide_nodes_5_punch, R.string.slide_nodes_5_desc, getString(R.string.slide_nodes_5_prompt), getString(R.string.slide_nodes_5_output)),
+                CinematicSlide(R.string.slide_nodes_6_punch, R.string.slide_nodes_6_desc, getString(R.string.slide_nodes_6_prompt), getString(R.string.slide_nodes_6_output)),
+                CinematicSlide(R.string.slide_nodes_7_punch, R.string.slide_nodes_7_desc, getString(R.string.slide_nodes_7_prompt), getString(R.string.slide_nodes_7_output)),
+                CinematicSlide(R.string.slide_nodes_8_punch, R.string.slide_nodes_8_desc, getString(R.string.slide_nodes_8_prompt), getString(R.string.slide_nodes_8_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_nodes
+        )
+        6 -> CinematicTabContent(
+            tabPosition = 6,
+            iconRes = R.drawable.ic_log,
+            titleRes = R.string.tab_info_title_log,
+            badgeRes = R.string.cinematic_badge_log,
+            slides = listOf(
+                CinematicSlide(R.string.slide_log_1_punch, R.string.slide_log_1_desc, getString(R.string.slide_log_1_prompt), getString(R.string.slide_log_1_output)),
+                CinematicSlide(R.string.slide_log_2_punch, R.string.slide_log_2_desc, getString(R.string.slide_log_2_prompt), getString(R.string.slide_log_2_output)),
+                CinematicSlide(R.string.slide_log_3_punch, R.string.slide_log_3_desc, getString(R.string.slide_log_3_prompt), getString(R.string.slide_log_3_output)),
+                CinematicSlide(R.string.slide_log_4_punch, R.string.slide_log_4_desc, getString(R.string.slide_log_4_prompt), getString(R.string.slide_log_4_output)),
+                CinematicSlide(R.string.slide_log_5_punch, R.string.slide_log_5_desc, getString(R.string.slide_log_5_prompt), getString(R.string.slide_log_5_output)),
+                CinematicSlide(R.string.slide_log_6_punch, R.string.slide_log_6_desc, getString(R.string.slide_log_6_prompt), getString(R.string.slide_log_6_output)),
+                CinematicSlide(R.string.slide_log_7_punch, R.string.slide_log_7_desc, getString(R.string.slide_log_7_prompt), getString(R.string.slide_log_7_output))
+            ),
+            technicalDetailsRes = R.string.tab_info_body_log
+        )
+        else -> null
+    }
+
     /**
-     * Explains what each tab is for. Shown on entry up to 8 times per tab
-     * (persisted in preferences). The NavaTastic tab has its own always-on
-     * intro popup instead.
+     * Shows a dynamic cinematic trailer-style explainer popup for the selected tab.
+     * Features rich feature slides with animated scale effects, simulated live HUD,
+     * adaptive reading timers, and expandable in-depth technical documentation.
      */
-    private fun showTabExplainer(position: Int) {
+    private fun showCinematicTabExplainer(position: Int, forceShow: Boolean = false, startExpanded: Boolean = false) {
         if (remoteTabSwitch) return
         if (demoSuppressExplainers) return
         if (initialTabSelected) {
             initialTabSelected = false
             return
         }
-        if (position == 3) return
-        val title = tabExplainTitle(position)
-        val body = tabExplainBody(position)
-        if (title.isEmpty() || body.isEmpty()) return
+        val content = getCinematicTabContent(position) ?: return
         val prefs = getSharedPreferences("meshkacho", MODE_PRIVATE)
         val key = "tab_explain_$position"
-        if (prefs.getInt(key, 0) >= 8 && !demoMode) return
-        showScrollableDialog(title, body)
-        if (!demoMode) prefs.edit().putInt(key, prefs.getInt(key, 0) + 1).apply()
+        if (!forceShow && prefs.getInt(key, 0) >= 15 && !demoMode) return
+
+        val view = layoutInflater.inflate(R.layout.dialog_cinematic_explainer, null)
+        val headerIcon = view.findViewById<ImageView>(R.id.headerIcon)
+        val headerBadge = view.findViewById<TextView>(R.id.headerBadge)
+        val headerTitle = view.findViewById<TextView>(R.id.headerTitle)
+        val btnCloseTop = view.findViewById<MaterialButton>(R.id.btnCloseTop)
+
+        val storyProgressContainer = view.findViewById<LinearLayout>(R.id.storyProgressContainer)
+        storyProgressContainer.removeAllViews()
+        val totalSlides = content.slides.size
+        val storyBars = mutableListOf<ProgressBar>()
+        for (i in 0 until totalSlides) {
+            val pb = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                layoutParams = LinearLayout.LayoutParams(0, dp(6), 1f).apply {
+                    if (i < totalSlides - 1) marginEnd = dp(2)
+                }
+                max = 1000
+                progress = 0
+                progressDrawable = getDrawable(R.drawable.bg_story_segment_active)
+                isClickable = true
+                isFocusable = true
+            }
+            storyProgressContainer.addView(pb)
+            storyBars.add(pb)
+        }
+
+        val stageTouchContainer = view.findViewById<FrameLayout>(R.id.stageTouchContainer)
+        val textHoldHint = view.findViewById<TextView>(R.id.textHoldHint)
+        val stageTextPrompt = view.findViewById<TextView>(R.id.stageTextPrompt)
+        val stageTextOutput = view.findViewById<TextView>(R.id.stageTextOutput)
+
+        val textPunchline = view.findViewById<TextView>(R.id.textPunchline)
+        val textDescription = view.findViewById<TextView>(R.id.textDescription)
+
+        val btnPrevStep = view.findViewById<MaterialButton>(R.id.btnPrevStep)
+        val textStepCounter = view.findViewById<TextView>(R.id.textStepCounter)
+        val btnNextStep = view.findViewById<MaterialButton>(R.id.btnNextStep)
+
+        val btnToggleMoreInfo = view.findViewById<MaterialButton>(R.id.btnToggleMoreInfo)
+        val moreInfoContainer = view.findViewById<LinearLayout>(R.id.moreInfoContainer)
+        val textTechnicalDetails = view.findViewById<TextView>(R.id.textTechnicalDetails)
+        val btnOpenAppManual = view.findViewById<MaterialButton>(R.id.btnOpenAppManual)
+        val btnOpenNavaManual = view.findViewById<MaterialButton>(R.id.btnOpenNavaManual)
+        val btnCloseBottom = view.findViewById<MaterialButton>(R.id.btnCloseBottom)
+
+        // Populate initial UI
+        headerIcon.setImageResource(content.iconRes)
+        headerBadge.setText(content.badgeRes)
+        headerTitle.setText(content.titleRes)
+        textTechnicalDetails.setText(content.technicalDetailsRes)
+
+        var currentStep = 0
+        var isPaused = false
+        var isExpanded = startExpanded
+        var userHasInteracted = false
+        var isFrozenInManualMode = false
+        var storyAnimator: ValueAnimator? = null
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(view)
+            .setCancelable(true)
+            .create()
+
+        demoActiveDialog = dialog
+
+        fun updateStep(stepIndex: Int, animate: Boolean, autoPlay: Boolean = true) {
+            storyAnimator?.removeAllListeners()
+            storyAnimator?.cancel()
+            storyAnimator = null
+
+            currentStep = stepIndex.coerceIn(0, totalSlides - 1)
+
+            for (i in 0 until totalSlides) {
+                storyBars[i].progress = when {
+                    i < currentStep -> 1000
+                    i == currentStep && !autoPlay -> 1000
+                    else -> 0
+                }
+            }
+
+            val slide = content.slides[currentStep]
+            textPunchline.text = getString(slide.punchlineRes)
+            textDescription.text = getString(slide.descRes)
+            stageTextPrompt.text = slide.promptText
+            stageTextOutput.text = slide.outputText
+            textStepCounter.text = "${currentStep + 1} / $totalSlides"
+
+            if (animate) {
+                textPunchline.alpha = 0f
+                textPunchline.scaleX = 0.78f
+                textPunchline.scaleY = 0.78f
+                textPunchline.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(380)
+                    .setInterpolator(OvershootInterpolator(1.6f))
+                    .start()
+
+                stageTouchContainer.alpha = 0.6f
+                stageTouchContainer.scaleX = 0.95f
+                stageTouchContainer.scaleY = 0.95f
+                stageTouchContainer.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(320)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+
+                textDescription.alpha = 0f
+                textDescription.translationY = dp(8).toFloat()
+                textDescription.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(350)
+                    .setStartDelay(60)
+                    .start()
+            }
+
+            if (!autoPlay || isFrozenInManualMode) {
+                isPaused = true
+                textHoldHint.text = getString(R.string.cinematic_paused_hint)
+                return
+            }
+
+            isPaused = false
+            textHoldHint.text = getString(R.string.cinematic_hold_hint)
+
+            val totalTextLen = getString(slide.punchlineRes).length +
+                    getString(slide.descRes).length +
+                    slide.promptText.length +
+                    slide.outputText.length
+
+            val baseDurationMs = (7500L + (totalTextLen * 50L)).coerceIn(8500L, 16000L)
+            val durationMs = if (userHasInteracted) {
+                (baseDurationMs * 2.0f).toLong().coerceIn(16000L, 30000L)
+            } else {
+                baseDurationMs
+            }
+
+            storyAnimator = ValueAnimator.ofInt(0, 1000).apply {
+                duration = durationMs
+                interpolator = LinearInterpolator()
+                addUpdateListener { anim ->
+                    if (currentStep in 0 until totalSlides) {
+                        storyBars[currentStep].progress = anim.animatedValue as Int
+                    }
+                }
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (!isPaused && !isFrozenInManualMode && dialog.isShowing) {
+                            val next = if (currentStep < totalSlides - 1) currentStep + 1 else 0
+                            updateStep(next, true, autoPlay = true)
+                        }
+                    }
+                })
+                if (!isPaused && !isExpanded) start()
+            }
+        }
+
+        storyBars.forEachIndexed { idx, pb ->
+            pb.setOnClickListener {
+                userHasInteracted = true
+                isFrozenInManualMode = true
+                updateStep(idx, true, autoPlay = false)
+            }
+        }
+
+        btnPrevStep.setOnClickListener {
+            userHasInteracted = true
+            isFrozenInManualMode = true
+            val prev = if (currentStep > 0) currentStep - 1 else totalSlides - 1
+            updateStep(prev, true, autoPlay = false)
+        }
+
+        btnNextStep.setOnClickListener {
+            userHasInteracted = true
+            isFrozenInManualMode = false
+            val next = if (currentStep < totalSlides - 1) currentStep + 1 else 0
+            updateStep(next, true, autoPlay = true)
+        }
+
+        stageTouchContainer.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    isPaused = true
+                    storyAnimator?.pause()
+                    textHoldHint.text = "⏸ Pausado"
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (!isFrozenInManualMode) {
+                        isPaused = false
+                        if (!isExpanded) {
+                            storyAnimator?.resume()
+                            textHoldHint.text = getString(R.string.cinematic_hold_hint)
+                        }
+                    } else {
+                        textHoldHint.text = getString(R.string.cinematic_paused_hint)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+
+        fun applyMoreInfoState() {
+            moreInfoContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            btnToggleMoreInfo.text = if (isExpanded) getString(R.string.cinematic_hide_info) else getString(R.string.cinematic_more_info)
+            if (isExpanded) {
+                storyAnimator?.pause()
+            } else if (!isPaused && !isFrozenInManualMode) {
+                storyAnimator?.resume()
+            }
+        }
+
+        btnToggleMoreInfo.setOnClickListener {
+            isExpanded = !isExpanded
+            applyMoreInfoState()
+        }
+
+        btnOpenAppManual.setOnClickListener {
+            showManualActionDialog(getString(R.string.cmd_app_manual), "Manual_app_MeshNavarra.pdf")
+        }
+
+        btnOpenNavaManual.setOnClickListener {
+            showManualActionDialog(getString(R.string.cmd_nava_manual), "Manual_NavaTastic.pdf")
+        }
+
+        btnCloseTop.setOnClickListener { dialog.dismiss() }
+        btnCloseBottom.setOnClickListener { dialog.dismiss() }
+
+        dialog.setOnDismissListener {
+            storyAnimator?.removeAllListeners()
+            storyAnimator?.cancel()
+            storyAnimator = null
+        }
+
+        applyMoreInfoState()
+        updateStep(0, true, autoPlay = true)
+
+        dialog.show()
+
+        if (!forceShow && !demoMode) {
+            prefs.edit().putInt(key, prefs.getInt(key, 0) + 1).apply()
+        }
     }
 
-    private fun tabExplainTitle(position: Int): String = when (position) {
-        0 -> getString(R.string.tab_info_title_gp)
-        1 -> getString(R.string.tab_info_title_cmd)
-        2 -> getString(R.string.tab_info_title_admin)
-        4 -> getString(R.string.tab_info_title_chat)
-        5 -> getString(R.string.tab_info_title_nodes)
-        6 -> getString(R.string.tab_info_title_log)
-        else -> ""
+    private fun showTabExplainer(position: Int) {
+        showCinematicTabExplainer(position, forceShow = false)
     }
 
-    private fun tabExplainBody(position: Int): String = when (position) {
-        0 -> getString(R.string.tab_info_body_gp)
-        1 -> getString(R.string.tab_info_body_cmd)
-        2 -> getString(R.string.tab_info_body_admin)
-        4 -> getString(R.string.tab_info_body_chat)
-        5 -> getString(R.string.tab_info_body_nodes)
-        6 -> getString(R.string.tab_info_body_log)
-        else -> ""
+    private fun showGoodPracticesInfo() {
+        showCinematicTabExplainer(0, forceShow = true, startExpanded = true)
+    }
+
+    private fun showNavaTasticIntro() {
+        showCinematicTabExplainer(3, forceShow = true, startExpanded = false)
     }
 
     private fun showScrollableDialog(title: String, body: String) {
@@ -1680,10 +2083,6 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             .setPositiveButton(R.string.close, null)
             .show()
         demoActiveDialog = dialog
-    }
-
-    private fun showGoodPracticesInfo() {
-        showScrollableDialog(getString(R.string.tab_info_title_gp), getString(R.string.tab_info_body_gp))
     }
 
     // ---------- Demo mode (screen-recording tour) ----------
@@ -2196,31 +2595,6 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             chatMessages.add(ChatMessage(0x5EED01, "Copio fuerte y claro.", 0, now))
         }
         refreshChat()
-    }
-
-    /**
-     * Shown every time the user enters the NavaTastic tab: reminds that the
-     * target node must run the custom Navarrico/NavaTastic firmware and gives a
-     * quick overview of what it is and how it improves on stock Meshtastic.
-     */
-    private fun showNavaTasticIntro() {
-        if (demoSuppressExplainers) return
-        val textView = TextView(this).apply {
-            text = getString(R.string.nava_intro_body)
-            textSize = 14f
-            setPadding(dp(20), dp(8), dp(20), dp(8))
-            movementMethod = android.text.method.ScrollingMovementMethod()
-        }
-        val scroll = ScrollView(this).apply {
-            addView(textView)
-            isFillViewport = true
-        }
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.nava_intro_title)
-            .setView(scroll)
-            .setPositiveButton(R.string.nava_intro_ok, null)
-            .show()
-        demoActiveDialog = dialog
     }
 
     /**
@@ -3080,9 +3454,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 cacheFile.outputStream().use { output -> input.copyTo(output) }
             }
             val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.fileprovider", cacheFile)
-            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/pdf")
-                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             startActivity(intent)
         } catch (e: android.content.ActivityNotFoundException) {
@@ -3091,6 +3465,93 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             Log.w(TAG, "open bundled pdf $assetName failed", e)
             Toast.makeText(this, getString(R.string.nava_manual_open_failed), Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun saveAssetToUri(assetName: String, uri: Uri) {
+        try {
+            contentResolver.openOutputStream(uri)?.use { out ->
+                assets.open(assetName).use { input ->
+                    input.copyTo(out)
+                }
+            }
+            Toast.makeText(this, getString(R.string.pdf_saved_successfully), Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save PDF to $uri", e)
+            Toast.makeText(this, getString(R.string.pdf_save_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun saveAssetToDownloads(assetName: String) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, assetName)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                    put(MediaStore.Downloads.IS_PENDING, 1)
+                }
+                val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                if (uri != null) {
+                    saveAssetToUri(assetName, uri)
+                    values.clear()
+                    values.put(MediaStore.Downloads.IS_PENDING, 0)
+                    contentResolver.update(uri, values, null, null)
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                val dest = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), assetName)
+                assets.open(assetName).use { input ->
+                    dest.outputStream().use { output -> input.copyTo(output) }
+                }
+                Toast.makeText(this, getString(R.string.pdf_saved_successfully), Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save PDF to Downloads", e)
+            Toast.makeText(this, getString(R.string.pdf_save_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun promptDownloadPdf(assetName: String) {
+        pendingDownloadAssetName = assetName
+        try {
+            createDocumentLauncher.launch(assetName)
+        } catch (e: Exception) {
+            Log.w(TAG, "SAF create document failed, falling back to Downloads", e)
+            saveAssetToDownloads(assetName)
+        }
+    }
+
+    private fun sharePdf(assetName: String) {
+        try {
+            val cacheFile = File(cacheDir, assetName)
+            assets.open(assetName).use { input ->
+                cacheFile.outputStream().use { output -> input.copyTo(output) }
+            }
+            val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.fileprovider", cacheFile)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(intent, getString(R.string.manual_action_share)))
+        } catch (e: Exception) {
+            Log.w(TAG, "Share PDF $assetName failed", e)
+        }
+    }
+
+    private fun showManualActionDialog(title: String, assetName: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(R.string.manual_action_prompt)
+            .setPositiveButton(R.string.manual_action_open) { _, _ ->
+                openBundledPdf(assetName)
+            }
+            .setNeutralButton(R.string.manual_action_download) { _, _ ->
+                promptDownloadPdf(assetName)
+            }
+            .setNegativeButton(R.string.manual_action_share) { _, _ ->
+                sharePdf(assetName)
+            }
+            .show()
     }
 
     private fun setupNavaTastic() {

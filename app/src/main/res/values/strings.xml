@@ -219,18 +219,367 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="tab_hint_more_left">More tabs to the left</string>
     <string name="tab_hint_more_right">More tabs to the right</string>
     <string name="bp_help_button">Why these settings? (duty cycle)</string>
-    <string name="tab_info_title_gp">Good Practices — why</string>
-    <string name="tab_info_title_cmd">Commands</string>
-    <string name="tab_info_title_admin">Administration</string>
-    <string name="tab_info_title_chat">Chat</string>
-    <string name="tab_info_title_nodes">Nodes</string>
-    <string name="tab_info_title_log">Log</string>
-    <string name="tab_info_body_gp">Why follow the Good Practices? Because the 868 MHz ISM band is shared, legally limited and already full of users in Spain.\n\nThe band is regulated by ETSI EN 300 220 and split into sub-bands, each with a maximum DUTY CYCLE: the fraction of time a device may transmit. If you transmit 1 second, you must stay silent long enough to respect the limit of that sub-band.\n\nETSI sub-bands and duty cycle (EN 300 220-2, §4.3.3):\n- 863-865 MHz: 0.1%\n- 865-868 MHz: 1%\n- 868-868.6 MHz: 1% (the usual Meshtastic default in Spain is 868.1 MHz)\n- 868.7-869.2 MHz: 0.1%\n- 869.4-869.65 MHz: 10% (up to 500 mW ERP; the Navarrico fleet runs here, SFNarrow 869.618 MHz)\n- 869.7-870 MHz: 1%\n\nThe limit is per device and per sub-band, and it is the OPERATOR\'s responsibility: exceeding it is not just bad manners, it is illegal and degrades the network for everyone.\n\nThere are already thousands of Meshtastic nodes in Spain. Every node periodically sends beacons: NodeInfo (name), device telemetry and GPS position. With thousands of nodes that background traffic adds up to a lot of airtime. User messages are worth far more than beacons — this tab reduces beacon traffic to the minimum needed to stay visible in the mesh:\n- NodeInfo every 72 h instead of 3 h (24x less)\n- GPS position every 72 h with smart position OFF (no extra bursts)\n- Sensible hop limit and rebroadcast settings\n\nIf we all do this, the channel stays mostly free for real messages. Apply it to your own node and encourage the rest of the fleet to do the same.\n\nReferences:\n- ETSI EN 300 220-1 / -2 (short-range devices; duty cycle in EN 300 220-2 §4.3.3)\n- The Things Network — Duty Cycle: https://www.thethingsnetwork.org/docs/lorawan/duty-cycle/\n- Meshtastic: https://meshtastic.org</string>
-    <string name="tab_info_body_cmd">Send commands to a node: telemetry, position, traceroute, owner name or a free text message. Each action shows the decoded response in a popup.</string>
-    <string name="tab_info_body_admin">Administer a node: reboot it, wipe its NodeDB, mark it as favorite or ignored, or fetch its node info (redownloads the database).</string>
-    <string name="tab_info_body_chat">Read the node\'s stored and live messages and reply on the channel. Pause before sending administration commands.</string>
-    <string name="tab_info_body_nodes">Visual cards of every node in the network (favorites first): battery, voltage, SNR, last heard and hops.</string>
-    <string name="tab_info_body_log">Persistent record of every request and response with timestamps. Newest entries appear first.</string>
+    <string name="tab_info_title_gp">Good Practices and Presets</string>
+    <string name="tab_info_title_cmd">Commands and Telemetry</string>
+    <string name="tab_info_title_admin">Administration and Control</string>
+    <string name="tab_info_title_nava">NavaTastic CLI</string>
+    <string name="tab_info_title_chat">Chat and Messaging</string>
+    <string name="tab_info_title_nodes">Nodes Radar</string>
+    <string name="tab_info_title_log">Logs and Audit</string>
+
+    <string name="cinematic_badge_gp">⚡ OPTIMIZATION &amp; PRESETS</string>
+    <string name="cinematic_badge_cmd">📡 TELEMETRY &amp; DIAGNOSTICS</string>
+    <string name="cinematic_badge_admin">🛡️ NODE CONTROL &amp; MANAGEMENT</string>
+    <string name="cinematic_badge_nava">⚡ NAVATASTIC REPEATERS</string>
+    <string name="cinematic_badge_chat">💬 TACTICAL MESSAGING</string>
+    <string name="cinematic_badge_nodes">🌐 RADAR &amp; FLEET</string>
+    <string name="cinematic_badge_log">📜 AUDIT CONSOLE</string>
+
+    <string name="cinematic_more_info">📖 Read more (Technical details)</string>
+    <string name="cinematic_hide_info">▲ Hide technical details</string>
+    <string name="cinematic_btn_app_manual">App Manual (PDF)</string>
+    <string name="cinematic_btn_nava_manual">NavaTastic Manual (PDF)</string>
+    <string name="cinematic_hold_hint">Hold to pause</string>
+    <string name="cinematic_paused_hint">⏸ Paused · Tap Next ► to resume</string>
+    <string name="cinematic_sim_title">REAL-TIME SIMULATION</string>
+    <string name="cinematic_prev">◄ Prev</string>
+    <string name="cinematic_next">Next ►</string>
+
+    <!-- Tab 0: Buenas Prácticas Slides (10 slides) -->
+    <string name="slide_gp_1_punch">Forget your computer!</string>
+    <string name="slide_gp_1_desc">Apply the ideal radio and beacon parameters in a single tap, without complex commands or terminal.</string>
+    <string name="slide_gp_1_prompt">preset apply: SFN_ES_869_618</string>
+    <string name="slide_gp_1_output" formatted="false">« SFN Spain 869.618 MHz OK · Duty cycle 10% · ERP 500mW configured</string>
+
+    <string name="slide_gp_2_punch">Protect airtime and solar battery</string>
+    <string name="slide_gp_2_desc">Reduce NodeInfo and GPS beacons to 72 hours. Free up the channel for real user messages and preserve energy.</string>
+    <string name="slide_gp_2_prompt">lora set_broadcasts: 72h</string>
+    <string name="slide_gp_2_output" formatted="false">« NodeInfo: 259200s (72h) · GPS: 259200s (72h) · Residual airtime reduced 96%</string>
+
+    <string name="slide_gp_3_punch">ETSI EN 300 220 legal compliance</string>
+    <string name="slide_gp_3_desc">Automatically compute and respect the duty cycle limits of the European 868 MHz ISM sub-band.</string>
+    <string name="slide_gp_3_prompt">check duty_cycle: EU868_SUBBAND</string>
+    <string name="slide_gp_3_output" formatted="false">« Legal 10% limit respected · Silence window regulated automatically</string>
+
+    <string name="slide_gp_4_punch">Instant standard modem presets</string>
+    <string name="slide_gp_4_desc">Switch between LongFast, LongModerate, MediumFast, or ShortTurbo with a single tap and link verification.</string>
+    <string name="slide_gp_4_prompt">modem_preset: LongModerate</string>
+    <string name="slide_gp_4_output">« Bandwidth: 125kHz · Spreading Factor: 11 · Coding Rate: 4/8 applied</string>
+
+    <string name="slide_gp_5_punch">Safe read-modify-write engine</string>
+    <string name="slide_gp_5_desc">Download existing configuration, apply only necessary adjustments, and verify saving without flash corruption risks.</string>
+    <string name="slide_gp_5_prompt">config read_modify_write</string>
+    <string name="slide_gp_5_output">« LoraConfig verified and saved successfully on the node</string>
+
+    <string name="slide_gp_6_punch">Smart Position disabled</string>
+    <string name="slide_gp_6_desc">Eliminate parasitic GPS broadcasts while moving that flood repeaters and drain the battery.</string>
+    <string name="slide_gp_6_prompt">smart_position: DISABLED</string>
+    <string name="slide_gp_6_output">« Maximum battery savings · Zero parasitic movement burst packets</string>
+
+    <string name="slide_gp_7_punch">JSON configuration backup</string>
+    <string name="slide_gp_7_desc">Export a complete snapshot of your node\'s current configuration to recover it anytime.</string>
+    <string name="slide_gp_7_prompt">backup_config -> nodedb_backup.json</string>
+    <string name="slide_gp_7_output">« Complete snapshot of radio and channel parameters saved locally</string>
+
+    <string name="slide_gp_8_punch">1-Tap profile restoration</string>
+    <string name="slide_gp_8_desc">Restore previously saved configurations with automatic data integrity verification.</string>
+    <string name="slide_gp_8_prompt">restore_config: nodedb_backup.json</string>
+    <string name="slide_gp_8_output">« Configuration verified and successfully restored to radio</string>
+
+    <string name="slide_gp_9_punch">Live channel verification</string>
+    <string name="slide_gp_9_desc">Verify exact operational frequency, bandwidth, and modulation factor in real time.</string>
+    <string name="slide_gp_9_prompt">check_channel_status</string>
+    <string name="slide_gp_9_output">« Channel 869.618 MHz · BW: 125 kHz · SF: 11 · Link status: Optimal</string>
+
+    <string name="slide_gp_10_punch">Sensible hop limit</string>
+    <string name="slide_gp_10_desc">Configure optimal hop distance to prevent broadcast storms from collapsing the mesh.</string>
+    <string name="slide_gp_10_prompt">set_hop_limit: 3</string>
+    <string name="slide_gp_10_output">« HopLimit set to 3 · Optimal routing without repeater congestion</string>
+
+    <!-- Tab 1: Commands Slides (8 slides) -->
+    <string name="slide_cmd_1_punch">Remote diagnostics in seconds</string>
+    <string name="slide_cmd_1_desc">Query device telemetry, battery level, exact voltage, and temperature of any node over the air.</string>
+    <string name="slide_cmd_1_prompt">req_telemetry -> !3a89ac94</string>
+    <string name="slide_cmd_1_output" formatted="false">« [Battery: 4.18V 100% · Temp: 24.2°C · Press: 1013 hPa · Hum: 48%]</string>
+
+    <string name="slide_cmd_2_punch">Hop tracking with Traceroute</string>
+    <string name="slide_cmd_2_desc">Discover the exact path taken by your packets through intermediary repeaters with step-by-step SNR metrics.</string>
+    <string name="slide_cmd_2_prompt">traceroute -> !3a89ac94</string>
+    <string name="slide_cmd_2_output">« Path: MY_NODE ➔ [SNR +6dB] ➔ VALLEY_REP ➔ [SNR +9dB] ➔ TARGET (2 hops)</string>
+
+    <string name="slide_cmd_3_punch">Instant remote GPS position</string>
+    <string name="slide_cmd_3_desc">Request live coordinates, altitude, and satellite lock from remote mobile or base nodes.</string>
+    <string name="slide_cmd_3_prompt">req_position -> !5cfaaca9</string>
+    <string name="slide_cmd_3_output">« Lat: 42.8168° N · Lon: -1.6432° W · Altitude: 450 m · Sats: 9</string>
+
+    <string name="slide_cmd_4_punch">Owner and node name change</string>
+    <string name="slide_cmd_4_desc">Update short name and long name on the fly without using CLI or blind reboots.</string>
+    <string name="slide_cmd_4_prompt">set_owner: "LOOKOUT REPEATER" [LOOK]</string>
+    <string name="slide_cmd_4_output">« Owner updated: LOOKOUT REPEATER (LOOK) [!c0ffee]</string>
+
+    <string name="slide_cmd_5_punch">Decoded responses in clear popups</string>
+    <string name="slide_cmd_5_desc">Every response received over the air is parsed, validated, and displayed with actionable metrics.</string>
+    <string name="slide_cmd_5_prompt">decode_packet: PortNum_TEXT_MESSAGE_APP</string>
+    <string name="slide_cmd_5_output">« Packet decoded · SNR: +11.25 dB · RSSI: -74 dBm · HopsAway: 0</string>
+
+    <string name="slide_cmd_6_punch">Environmental telemetry with BME680</string>
+    <string name="slide_cmd_6_desc">Receive live weather data and air quality from nodes with connected environmental sensors.</string>
+    <string name="slide_cmd_6_prompt">req_ambient_telemetry -> !3a89ac94</string>
+    <string name="slide_cmd_6_output">« [BME680: Temp 22.4°C · Hum 52% · Press 1014 hPa · Gas 34 kOhm]</string>
+
+    <string name="slide_cmd_7_punch">Direct messages with PKI ACK</string>
+    <string name="slide_cmd_7_desc">Send private test messages and receive cryptographic delivery confirmations from receiver.</string>
+    <string name="slide_cmd_7_prompt">send_dm: "Repeater test" -> !3a89ac94</string>
+    <string name="slide_cmd_7_output">« Message sent with PKI ACK · [✓ ACK received in 840ms]</string>
+
+    <string name="slide_cmd_8_punch">Node user profile query</string>
+    <string name="slide_cmd_8_desc">Request user profile, hardware model, and operational capabilities of any node on the mesh.</string>
+    <string name="slide_cmd_8_prompt">req_user_info -> !3a89ac94</string>
+    <string name="slide_cmd_8_output">« Info: \'RN1_Pamplona\' · Hardware RAK4631 · Role: ROUTER · Channels: 8</string>
+
+    <!-- Tab 2: Administration Slides (8 slides) -->
+    <string name="slide_admin_1_punch">Favorites and ignore list in one tap</string>
+    <string name="slide_admin_1_desc">Pin important fleet repeaters to the top or ignore noisy nodes flooding your table.</string>
+    <string name="slide_admin_1_prompt">set_favorite: !3a89ac94 -> TRUE</string>
+    <string name="slide_admin_1_output">« Node !3a89ac94 set as FAVORITE (routing and display priority)</string>
+
+    <string name="slide_admin_2_punch">Clean NodeDB while keeping favorites</string>
+    <string name="slide_admin_2_desc">Purge stale or out-of-range nodes from your database without losing your pinned favorite nodes.</string>
+    <string name="slide_admin_2_prompt">wipe_nodedb keep_favorites=TRUE</string>
+    <string name="slide_admin_2_output">« 68 ephemeral nodes purged · 12 favorite nodes preserved intact</string>
+
+    <string name="slide_admin_3_punch">Safe remote reboot and shutdown</string>
+    <string name="slide_admin_3_desc">Trigger controlled remote restarts with customizable countdown timer to apply cold boot changes.</string>
+    <string name="slide_admin_3_prompt">admin_reboot in_seconds=5</string>
+    <string name="slide_admin_3_output">« Reboot command sent · Node rebooting in 5 seconds...</string>
+
+    <string name="slide_admin_4_punch">PKI Administrator key management</string>
+    <string name="slide_admin_4_desc">Configure up to 3 encrypted admin public keys for exclusive infrastructure control.</string>
+    <string name="slide_admin_4_prompt">admin_keys set_pubkey: "a8f9e2..."</string>
+    <string name="slide_admin_4_output">« Admin key registered · Navadmin channel locked for unauthorized nodes</string>
+
+    <string name="slide_admin_5_punch">Promote to Master Node</string>
+    <string name="slide_admin_5_desc">Turn your connected device into the central fleet control point with elevated mesh privileges.</string>
+    <string name="slide_admin_5_prompt">promote_to_master: NODE_LOCAL</string>
+    <string name="slide_admin_5_output">« Master mode active · Fleet remote administration enabled</string>
+
+    <string name="slide_admin_6_punch">Protected session disconnect</string>
+    <string name="slide_admin_6_desc">Close USB or BLE connection safely ensuring no packets remain pending in the pipeline.</string>
+    <string name="slide_admin_6_prompt">disconnect_radio_session</string>
+    <string name="slide_admin_6_output">« Session closed cleanly · Radio queues flushed without corruption</string>
+
+    <string name="slide_admin_7_punch">Node database synchronization</string>
+    <string name="slide_admin_7_desc">Download and update contact lists and encryption keys directly from the radio memory.</string>
+    <string name="slide_admin_7_prompt">sync_nodedb_cache</string>
+    <string name="slide_admin_7_output">« Node database refreshed in local memory · 0 UI latency</string>
+
+    <string name="slide_admin_8_punch">Preventive maintenance checks</string>
+    <string name="slide_admin_8_desc">Execute health checks before sending critical configuration commands over the air.</string>
+    <string name="slide_admin_8_prompt">admin_maintenance_check</string>
+    <string name="slide_admin_8_output">« Node health: Healthy · 0 I2C/SPI bus faults · Nominal battery</string>
+
+    <!-- Tab 3: NavaTastic CLI Slides (16 ELITE SLIDES) -->
+    <string name="slide_nava_1_punch">40+ commands for solar repeaters</string>
+    <string name="slide_nava_1_desc">Specially tailored for nodes running Navarrico/NavaTastic firmware with complete hardware control.</string>
+    <string name="slide_nava_1_prompt">/nava stats</string>
+    <string name="slide_nava_1_output" formatted="false">« [Free RAM: 46KB · Uptime: 14d 6h · Battery: 4.19V 100% · Temp: 21.8°C · Resets: 0]</string>
+
+    <string name="slide_nava_2_punch">Control via encrypted PKI DM or Navadmin</string>
+    <string name="slide_nava_2_desc">Send encrypted point-to-point commands or broadcast read-only queries on the Navadmin channel.</string>
+    <string name="slide_nava_2_prompt">/nava get_vbat (via DM PKI)</string>
+    <string name="slide_nava_2_output">« [Encrypted PKI] vbat_min=3.10V · vbat_max=4.20V · vwake=3.45V</string>
+
+    <string name="slide_nava_3_punch">CONFIRM safety gate protection</string>
+    <string name="slide_nava_3_desc">Destructive or risky commands require typing CONFIRM before sending to prevent accidental bricking.</string>
+    <string name="slide_nava_3_prompt">/nava factory_reset ⚠</string>
+    <string name="slide_nava_3_output">« [SAFETY LOCK] Type \'CONFIRM\' to authorize destructive command</string>
+
+    <string name="slide_nava_4_punch">Complete secondary channel control</string>
+    <string name="slide_nava_4_desc">Create, modify, delete, and share channel URLs across slots 2 to 7 with built-in Base64 PSK generator.</string>
+    <string name="slide_nava_4_prompt">/nava ch_set 2 "EMERGENCY" AQ==</string>
+    <string name="slide_nava_4_output">« Slot 2 channel configured as \'EMERGENCY\' · Base64 PSK saved</string>
+
+    <string name="slide_nava_5_punch">Zero Flash memory wear</string>
+    <string name="slide_nava_5_desc">Advanced diagnostics (stats/log/mute) execute 100% in RAM to maximize flash chip longevity.</string>
+    <string name="slide_nava_5_prompt">/nava log</string>
+    <string name="slide_nava_5_output">« [RAM Log]: 10 events captured · 0 Flash erase cycles required</string>
+
+    <string name="slide_nava_6_punch">LiFePO4, LiPo and Li-Ion battery chemistries</string>
+    <string name="slide_nava_6_desc">Configure OCV curves and charge cutoffs for LiFePO4 (3.2V) or Li-Ion/LiPo (3.7V/3.85V) battery packs.</string>
+    <string name="slide_nava_6_prompt">/nava set_chem lifepo4 ⚠</string>
+    <string name="slide_nava_6_output">« LiFePO4 chemistry active · OCV voltage curves adapted to 3.2V nominal</string>
+
+    <string name="slide_nava_7_punch">Critical solar cutoffs and wake voltages</string>
+    <string name="slide_nava_7_desc">Set precise shutdown voltage (vbat) and safe wake voltage (vwake) to eliminate dawn reboot looping.</string>
+    <string name="slide_nava_7_prompt">/nava set_vwake 3450 ⚠</string>
+    <string name="slide_nava_7_output">« Safe wake threshold set to 3.45V · Solar hysteresis loop protection active</string>
+
+    <string name="slide_nava_8_punch">Storm Mode and deep hibernation</string>
+    <string name="slide_nava_8_desc">Place repeater in ultra-low power System OFF (1-3 µA) during prolonged bad weather until sun returns.</string>
+    <string name="slide_nava_8_prompt">/nava storm ⚠</string>
+    <string name="slide_nava_8_output">« Storm Mode active · System OFF (1-3 µA) sleep until solar recharge</string>
+
+    <string name="slide_nava_9_punch">Dawn Solar Brownout Resistance</string>
+    <string name="slide_nava_9_desc">Hardware LPCOMP comparator and waitUntilPowerLevelSafe ensure cold boot only under stable power.</string>
+    <string name="slide_nava_9_prompt">/nava power_safe_status</string>
+    <string name="slide_nava_9_output">« Hardware LPCOMP active · Hysteresis cleared · Safe boot verified</string>
+
+    <string name="slide_nava_10_punch">Emergency transmitter silencing</string>
+    <string name="slide_nava_10_desc">Disable RF transmission during emergencies or jamming events while keeping receiver active.</string>
+    <string name="slide_nava_10_prompt">/nava txoff ⚠</string>
+    <string name="slide_nava_10_output">« LoRa transmitter muted · Passive listening mode enabled without RF output</string>
+
+    <string name="slide_nava_11_punch">Remote Bluetooth BLE powerdown</string>
+    <string name="slide_nava_11_desc">Turn off BLE radio on mountain repeaters to save 8-12 mA of continuous solar battery drain.</string>
+    <string name="slide_nava_11_prompt">/nava ble off ⚠</string>
+    <string name="slide_nava_11_output">« BLE module powered off · Energy savings active for solar repeater</string>
+
+    <string name="slide_nava_12_punch">Persistent RAM-based blacklist</string>
+    <string name="slide_nava_12_desc">Block rogue or misconfigured nodes from flooding community repeaters.</string>
+    <string name="slide_nava_12_prompt">/nava ign !badc0de ⚠</string>
+    <string name="slide_nava_12_output">« Node !badc0de added to blacklist · Frames dropped at physical layer</string>
+
+    <string name="slide_nava_13_punch">Up to 3 PKI Administrator Keys</string>
+    <string name="slide_nava_13_desc">Manage up to 3 encrypted admin public keys for exclusive and secure infrastructure management.</string>
+    <string name="slide_nava_13_prompt">/nava keys_add "04a8b9..."</string>
+    <string name="slide_nava_13_output">« Admin public key registered · Infrastructure channel secured</string>
+
+    <string name="slide_nava_14_punch">On-the-fly beacon cadence control</string>
+    <string name="slide_nava_14_desc">Adjust position and telemetry beacon intervals live over the air (1 to 10080 min or disabled).</string>
+    <string name="slide_nava_14_prompt">/nava set_pos_tx 4320</string>
+    <string name="slide_nava_14_output">« GPS position interval set to 72 hours (4320 min)</string>
+
+    <string name="slide_nava_15_punch">Clear static GPS position</string>
+    <string name="slide_nava_15_desc">Erase fixed GPS coordinates from repeater memory when relocating to a new mountaintop site.</string>
+    <string name="slide_nava_15_prompt">/nava pos_clear</string>
+    <string name="slide_nava_15_output">« Static coordinates cleared · Node ready for new location assignment</string>
+
+    <string name="slide_nava_16_punch">Meshtastic compatible channel URLs</string>
+    <string name="slide_nava_16_desc">Generate standard Meshtastic channel import URLs directly from repeater over the air.</string>
+    <string name="slide_nava_16_prompt">/nava ch_url 2</string>
+    <string name="slide_nava_16_output">« URL generated: https://meshtastic.org/e/#... ready to share</string>
+
+    <!-- Tab 4: Chat Slides (7 slides) -->
+    <string name="slide_chat_1_punch">Persistent channel-based history</string>
+    <string name="slide_chat_1_desc">Your chat logs are stored on device organized by channel and preserved across reconnections.</string>
+    <string name="slide_chat_1_prompt">select_channel: "Navadmin"</string>
+    <string name="slide_chat_1_output">« Loaded 48 conversation history messages for Navadmin channel</string>
+
+    <string name="slide_chat_2_punch">Real-time packet delivery indicators</string>
+    <string name="slide_chat_2_desc">See the exact status of each sent message: in flight (⟳), delivered (✓), or delivery error (✗).</string>
+    <string name="slide_chat_2_prompt">send_msg: "Repeater coverage test"</string>
+    <string name="slide_chat_2_output">« [11:25] » me: Repeater coverage test · [✓ Delivered]</string>
+
+    <string name="slide_chat_3_punch">Independent channel switcher</string>
+    <string name="slide_chat_3_desc">Transmit and receive messages on the primary channel or any secondary channel without cross-talk.</string>
+    <string name="slide_chat_3_prompt">switch_tx_channel: Slot 1 (Navadmin)</string>
+    <string name="slide_chat_3_output">« Transmit channel set to slot 1 · PSK encryption enabled</string>
+
+    <string name="slide_chat_4_punch">Tactical stream pause</string>
+    <string name="slide_chat_4_desc">Pause incoming message feed to compose replies or run administration commands without distractions.</string>
+    <string name="slide_chat_4_prompt">toggle_chat_pause: PAUSED</string>
+    <string name="slide_chat_4_output">« Display stream paused · Incoming messages queued in background</string>
+
+    <string name="slide_chat_5_punch">One-tap instant resend</string>
+    <string name="slide_chat_5_desc">If a message fails due to temporary coverage loss, tap the error badge to resend immediately.</string>
+    <string name="slide_chat_5_prompt">resend_packet: msg_id=4821</string>
+    <string name="slide_chat_5_output">« Resending packet with routing ACK requested... ✓ Received by mesh</string>
+
+    <string name="slide_chat_6_punch">Tactical distinct message bubbles</string>
+    <string name="slide_chat_6_desc">Clean UI with visual separation between local and remote messages for effortless reading in the field.</string>
+    <string name="slide_chat_6_prompt">render_chat_bubbles</string>
+    <string name="slide_chat_6_output">« Optimized chat stream · Right-aligned local bubbles with delivery badges</string>
+
+    <string name="slide_chat_7_punch">High precision timestamps</string>
+    <string name="slide_chat_7_desc">Every frame records exact transmission and reception time for reliable chronological auditing.</string>
+    <string name="slide_chat_7_prompt">inspect_timestamp</string>
+    <string name="slide_chat_7_output">« [11:42:15.204] Frame exact timestamp tracking active</string>
+
+    <!-- Tab 5: Nodes Slides (8 slides) -->
+    <string name="slide_nodes_1_punch">Visual cards with favorites first</string>
+    <string name="slide_nodes_1_desc">Complete overview of all detected nodes in the mesh with your favorite nodes pinned to the top.</string>
+    <string name="slide_nodes_1_prompt">render_nodes_radar</string>
+    <string name="slide_nodes_1_output">« 24 nodes detected · 4 favorites pinned · Average SNR +8.4 dB</string>
+
+    <string name="slide_nodes_2_punch">Signal, battery, and hop metrics</string>
+    <string name="slide_nodes_2_desc">Monitor voltage, charge percentage, last packet SNR, and hop distance for every device.</string>
+    <string name="slide_nodes_2_prompt">inspect_node: !3a89ac94</string>
+    <string name="slide_nodes_2_output" formatted="false">« Battery: 100% (4.18V) · SNR: +11.5 dB · Hops: 0 (Direct) · Last seen: 2 min ago</string>
+
+    <string name="slide_nodes_3_punch">Popup with 11 diagnostic actions</string>
+    <string name="slide_nodes_3_desc">Tap any card to open a full action menu: request environment, power, position, traceroute, or share.</string>
+    <string name="slide_nodes_3_prompt">node_menu_action: ENVIRONMENT</string>
+    <string name="slide_nodes_3_output">« Environmental telemetry requested · Waiting for BME680 sensor data...</string>
+
+    <string name="slide_nodes_4_punch">Import nodes via URL or QR code</string>
+    <string name="slide_nodes_4_desc">Add contacts and public keys directly by pasting shared links without exhausting node Flash memory.</string>
+    <string name="slide_nodes_4_prompt">import_url: "https://meshtastic.org/e/#..."</string>
+    <string name="slide_nodes_4_output">« Contact \'NORTH REPEATER\' imported with verified public key</string>
+
+    <string name="slide_nodes_5_punch">Instant search and filtering</string>
+    <string name="slide_nodes_5_desc">Find any node by short name, long name, hex ID, or hardware role in milliseconds.</string>
+    <string name="slide_nodes_5_prompt">search_filter: "LOOK"</string>
+    <string name="slide_nodes_5_output">« 1 match found: LOOKOUT REPEATER (!c0ffee)</string>
+
+    <string name="slide_nodes_6_punch">0-Hop direct line of sight radar</string>
+    <string name="slide_nodes_6_desc">Quickly isolate nodes and repeaters within direct RF line of sight without hops.</string>
+    <string name="slide_nodes_6_prompt">filter_hops: 0_DIRECT</string>
+    <string name="slide_nodes_6_output">« 8 direct line-of-sight nodes detected · Average SNR +7.2 dB</string>
+
+    <string name="slide_nodes_7_punch">Hardware chipset detection</string>
+    <string name="slide_nodes_7_desc">Automatically identify microcontroller and LoRa radio hardware model (RAK4631, Heltec, T-Beam).</string>
+    <string name="slide_nodes_7_prompt">detect_hardware_model</string>
+    <string name="slide_nodes_7_output">« Hardware detected: RAK Wireless 4631 (nRF52840 + SX1262 LoRa)</string>
+
+    <string name="slide_nodes_8_punch">Relative last contact indicator</string>
+    <string name="slide_nodes_8_desc">Accurately determine how many seconds/minutes have elapsed since the last received beacon.</string>
+    <string name="slide_nodes_8_prompt">calc_last_heard</string>
+    <string name="slide_nodes_8_output">« Heard 42 seconds ago · Link active and responsive</string>
+
+    <!-- Tab 6: Log Slides (7 slides) -->
+    <string name="slide_log_1_punch">Forensic record of every byte</string>
+    <string name="slide_log_1_desc">Inspect all transmitted and received frames (FROM_RADIO / TO_RADIO) in real time with millisecond timestamps.</string>
+    <string name="slide_log_1_prompt">stream_log: LIVE</string>
+    <string name="slide_log_1_output">« [11:26:04] » FROM_RADIO: PacketId=84920 Type=TELEMETRY From=!3a89ac94</string>
+
+    <string name="slide_log_2_punch">Persistent file surviving reboots</string>
+    <string name="slide_log_2_desc">Event history is written to app_log.txt so you can audit communications days later.</string>
+    <string name="slide_log_2_prompt">read_log_file: app_log.txt</string>
+    <string name="slide_log_2_output">« File loaded · 200 recent events listed in reverse chronological order</string>
+
+    <string name="slide_log_3_punch">Instant clear button</string>
+    <string name="slide_log_3_desc">Clear screen buffer and empty on-disk log file in a single tap whenever you need a fresh start.</string>
+    <string name="slide_log_3_prompt">clear_logs_action</string>
+    <string name="slide_log_3_output">« UI buffer and on-disk file cleared successfully</string>
+
+    <string name="slide_log_4_punch">Automatic crash logging to disk</string>
+    <string name="slide_log_4_desc">If an unhandled exception occurs, a detailed diagnostic report is generated to assist debugging.</string>
+    <string name="slide_log_4_prompt">crash_logger: ACTIVE</string>
+    <string name="slide_log_4_output">« Crash logger active · Automated reports stored in logs directory</string>
+
+    <string name="slide_log_5_punch">Remote ADB control for automation</string>
+    <string name="slide_log_5_desc">Trigger automated test suites and external scripts via Android broadcast intents.</string>
+    <string name="slide_log_5_prompt">adb am broadcast -a com.meshkachoutility.REMOTE</string>
+    <string name="slide_log_5_output">« Broadcast command received · Running automated verification suite</string>
+
+    <string name="slide_log_6_punch">Detailed packet header inspection</string>
+    <string name="slide_log_6_desc">Inspect WantAck flags, HopLimit, transmit channel index, and port numbers of each packet.</string>
+    <string name="slide_log_6_prompt">inspect_packet_header</string>
+    <string name="slide_log_6_output">« [ID=8920 HopLimit=3 HopStart=3 WantAck=True PortNum=TEXT_MESSAGE]</string>
+
+    <string name="slide_log_7_punch">Anomaly and frame drop auditor</string>
+    <string name="slide_log_7_desc">Instantly identify corrupted frames, packet collisions, or radio buffer overflows.</string>
+    <string name="slide_log_7_prompt">filter_log_level: WARN</string>
+    <string name="slide_log_7_output">« 0 synchronization losses · Radio pipeline buffer 100% clear</string>
+
+    <!-- Technical Details (Updated & Enriched for v1.0.7) -->
+    <string name="tab_info_body_gp" formatted="false">Why follow Good Practices? Because the 868 MHz ISM band is shared, legally limited, and already congested with beacons in Spain and Europe.\n\nThe band is regulated under ETSI EN 300 220 and divided into sub-bands, each with a strict maximum DUTY CYCLE: the fraction of time a device is allowed to transmit. If you transmit for 1 second, you must maintain air silence for the legally required window before transmitting again.\n\nETSI sub-bands and duty cycle (EN 300 220-2, §4.3.3):\n- 863-865 MHz: 0.1%\n- 865-868 MHz: 1%\n- 868-868.6 MHz: 1% (standard Meshtastic default in Spain: 868.125 MHz)\n- 868.7-869.2 MHz: 0.1%\n- 869.4-869.65 MHz: 10% (up to 500 mW ERP; Navarrico fleet operates here, SFNarrow 869.618 MHz)\n- 869.7-870 MHz: 1%\n\nThis limit is per device and per sub-band, and compliance is the OPERATOR\'s legal responsibility: exceeding it degrades the mesh and causes packet collisions for everyone.\n\nThis tab optimizes your radio in one tap:\n- NodeInfo every 72 h instead of 3 h (24x less airtime)\n- GPS position every 72 h with Smart Position disabled (no parasitic burst traffic)\n- Sensible hop limits and rebroadcast rules\n- SFN Spain and standard modem presets (LongFast, LongModerate, MediumFast, ShortTurbo)\n\nApply it to your node and encourage your local community to do the same to keep the air clean.</string>
+    <string name="tab_info_body_cmd">Send direct commands and telemetry queries to any mesh node over the air without requiring a physical serial console:\n\n1. Device Telemetry: battery percentage, exact voltage, energy consumption, MCU temperature, and runtime metrics.\n2. Environmental Telemetry: read ambient temperature, atmospheric pressure, relative humidity, and air quality when I2C sensors (BME280/BME680/BMP280) are detected.\n3. Geographic Position: request live GPS coordinates, altitude, and satellite lock status.\n4. Traceroute: trace complete multi-hop repeater routes with SNR measured on each segment.\n5. Change Owner: update long name and short name dynamically over the air.\n6. Free Text Message: send targeted diagnostic text with delivery confirmation.\n\nEvery response received over the air is parsed, validated, and displayed in interactive popups with comprehensive metrics.</string>
+    <string name="tab_info_body_admin">Advanced administration panel and node maintenance for Meshtastic devices:\n\n1. Favorite Management: pin key fleet repeaters to the top of the UI and prioritize them in radio packet routing.\n2. Ignore List: silence noisy or malfunctioning nodes to prevent database flooding.\n3. Intelligent NodeDB Wipe: purge ephemeral and inactive nodes while preserving 100% of your favorite nodes.\n4. Remote Reboot: send controlled reboot commands with custom delay timers to apply hardware changes.\n5. PKI Admin Keys: manage up to 3 encrypted admin public keys to protect infrastructure repeaters from unauthorized access.\n6. Master Node Mode: elevate the connected radio to act as central fleet controller.\n\nAll operations include safety validations to prevent accidental lockouts.</string>
+    <string name="tab_info_body_chat">Tactical two-way messaging console over LoRa radio:\n\n1. Persistent History: each channel maintains its own conversation log on the phone, preserved across app restarts and radio reconnects.\n2. Real-time Delivery Status: see instantly whether a packet is in flight (⟳), received by target (✓), or failed (✗).\n3. One-Tap Resend: tap any failed message to retry transmission immediately.\n4. Channel Switcher: switch effortlessly between primary and secondary channels (including the Navadmin channel).\n5. Stream Pause: pause incoming traffic feed when composing messages or executing critical administration tasks.</string>
+    <string name="tab_info_body_nodes">Visual fleet radar for all detected mesh nodes:\n\n1. Detailed Cards: view node name, short alias, hex ID, battery level, voltage, last SNR, hop distance, and time since last heard.\n2. Prioritized Favorites: favorite nodes are automatically sorted at the top of the list.\n3. 11-Action Context Menu: tap any card to request telemetry, environment, power, position, traceroute, neighbors, host status, or share contact.\n4. URL Import: paste shared Meshtastic URLs to import contacts and public keys without exhausting limited node Flash.\n5. Instant Search: filter nodes by name, ID, or hardware role in real time.</string>
+    <string name="tab_info_body_log">Real-time debugging and forensic traffic monitor:\n\n1. Traffic Stream: view every frame transmitted and received (FROM_RADIO / TO_RADIO) with millisecond timestamps and packet type breakdown.\n2. Persistent Log File (app_log.txt): stores the last 200 events on local storage for post-operation audits.\n3. Clear Logs Button: wipe the UI buffer and on-disk file in one tap for fresh testing sessions.\n4. Crash Logger: automatic exception recording to disk for diagnostics.\n5. Remote ADB Control: execute automated scripted test suites in laboratory environments.</string>
+    <string name="tab_info_body_nava">Specialized remote control for repeaters running Navarrico/NavaTastic firmware (Meshtastic v2.7.26 fork optimized for solar infrastructure in 868 MHz):\n\n1. Communication Routes:\n   - Navadmin Channel: read-only queries for fleet monitoring (Base64 PSK AQ==).\n   - Private DM (PKI): hardware modification and control commands secured via point-to-point encryption.\n2. CONFIRM Safety Gate: destructive commands (battery chemistry, cutoff/wake voltages, channel wipes, storm mode, factory reset) are locked until typing CONFIRM.\n3. Flash-Wear-Free RAM Diagnostics: query statistics (stats), event logs (log), and radio mute executed 100% in RAM to maximize flash longevity.\n4. Secondary Channel Management: full support for slots 2 to 7 with built-in Base64 PSK generator.\n5. Solar Optimization: static position clearing (pos_clear), configurable beacon cadences, and ultra-efficient System OFF sleep (1-3 µA).</string>
     <string name="nava_target_hint">Target node (favorites first)</string>
     <string name="nava_note">Choose the route: Navadmin channel (read-only responses) or private DM (PKI) to the selected node. Commands that need to reach the node itself can only be sent as DM. Responses to whatever you send appear in the conversation below.</string>
     <string name="nava_route">Send via</string>
@@ -536,13 +885,13 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_ping">Latency reply with uptime and noise floor. E.g. PONG: RN1 | SNR: 3.5 dB | Bat: 4120 mV | UP: 32d 4h | RUIDO: -120 dBm. Rate limit: 1 reply every 10 s per node.</string>
     <string name="nava_desc_status">Memory health: nodes RAM/80, manual/auto favorites, orphans, uptime.</string>
     <string name="nava_desc_env">Battery, heap, nRF52 CPU temperature and I2C environment sensor.</string>
-    <string name="nava_desc_channel">Spectrum usage (airtime % and TX %).</string>
+    <string name="nava_desc_channel" formatted="false">Spectrum usage (airtime % and TX %).</string>
     <string name="nava_desc_peers">Direct 0-hop neighbors (ID, role, SNR, time since last contact).</string>
     <string name="nava_desc_rxlog">Metadata of the last 5 received packets (ID, PortNum, SNR, RSSI).</string>
     <string name="nava_desc_afc">TCXO frequency drift in Hz of the last packet.</string>
     <string name="nava_desc_reset_reason">Last reset reason (RESETREAS register).</string>
     <string name="nava_desc_noise">Instant LoRa chip noise floor in dBm.</string>
-    <string name="nava_desc_bat">Active chemistry, mV, OCV % and TX state.</string>
+    <string name="nava_desc_bat" formatted="false">Active chemistry, mV, OCV % and TX state.</string>
     <string name="nava_desc_help">Short command glossary.</string>
     <string name="nava_desc_route">Hops and SNR with which the node hears you. If not in the DB it auto-launches a TraceRoute. Usage: route !ID</string>
     <string name="nava_desc_trace">Launches a native TraceRoute to the node. Usage: trace !ID</string>
@@ -640,4 +989,11 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="ble_not_connected">Bluetooth is not currently connected.</string>
     <string name="log_usb_disconnected_manual">USB disconnected by user.</string>
     <string name="log_ble_disconnected_manual">Bluetooth disconnected by user.</string>
+    <string name="manual_action_title">Documentation Manual</string>
+    <string name="manual_action_prompt">What would you like to do with this official document?</string>
+    <string name="manual_action_open">Open viewer</string>
+    <string name="manual_action_download">Download PDF</string>
+    <string name="manual_action_share">Share PDF</string>
+    <string name="pdf_saved_successfully">PDF document saved to device storage.</string>
+    <string name="pdf_save_failed">Could not save PDF document to storage.</string>
 </resources>

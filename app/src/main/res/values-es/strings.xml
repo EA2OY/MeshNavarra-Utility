@@ -218,18 +218,367 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="tab_hint_more_left">Más pestañas a la izquierda</string>
     <string name="tab_hint_more_right">Más pestañas a la derecha</string>
     <string name="bp_help_button">¿Por qué estos ajustes? (duty cycle)</string>
-    <string name="tab_info_title_gp">Buenas Prácticas — por qué</string>
-    <string name="tab_info_title_cmd">Comandos</string>
-    <string name="tab_info_title_admin">Administración</string>
-    <string name="tab_info_title_chat">Chat</string>
-    <string name="tab_info_title_nodes">Nodos</string>
-    <string name="tab_info_title_log">Log</string>
-    <string name="tab_info_body_gp">¿Por qué las Buenas Prácticas? Porque la banda ISM de 868 MHz es compartida, está limitada por ley y ya está llena de usuarios en España.\n\nLa banda está regulada por ETSI EN 300 220 y dividida en sub-bandas, cada una con un CICLO DE TRABAJO (duty cycle) máximo: la fracción de tiempo que un dispositivo puede transmitir. Si transmites 1 segundo, debes guardar silencio el tiempo necesario para respetar el límite de esa sub-banda.\n\nSub-bandas ETSI y duty cycle (EN 300 220-2, §4.3.3):\n- 863-865 MHz: 0,1%\n- 865-868 MHz: 1%\n- 868-868,6 MHz: 1% (el default habitual de Meshtastic en España es 868,1 MHz)\n- 868,7-869,2 MHz: 0,1%\n- 869,4-869,65 MHz: 10% (hasta 500 mW ERP; la flota Navarrico va aquí, SFNarrow 869,618 MHz)\n- 869,7-870 MHz: 1%\n\nEl límite es por dispositivo y por sub-banda, y es responsabilidad del OPERADOR: superarlo no es solo mala educación, es ilegal y degrada la red para todos.\n\nYa hay miles de nodos Meshtastic en España. Cada nodo envía balizas periódicamente: NodeInfo (nombre), telemetría del dispositivo y posición GPS. Con miles de nodos, ese tráfico de fondo suma mucho tiempo de antena. Los mensajes de los usuarios valen mucho más que las balizas — esta pestaña reduce las balizas al mínimo necesario para seguir siendo visible en la malla:\n- NodeInfo cada 72 h en vez de 3 h (24 veces menos)\n- Posición GPS cada 72 h con posición inteligente DESACTIVADA (sin ráfagas extra)\n- Límite de saltos y rebroadcast sensatos\n\nSi todos lo hacemos, el canal queda casi libre para los mensajes reales. Aplícalo a tu nodo y anima al resto de la flota a hacer lo mismo.\n\nReferencias:\n- ETSI EN 300 220-1 / -2 (dispositivos de corto alcance; duty cycle en EN 300 220-2 §4.3.3)\n- The Things Network — Duty Cycle: https://www.thethingsnetwork.org/docs/lorawan/duty-cycle/\n- Meshtastic: https://meshtastic.org</string>
-    <string name="tab_info_body_cmd">Envía comandos a un nodo: telemetría, posición, traceroute, nombre del propietario o un mensaje libre. Cada acción muestra la respuesta decodificada en un popup.</string>
-    <string name="tab_info_body_admin">Administra un nodo: reinícialo, borra su NodeDB, márcalo como favorito o ignorado, u obtén su información (vuelve a descargar la base de datos).</string>
-    <string name="tab_info_body_chat">Lee los mensajes almacenados y en vivo del nodo y responde en el canal. Usa Pausar antes de enviar comandos de administración.</string>
-    <string name="tab_info_body_nodes">Tarjetas visuales de todos los nodos de la red (favoritos primero): batería, voltaje, SNR, última vez oído y saltos.</string>
-    <string name="tab_info_body_log">Registro persistente de cada petición y respuesta con marca de tiempo. Las entradas más recientes aparecen primero.</string>
+    <string name="tab_info_title_gp">Buenas Prácticas y Presets</string>
+    <string name="tab_info_title_cmd">Comandos y Telemetría</string>
+    <string name="tab_info_title_admin">Administración y Control</string>
+    <string name="tab_info_title_nava">NavaTastic CLI</string>
+    <string name="tab_info_title_chat">Chat y Mensajería</string>
+    <string name="tab_info_title_nodes">Radar de Nodos</string>
+    <string name="tab_info_title_log">Registro y Auditoría</string>
+
+    <string name="cinematic_badge_gp">⚡ OPTIMIZACIÓN &amp; PRESETS</string>
+    <string name="cinematic_badge_cmd">📡 TELEMETRÍA Y DIAGNÓSTICO</string>
+    <string name="cinematic_badge_admin">🛡️ CONTROL Y GESTIÓN DE NODOS</string>
+    <string name="cinematic_badge_nava">⚡ REPETIDORES NAVATASTIC</string>
+    <string name="cinematic_badge_chat">💬 MENSAJERÍA TÁCTICA</string>
+    <string name="cinematic_badge_nodes">🌐 RADAR Y FLOTA</string>
+    <string name="cinematic_badge_log">📜 CONSOLA DE AUDITORÍA</string>
+
+    <string name="cinematic_more_info">📖 Leer más (Detalles técnicos)</string>
+    <string name="cinematic_hide_info">▲ Ocultar detalles técnicos</string>
+    <string name="cinematic_btn_app_manual">Manual de la App (PDF)</string>
+    <string name="cinematic_btn_nava_manual">Manual NavaTastic (PDF)</string>
+    <string name="cinematic_hold_hint">Mantén pulsado para pausar</string>
+    <string name="cinematic_paused_hint">⏸ Pausado · Pulsa Siguiente ► para reanudar</string>
+    <string name="cinematic_sim_title">SIMULACIÓN EN TIEMPO REAL</string>
+    <string name="cinematic_prev">◄ Anterior</string>
+    <string name="cinematic_next">Siguiente ►</string>
+
+    <!-- Tab 0: Buenas Prácticas Slides (10 slides) -->
+    <string name="slide_gp_1_punch">¡Olvídate del ordenador!</string>
+    <string name="slide_gp_1_desc">Aplica la configuración ideal de radio y balizas en un solo toque, sin necesidad de comandos complejos ni consola.</string>
+    <string name="slide_gp_1_prompt">preset apply: SFN_ES_869_618</string>
+    <string name="slide_gp_1_output" formatted="false">« SFN España 869.618 MHz OK · Duty cycle 10% · ERP 500mW configurado</string>
+
+    <string name="slide_gp_2_punch">Protege el espectro y tu batería</string>
+    <string name="slide_gp_2_desc">Reduce las balizas NodeInfo y GPS a 72 horas. Deja el canal libre para los mensajes reales y salva la batería solar.</string>
+    <string name="slide_gp_2_prompt">lora set_broadcasts: 72h</string>
+    <string name="slide_gp_2_output" formatted="false">« NodeInfo: 259200s (72h) · GPS: 259200s (72h) · Tráfico residual reducido 96%</string>
+
+    <string name="slide_gp_3_punch">Cumplimiento legal ETSI EN 300 220</string>
+    <string name="slide_gp_3_desc">Calcula y respeta automáticamente los límites de duty cycle de la sub-banda europea de 868 MHz.</string>
+    <string name="slide_gp_3_prompt">check duty_cycle: EU868_SUBBAND</string>
+    <string name="slide_gp_3_output" formatted="false">« Límite legal 10% respetado · Ventana de silencio regulada automáticamente</string>
+
+    <string name="slide_gp_4_punch">Presets de módem estándar al instante</string>
+    <string name="slide_gp_4_desc">Cambia entre LongFast, LongModerate, MediumFast o ShortTurbo con un solo toque y verificación de enlace.</string>
+    <string name="slide_gp_4_prompt">modem_preset: LongModerate</string>
+    <string name="slide_gp_4_output">« Bandwidth: 125kHz · Spreading Factor: 11 · Coding Rate: 4/8 aplicado</string>
+
+    <string name="slide_gp_5_punch">Lectura y modificación segura</string>
+    <string name="slide_gp_5_desc">Descarga la configuración actual, aplica solo los cambios necesarios y verifica el guardado sin riesgos.</string>
+    <string name="slide_gp_5_prompt">config read_modify_write</string>
+    <string name="slide_gp_5_output">« LoraConfig verificado y persistido con éxito en el nodo</string>
+
+    <string name="slide_gp_6_punch">Smart Position desactivada</string>
+    <string name="slide_gp_6_desc">Elimina ráfagas parásitas de posición GPS al moverse que saturan los repetidores y agotan la batería.</string>
+    <string name="slide_gp_6_prompt">smart_position: DISABLED</string>
+    <string name="slide_gp_6_output">« Ahorro de batería extremo · Cero emisiones parásitas de movimiento</string>
+
+    <string name="slide_gp_7_punch">Copia de seguridad en archivo JSON</string>
+    <string name="slide_gp_7_desc">Exporta un volcado completo de la configuración actual de tu nodo para recuperarla ante cualquier problema.</string>
+    <string name="slide_gp_7_prompt">backup_config -> nodedb_backup.json</string>
+    <string name="slide_gp_7_output">« Snapshot completo de parámetros de radio y canales guardado en almacenamiento local</string>
+
+    <string name="slide_gp_8_punch">Restauración de perfil en 1 toque</string>
+    <string name="slide_gp_8_desc">Restaura configuraciones previas guardadas con validación previa de integridad de datos.</string>
+    <string name="slide_gp_8_prompt">restore_config: nodedb_backup.json</string>
+    <string name="slide_gp_8_output">« Configuración restaurada y verificada en el nodo sin errores</string>
+
+    <string name="slide_gp_9_punch">Comprobación de canal en tiempo real</string>
+    <string name="slide_gp_9_desc">Verifica la frecuencia exacta, ancho de banda y factor de modulación activo de tu transmisor.</string>
+    <string name="slide_gp_9_prompt">check_channel_status</string>
+    <string name="slide_gp_9_output">« Canal 869.618 MHz · Ancho: 125 kHz · SF: 11 · Estado de enlace: Óptimo</string>
+
+    <string name="slide_gp_10_punch">Límite de saltos sensato</string>
+    <string name="slide_gp_10_desc">Configura el número de saltos adecuado para evitar tormentas de retransmisión que colapsen la malla.</string>
+    <string name="slide_gp_10_prompt">set_hop_limit: 3</string>
+    <string name="slide_gp_10_output">« HopLimit fijado en 3 · Enrutamiento óptimo sin saturación de repetidores</string>
+
+    <!-- Tab 1: Comandos Slides (8 slides) -->
+    <string name="slide_cmd_1_punch">Diagnóstico remoto en segundos</string>
+    <string name="slide_cmd_1_desc">Consulta telemetría, batería, voltaje y temperatura de cualquier nodo en la malla sin cables.</string>
+    <string name="slide_cmd_1_prompt">req_telemetry -> !3a89ac94</string>
+    <string name="slide_cmd_1_output" formatted="false">« [Batería: 4.18V 100% · Temp: 24.2°C · Presión: 1013 hPa · Humedad: 48%]</string>
+
+    <string name="slide_cmd_2_punch">Rastreo de saltos con Traceroute</string>
+    <string name="slide_cmd_2_desc">Descubre la ruta exacta que siguen tus paquetes a través de los repetidores intermedios con SNR detallado.</string>
+    <string name="slide_cmd_2_prompt">traceroute -> !3a89ac94</string>
+    <string name="slide_cmd_2_output">« Ruta: MI_NODO ➔ [SNR +6dB] ➔ REP_VALLE ➔ [SNR +9dB] ➔ DESTINO (2 saltos)</string>
+
+    <string name="slide_cmd_3_punch">Posición GPS remota al instante</string>
+    <string name="slide_cmd_3_desc">Pide la ubicación exacta de un nodo móvil o repetidor con coordenadas y altitud en tiempo real.</string>
+    <string name="slide_cmd_3_prompt">req_position -> !5cfaaca9</string>
+    <string name="slide_cmd_3_output">« Lat: 42.8168° N · Lon: -1.6432° W · Altitud: 450 m · Satélites: 9</string>
+
+    <string name="slide_cmd_4_punch">Cambio de nombre y propietario</string>
+    <string name="slide_cmd_4_desc">Actualiza el nombre corto y largo de tu nodo sin pasar por la terminal ni reiniciar a ciegas.</string>
+    <string name="slide_cmd_4_prompt">set_owner: "REPETIDOR MIRADOR" [MIRA]</string>
+    <string name="slide_cmd_4_output">« Propietario actualizado: REPETIDOR MIRADOR (MIRA) [!c0ffee]</string>
+
+    <string name="slide_cmd_5_punch">Respuestas decodificadas en popups</string>
+    <string name="slide_cmd_5_desc">Cada respuesta recibida por radio se procesa y muestra en ventanas claras con métricas legibles.</string>
+    <string name="slide_cmd_5_prompt">decode_packet: PortNum_TEXT_MESSAGE_APP</string>
+    <string name="slide_cmd_5_output">« Paquete decodificado · SNR: +11.25 dB · RSSI: -74 dBm · HopsAway: 0</string>
+
+    <string name="slide_cmd_6_punch">Telemetría ambiental con BME680</string>
+    <string name="slide_cmd_6_desc">Recibe datos meteorológicos y calidad del aire en directo de nodos con sensores ambientales conectados.</string>
+    <string name="slide_cmd_6_prompt">req_ambient_telemetry -> !3a89ac94</string>
+    <string name="slide_cmd_6_output">« [BME680: Temp 22.4°C · Hum 52% · Presión 1014 hPa · Gas 34 kOhm]</string>
+
+    <string name="slide_cmd_7_punch">Mensajes directos con acuse PKI</string>
+    <string name="slide_cmd_7_desc">Envía textos de prueba privados y recibe la confirmación criptográfica de recepción del receptor.</string>
+    <string name="slide_cmd_7_prompt">send_dm: "Test repetidor" -> !3a89ac94</string>
+    <string name="slide_cmd_7_output">« Mensaje enviado con acuse PKI · [✓ ACK recibido en 840ms]</string>
+
+    <string name="slide_cmd_8_punch">Consulta de información de nodo</string>
+    <string name="slide_cmd_8_desc">Pide el perfil de usuario, modelo de hardware y capacidades de cualquier nodo conectado a la red.</string>
+    <string name="slide_cmd_8_prompt">req_user_info -> !3a89ac94</string>
+    <string name="slide_cmd_8_output">« Info: \'RN1_Pamplona\' · Hardware RAK4631 · Rol: ROUTER · Canales: 8</string>
+
+    <!-- Tab 2: Administración Slides (8 slides) -->
+    <string name="slide_admin_1_punch">Favoritos y lista negra en un toque</string>
+    <string name="slide_admin_1_desc">Marca nodos prioritarios para que siempre estén arriba o ignora nodos ruidosos que saturan tu lista.</string>
+    <string name="slide_admin_1_prompt">set_favorite: !3a89ac94 -> TRUE</string>
+    <string name="slide_admin_1_output">« Nodo !3a89ac94 fijado como FAVORITO (prioridad en radio y listados)</string>
+
+    <string name="slide_admin_2_punch">Limpieza de NodeDB conservando favoritos</string>
+    <string name="slide_admin_2_desc">Purga los nodos antiguos o fuera de cobertura de tu base de datos sin perder jamás tus nodos preferidos.</string>
+    <string name="slide_admin_2_prompt">wipe_nodedb keep_favorites=TRUE</string>
+    <string name="slide_admin_2_output">« 68 nodos efímeros purgados · 12 favoritos intactos preservados</string>
+
+    <string name="slide_admin_3_punch">Reinicio y apagado remoto seguro</string>
+    <string name="slide_admin_3_desc">Reinicia el microcontrolador de forma remota o programa un reinicio seguro para aplicar cambios.</string>
+    <string name="slide_admin_3_prompt">admin_reboot in_seconds=5</string>
+    <string name="slide_admin_3_output">« Orden de reinicio enviada · Nodo reiniciando en 5 segundos...</string>
+
+    <string name="slide_admin_4_punch">Gestión de claves de administrador PKI</string>
+    <string name="slide_admin_4_desc">Configura hasta 3 claves públicas de administración cifrada para control exclusivo de infraestructura.</string>
+    <string name="slide_admin_4_prompt">admin_keys set_pubkey: "a8f9e2..."</string>
+    <string name="slide_admin_4_output">« Clave de administración registrada · Canal Navadmin protegido contra no-admins</string>
+
+    <string name="slide_admin_5_punch">Convertir en Nodo Maestro</string>
+    <string name="slide_admin_5_desc">Convierte tu terminal en el centro de mando de la flota con permisos elevados en toda la red.</string>
+    <string name="slide_admin_5_prompt">promote_to_master: NODE_LOCAL</string>
+    <string name="slide_admin_5_output">« Modo Maestro activo · Capacidades de administración remota habilitadas</string>
+
+    <string name="slide_admin_6_punch">Desconexión protegida de sesión</string>
+    <string name="slide_admin_6_desc">Cierra la sesión USB o Bluetooth de forma segura asegurando que no queden paquetes pendientes en cola.</string>
+    <string name="slide_admin_6_prompt">disconnect_radio_session</string>
+    <string name="slide_admin_6_output">« Sesión cerrada limpiamente · Transmisiones completadas sin corrupción</string>
+
+    <string name="slide_admin_7_punch">Sincronización de base de datos</string>
+    <string name="slide_admin_7_desc">Descarga y actualiza en tiempo real la tabla de contactos y claves de cifrado de la memoria del nodo.</string>
+    <string name="slide_admin_7_prompt">sync_nodedb_cache</string>
+    <string name="slide_admin_7_output">« Tabla de nodos actualizada en memoria local · 0 retrasos en la interfaz</string>
+
+    <string name="slide_admin_8_punch">Mantenimiento preventivo</string>
+    <string name="slide_admin_8_desc">Ejecuta comprobaciones de salud del nodo antes de enviar órdenes críticas de configuración.</string>
+    <string name="slide_admin_8_prompt">admin_maintenance_check</string>
+    <string name="slide_admin_8_output">« Estado del nodo: Saludable · 0 errores en bus I2C/SPI · Batería nominal</string>
+
+    <!-- Tab 3: NavaTastic CLI Slides (16 ELITE SLIDES) -->
+    <string name="slide_nava_1_punch">Más de 40 comandos para repetidores solares</string>
+    <string name="slide_nava_1_desc">Diseñado específicamente para nodos con firmware Navarrico/NavaTastic con control total de hardware y energía.</string>
+    <string name="slide_nava_1_prompt">/nava stats</string>
+    <string name="slide_nava_1_output" formatted="false">« [RAM libre: 46KB · Uptime: 14d 6h · Batería: 4.19V 100% · Temp: 21.8°C · Resets: 0]</string>
+
+    <string name="slide_nava_2_punch">Control por DM cifrado PKI o Navadmin</string>
+    <string name="slide_nava_2_desc">Envía comandos de control privados punto a punto o consultas de solo lectura por el canal Navadmin.</string>
+    <string name="slide_nava_2_prompt">/nava get_vbat (via DM PKI)</string>
+    <string name="slide_nava_2_output">« [PKI Cifrado] vbat_min=3.10V · vbat_max=4.20V · vwake=3.45V</string>
+
+    <string name="slide_nava_3_punch">Compuerta de seguridad CONFIRMAR</string>
+    <string name="slide_nava_3_desc">Los comandos destructivos o de riesgo exigen escribir CONFIRMAR antes de enviar, evitando accidentes fatales.</string>
+    <string name="slide_nava_3_prompt">/nava factory_reset ⚠</string>
+    <string name="slide_nava_3_output">« [BLOQUEO DE SEGURIDAD] Escribe \'CONFIRMAR\' para autorizar el comando destructivo</string>
+
+    <string name="slide_nava_4_punch">Gestión completa de canales secundarios</string>
+    <string name="slide_nava_4_desc">Crea, modifica, borra y comparte URLs de canales en los slots 2 al 7 con asistente de claves PSK Base64.</string>
+    <string name="slide_nava_4_prompt">/nava ch_set 2 "EMERGENCIAS" AQ==</string>
+    <string name="slide_nava_4_output">« Canal slot 2 configurado como \'EMERGENCIAS\' · PSK Base64 registrada</string>
+
+    <string name="slide_nava_5_punch">Cero desgaste de memoria Flash</string>
+    <string name="slide_nava_5_desc">Diagnósticos avanzados (stats/log/mute) ejecutados 100% en RAM para alargar la vida del chip por años.</string>
+    <string name="slide_nava_5_prompt">/nava log</string>
+    <string name="slide_nava_5_output">« [RAM Log]: 10 eventos capturados · 0 escrituras en Flash requeridas</string>
+
+    <string name="slide_nava_6_punch">Química de batería LiFePO4, LiPo y Li-Ion</string>
+    <string name="slide_nava_6_desc">Ajusta las curvas OCV y tensiones de carga para baterías LiFePO4 (3.2V) o Li-Ion/LiPo (3.7V/3.85V).</string>
+    <string name="slide_nava_6_prompt">/nava set_chem lifepo4 ⚠</string>
+    <string name="slide_nava_6_output">« Química LiFePO4 activa · Curvas de voltaje OCV adaptadas a 3.2V nominal</string>
+
+    <string name="slide_nava_7_punch">Voltajes críticos de corte y despertar solar</string>
+    <string name="slide_nava_7_desc">Define el voltaje exacto de apagado (vbat) y de despertar seguro (vwake) para evitar reinicios infinitos al amanecer.</string>
+    <string name="slide_nava_7_prompt">/nava set_vwake 3450 ⚠</string>
+    <string name="slide_nava_7_output">« Umbral de despertar fijado en 3.45V · Histéresis solar protegida</string>
+
+    <string name="slide_nava_8_punch">Modo Tormenta e hibernación extrema</string>
+    <string name="slide_nava_8_desc">Pone el repetidor en ultra bajo consumo (1-3 µA) en temporales prolongados hasta que regrese el sol.</string>
+    <string name="slide_nava_8_prompt">/nava storm ⚠</string>
+    <string name="slide_nava_8_output">« Modo Tormenta activo · Suspensión System OFF (1-3 µA) hasta recarga solar</string>
+
+    <string name="slide_nava_9_punch">Resistencia a Brownouts de amanecer</string>
+    <string name="slide_nava_9_desc">El comparador analógico LPCOMP y waitUntilPowerLevelSafe garantizan arranque sólo con energía solar estable.</string>
+    <string name="slide_nava_9_prompt">/nava power_safe_status</string>
+    <string name="slide_nava_9_output">« LPCOMP hardware activo · Histéresis superada · Arranque seguro verificado</string>
+
+    <string name="slide_nava_10_punch">Silenciamiento de emergencia de TX</string>
+    <string name="slide_nava_10_desc">Desactiva la transmisión de radio en situaciones de emergencia o interferencias sin apagar la escucha.</string>
+    <string name="slide_nava_10_prompt">/nava txoff ⚠</string>
+    <string name="slide_nava_10_output">« Transmisor LoRa desactivado · Modo escucha pasiva activado sin emitir RF</string>
+
+    <string name="slide_nava_11_punch">Apagado remoto de Bluetooth BLE</string>
+    <string name="slide_nava_11_desc">Apaga la radio Bluetooth del repetidor en montaña para ahorrar 8-12 mA continuos de energía solar.</string>
+    <string name="slide_nava_11_prompt">/nava ble off ⚠</string>
+    <string name="slide_nava_11_output">« Módulo BLE apagado · Ahorro de energía activo para repetidor solar</string>
+
+    <string name="slide_nava_12_punch">Lista negra persistente en RAM</string>
+    <string name="slide_nava_12_desc">Bloquea nodos ruidosos o saboteadores que intenten saturar el repetidor comunitario.</string>
+    <string name="slide_nava_12_prompt">/nava ign !badc0de ⚠</string>
+    <string name="slide_nava_12_output">« Nodo !badc0de añadido a lista negra · Paquetes descartados en capa física</string>
+
+    <string name="slide_nava_13_punch">Hasta 3 Claves de Administrador PKI</string>
+    <string name="slide_nava_13_desc">Gestiona hasta 3 claves públicas de administración para control exclusivo y blindado de la red.</string>
+    <string name="slide_nava_13_prompt">/nava keys_add "04a8b9..."</string>
+    <string name="slide_nava_13_output">« Clave pública admin registrada · Acceso de infraestructura blindado</string>
+
+    <string name="slide_nava_14_punch">Cadencia de balizas en caliente</string>
+    <string name="slide_nava_14_desc">Ajusta en tiempo real los intervalos de emisión de balizas de posición y telemetría (1 a 10080 min o apagado).</string>
+    <string name="slide_nava_14_prompt">/nava set_pos_tx 4320</string>
+    <string name="slide_nava_14_output">« Intervalo de posición GPS fijado en 72 horas (4320 min)</string>
+
+    <string name="slide_nava_15_punch">Borrado de posición estática</string>
+    <string name="slide_nava_15_desc">Limpia las coordenadas fijadas en la memoria del repetidor cuando se traslada a una nueva ubicación.</string>
+    <string name="slide_nava_15_prompt">/nava pos_clear</string>
+    <string name="slide_nava_15_output">« Coordenadas fijas borradas · Nodo listo para nueva asignación</string>
+
+    <string name="slide_nava_16_punch">Generador de URLs de canal compatibles</string>
+    <string name="slide_nava_16_desc">Genera URLs de importación de canal de Meshtastic compatibles directamente desde el repetidor.</string>
+    <string name="slide_nava_16_prompt">/nava ch_url 2</string>
+    <string name="slide_nava_16_output">« URL generada: https://meshtastic.org/e/#... lista para compartir</string>
+
+    <!-- Tab 4: Chat Slides (7 slides) -->
+    <string name="slide_chat_1_punch">Historial persistente por canal</string>
+    <string name="slide_chat_1_desc">Tus conversaciones se guardan en el móvil organizadas por canal, sin perder mensajes al reconectar.</string>
+    <string name="slide_chat_1_prompt">select_channel: "Navadmin"</string>
+    <string name="slide_chat_1_output">« Cargados 48 mensajes de historial para el canal Navadmin</string>
+
+    <string name="slide_chat_2_punch">Indicadores de entrega en tiempo real</string>
+    <string name="slide_chat_2_desc">Visualiza el estado exacto de cada mensaje: en camino (⟳), entregado al nodo (✓) o error de reenvío (✗).</string>
+    <string name="slide_chat_2_prompt">send_msg: "Prueba de cobertura repetidor"</string>
+    <string name="slide_chat_2_output">« [11:25] » me: Prueba de cobertura · [✓ Entregado]</string>
+
+    <string name="slide_chat_3_punch">Selector de canales independientes</string>
+    <string name="slide_chat_3_desc">Envía y recibe mensajes en el canal primario o en cualquier canal secundario sin interferencias.</string>
+    <string name="slide_chat_3_prompt">switch_tx_channel: Slot 1 (Navadmin)</string>
+    <string name="slide_chat_3_output">« Canal de transmisión fijado en slot 1 · Cifrado PSK activo</string>
+
+    <string name="slide_chat_4_punch">Pausa táctica de recepción</string>
+    <string name="slide_chat_4_desc">Pausa la llegada continua de tráfico para redactar o ejecutar comandos sin distracciones.</string>
+    <string name="slide_chat_4_prompt">toggle_chat_pause: PAUSED</string>
+    <string name="slide_chat_4_output">« Recepción en pantalla pausada · Mensajes en cola guardándose en segundo plano</string>
+
+    <string name="slide_chat_5_punch">Reenvío rápido con un solo toque</string>
+    <string name="slide_chat_5_desc">Si un mensaje no llega por falta de cobertura, pulsa sobre el indicador de error para reenviarlo al momento.</string>
+    <string name="slide_chat_5_prompt">resend_packet: msg_id=4821</string>
+    <string name="slide_chat_5_output">« Reenviando paquete con routing ACK solicitado... ✓ Recibido por la malla</string>
+
+    <string name="slide_chat_6_punch">Burbujas tácticas diferenciadas</string>
+    <string name="slide_chat_6_desc">Interfaz clara con separación visual de mensajes propios y remotos para facilitar la lectura en campo.</string>
+    <string name="slide_chat_6_prompt">render_chat_bubbles</string>
+    <string name="slide_chat_6_output">« Interfaz de mensajería optimizada · Burbujas alineadas con marcas de estado</string>
+
+    <string name="slide_chat_7_punch">Marcas de tiempo de alta precisión</string>
+    <string name="slide_chat_7_desc">Cada paquete registra la hora exacta de emisión y recepción para auditoría cronológica precisa.</string>
+    <string name="slide_chat_7_prompt">inspect_timestamp</string>
+    <string name="slide_chat_7_output">« [11:42:15.204] Registro cronológico exacto de tramas activado</string>
+
+    <!-- Tab 5: Nodos Slides (8 slides) -->
+    <string name="slide_nodes_1_punch">Tarjetas visuales con favoritos primero</string>
+    <string name="slide_nodes_1_desc">Vista panorámica de toda la red con tus nodos favoritos fijados arriba y métricas clave de un vistazo.</string>
+    <string name="slide_nodes_1_prompt">render_nodes_radar</string>
+    <string name="slide_nodes_1_output">« 24 nodos detectados · 4 favoritos arriba · SNR promedio +8.4 dB</string>
+
+    <string name="slide_nodes_2_punch">Métricas de señal, batería y saltos</string>
+    <string name="slide_nodes_2_desc">Monitorea el voltaje, porcentaje de carga, SNR del último paquete y distancia en saltos de cada equipo.</string>
+    <string name="slide_nodes_2_prompt">inspect_node: !3a89ac94</string>
+    <string name="slide_nodes_2_output" formatted="false">« Batería: 100% (4.18V) · SNR: +11.5 dB · Saltos: 0 (Directo) · Visto: hace 2 min</string>
+
+    <string name="slide_nodes_3_punch">Popup con 11 acciones de diagnóstico</string>
+    <string name="slide_nodes_3_desc">Toca cualquier tarjeta para abrir un menú completo: pedir ambiente, energía, posición, traceroute o compartir.</string>
+    <string name="slide_nodes_3_prompt">node_menu_action: AMBIENTE</string>
+    <string name="slide_nodes_3_output">« Solicitud de telemetría ambiental enviada · Esperando respuesta del sensor BME680...</string>
+
+    <string name="slide_nodes_4_punch">Importa nodos por URL o código QR</string>
+    <string name="slide_nodes_4_desc">Agrega contactos y claves públicas directamente pegando un enlace compartido, sin saturar la flash del nodo.</string>
+    <string name="slide_nodes_4_prompt">import_url: "https://meshtastic.org/e/#..."</string>
+    <string name="slide_nodes_4_output">« Contacto \'REPETIDOR NORTE\' importado con clave pública verificada</string>
+
+    <string name="slide_nodes_5_punch">Búsqueda instantánea y filtrado</string>
+    <string name="slide_nodes_5_desc">Encuentra cualquier nodo por nombre corto, nombre largo, ID hexadecimal o rol en milisegundos.</string>
+    <string name="slide_nodes_5_prompt">search_filter: "MIRA"</string>
+    <string name="slide_nodes_5_output">« 1 coincidencia encontrada: REPETIDOR MIRADOR (!c0ffee)</string>
+
+    <string name="slide_nodes_6_punch">Radar de cobertura directa 0 saltos</string>
+    <string name="slide_nodes_6_desc">Identifica al instante los repetidores y nodos que tienes en cobertura visual directa sin intermediarios.</string>
+    <string name="slide_nodes_6_prompt">filter_hops: 0_DIRECT</string>
+    <string name="slide_nodes_6_output">« 8 nodos en línea de vista directa · SNR promedio +7.2 dB</string>
+
+    <string name="slide_nodes_7_punch">Identificación de modelo de hardware</string>
+    <string name="slide_nodes_7_desc">Reconoce automáticamente el chipset y módulo de radio (RAK4631, Heltec V3, T-Beam, Station G2).</string>
+    <string name="slide_nodes_7_prompt">detect_hardware_model</string>
+    <string name="slide_nodes_7_output">« Hardware detectado: RAK Wireless 4631 (nRF52840 + SX1262 LoRa)</string>
+
+    <string name="slide_nodes_8_punch">Indicador de último contacto relativo</string>
+    <string name="slide_nodes_8_desc">Calcula con precisión cuánto tiempo ha pasado desde el último paquete recibido de cada nodo.</string>
+    <string name="slide_nodes_8_prompt">calc_last_heard</string>
+    <string name="slide_nodes_8_output">« Escuchado hace 42 segundos · Enlace activo y respondiendo</string>
+
+    <!-- Tab 6: Log Slides (7 slides) -->
+    <string name="slide_log_1_punch">Registro forense de cada byte</string>
+    <string name="slide_log_1_desc">Inspecciona en tiempo real todas las tramas enviadas y recibidas con marcas de tiempo precisas.</string>
+    <string name="slide_log_1_prompt">stream_log: LIVE</string>
+    <string name="slide_log_1_output">« [11:26:04] » FROM_RADIO: PacketId=84920 Type=TELEMETRY From=!3a89ac94</string>
+
+    <string name="slide_log_2_punch">Archivo persistente que sobrevive a reinicios</string>
+    <string name="slide_log_2_desc">El historial de eventos se guarda en el archivo app_log.txt para que puedas auditarlo días después.</string>
+    <string name="slide_log_2_prompt">read_log_file: app_log.txt</string>
+    <string name="slide_log_2_output">« Archivo cargado · 200 eventos recientes listados en orden cronológico inverso</string>
+
+    <string name="slide_log_3_punch">Botón de borrado instantáneo</string>
+    <string name="slide_log_3_desc">Limpia la pantalla y vacía el archivo de log en disco con un solo toque cuando quieras empezar de cero.</string>
+    <string name="slide_log_3_prompt">clear_logs_action</string>
+    <string name="slide_log_3_output">« Registros visuales y archivo en disco vaciados con éxito</string>
+
+    <string name="slide_log_4_punch">Registro automático de fallos a archivo</string>
+    <string name="slide_log_4_desc">Si ocurre cualquier excepción no controlada, se genera un informe detallado para facilitar su depuración.</string>
+    <string name="slide_log_4_prompt">crash_logger: ACTIVE</string>
+    <string name="slide_log_4_output">« Crash logger preparado · Informes automáticos en directorio de logs</string>
+
+    <string name="slide_log_5_punch">Control remoto vía ADB para automatización</string>
+    <string name="slide_log_5_desc">Permite ejecutar baterías de pruebas automatizadas y scripts externos mediante intents de broadcast.</string>
+    <string name="slide_log_5_prompt">adb am broadcast -a com.meshkachoutility.REMOTE</string>
+    <string name="slide_log_5_output">« Comando recibido vía broadcast · Ejecutando suite de validación</string>
+
+    <string name="slide_log_6_punch">Desglose detallado de cabeceras de paquetes</string>
+    <string name="slide_log_6_desc">Inspecciona los bits de WantAck, HopLimit, canal de emisión y tipo de puerto de cada paquete.</string>
+    <string name="slide_log_6_prompt">inspect_packet_header</string>
+    <string name="slide_log_6_output">« [ID=8920 HopLimit=3 HopStart=3 WantAck=True PortNum=TEXT_MESSAGE]</string>
+
+    <string name="slide_log_7_punch">Auditoría de anomalías y descartes</string>
+    <string name="slide_log_7_desc">Identifica al instante si hay tramas corruptas, desbordamientos de buffer o anomalías de radio.</string>
+    <string name="slide_log_7_prompt">filter_log_level: WARN</string>
+    <string name="slide_log_7_output">« 0 pérdidas de sincronismo · Buffer de radio fluido al 100%</string>
+
+    <!-- Technical Details (Updated & Enriched for v1.0.7) -->
+    <string name="tab_info_body_gp" formatted="false">¿Por qué las Buenas Prácticas? Porque la banda ISM de 868 MHz es compartida, está limitada por ley y ya está saturada de balizas en España.\n\nLa banda está regulada por la norma ETSI EN 300 220 y dividida en sub-bandas, cada una con un CICLO DE TRABAJO (duty cycle) máximo: la fracción de tiempo que un dispositivo puede transmitir. Si transmites 1 segundo, debes guardar silencio el tiempo legal necesario para respetar el límite de esa sub-banda.\n\nSub-bandas ETSI y duty cycle (EN 300 220-2, §4.3.3):\n- 863-865 MHz: 0,1%\n- 865-868 MHz: 1%\n- 868-868,6 MHz: 1% (default estándar de Meshtastic en España: 868,125 MHz)\n- 868,7-869,2 MHz: 0,1%\n- 869,4-869,65 MHz: 10% (hasta 500 mW ERP; la flota Navarrico va aquí, SFNarrow 869,618 MHz)\n- 869,7-870 MHz: 1%\n\nEl límite es por dispositivo y por sub-banda, y es responsabilidad legal del OPERADOR: superarlo degrada la red de todos y satura los repetidores comunitarios.\n\nEsta pestaña optimiza tu nodo en un toque:\n- NodeInfo cada 72 h en vez de 3 h (24 veces menos tráfico residual)\n- Posición GPS cada 72 h con Smart Position desactivada (sin ráfagas parásitas)\n- Límite de saltos y rebroadcast sensatos\n- Presets SFN España y módem estándar (LongFast, LongModerate, MediumFast, ShortTurbo)\n\nAplícalo a tu nodo y anima a tu comunidad a hacer lo mismo para mantener el aire limpio.</string>
+    <string name="tab_info_body_cmd">Envía órdenes directas y consultas de telemetría a cualquier nodo de la red sin necesidad de terminal física:\n\n1. Telemetría de dispositivo: nivel de batería, voltaje exacto, consumo, temperatura del micro y métricas de rendimiento.\n2. Telemetría ambiental: lectura de temperatura, presión atmosférica, humedad relativa y calidad del aire si el nodo dispone de sensores I2C (BME280/BME680/BMP280).\n3. Posición geográfica: solicita coordenadas GPS en vivo, altitud y satélites fijados.\n4. Traceroute: traza la ruta completa de saltos entre repetidores intermedios calculando el SNR en cada tramo.\n5. Cambio de propietario: actualiza el nombre largo y nombre corto del nodo destino en caliente.\n6. Mensaje libre: envía texto de diagnóstico directo con acuse de recibo.\n\nCada respuesta recibida por radio se decodifica y muestra automáticamente en un popup con métricas completas.</string>
+    <string name="tab_info_body_admin">Panel de administración avanzada y mantenimiento de nodos Meshtastic:\n\n1. Gestión de favoritos: marca nodos clave de tu flota para que se sitúen en la parte superior y se prioricen en el enrutamiento de radio.\n2. Lista de ignorados: silencia nodos ruidosos o fuera de servicio para evitar que saturen tu base de datos.\n3. Limpieza inteligente de NodeDB: purga los nodos efímeros o inactivos de la memoria RAM/Flash conservando el 100% de tus nodos favoritos.\n4. Reinicio remoto: envía una orden de reinicio controlado con temporizador para aplicar configuraciones en frío.\n5. Claves de administrador PKI: consulta y administra hasta 3 claves públicas de administración para proteger el acceso a tus repetidores.\n6. Nodo Maestro: eleva el nodo conectado a modo de mando central de la red.\n\nTodas las operaciones cuentan con validaciones previas para evitar bloqueos del nodo.</string>
+    <string name="tab_info_body_chat">Consola táctica de mensajería bidireccional por radio LoRa:\n\n1. Historial persistente: cada canal conserva su propio historial de conversaciones en el teléfono, que sobrevive a cierres de la app y reinicios del nodo.\n2. Indicadores de entrega en tiempo real: visualiza al instante si un paquete está en camino (⟳), ha sido recibido por el nodo de destino (✓) o ha fallado por falta de cobertura (✗).\n3. Reenvío con un toque: pulsa sobre cualquier mensaje fallido para reintentar la transmisión de inmediato.\n4. Selector de canales: cambia cómodamente entre el canal primario y canales secundarios (incluyendo el canal Navadmin).\n5. Pausa de recepción: detén el flujo visual de mensajes en pantalla cuando necesites redactar con calma o realizar operaciones de administración.</string>
+    <string name="tab_info_body_nodes">Radar visual de la flota de nodos detectados en la malla:\n\n1. Tarjetas detalladas: visualiza de un vistazo el nombre, alias, ID hexadecimal, batería, voltaje, SNR del último paquete, distancia en saltos y tiempo transcurrido desde la última recepción.\n2. Favoritos priorizados: tus nodos preferidos se ordenan automáticamente en la cabecera.\n3. Menú contextual de 11 acciones: pulsa cualquier tarjeta para pedir telemetría, ambiente, energía, posición, traceroute, vecinos, estado de host o compartir su contacto.\n4. Importación por URL: pega enlaces compartidos de Meshtastic para añadir contactos y claves públicas sin consumir la limitada memoria Flash del nodo.\n5. Búsqueda instantánea: filtra por nombre, ID o rol en tiempo real.</string>
+    <string name="tab_info_body_log">Consola de depuración y registro forense en tiempo real:\n\n1. Monitor de tráfico: visualiza cada trama transmitida y recibida (FROM_RADIO / TO_RADIO) con marca de tiempo precisa y desglose de paquete.\n2. Archivo persistente (app_log.txt): se conservan los últimos 200 eventos en almacenamiento local para revisiones posteriores.\n3. Botón de borrado de logs: vacía la consola en pantalla y el archivo en disco en un toque para iniciar nuevas sesiones de prueba limpias.\n4. Crash Logger: registro automático de excepciones a disco para facilitar el soporte técnico.\n5. Control remoto ADB: permite interactuar mediante comandos scriptados en pruebas de laboratorio.</string>
+    <string name="tab_info_body_nava">Control remoto especializado para repetidores que ejecutan el firmware Navarrico/NavaTastic (fork de Meshtastic v2.7.26 optimizado para infraestructura solar en 868 MHz):\n\n1. Vías de comunicación:\n   - Canal Navadmin: consultas de solo lectura accesibles para supervisión de la flota (PSK Base64 AQ==).\n   - DM Privado (PKI): comandos de control y modificación de hardware protegidos mediante cifrado punto a punto.\n2. Compuerta de seguridad CONFIRMAR: comandos destructivos o de riesgo (química de batería, voltajes de corte/despertar, borrado de canales, modo tormenta, factory reset) bloqueados hasta escribir CONFIRMAR.\n3. Diagnósticos en RAM con cero desgaste de Flash: consultas de estadísticas (stats), registro de eventos (log) y silenciamiento (mute) 100% en memoria para maximizar la vida útil del chip.\n4. Gestión de canales secundarios: soporte para slots 2 al 7 con asistente generador de claves PSK Base64.\n5. Cadencias de difusión y modo solar: control de posición estática (pos_clear), intervalos de NodeInfo/GPS y suspensión ultra-eficiente System OFF (1-3 µA).</string>
     <string name="nava_target_hint">Nodo destino (favoritos primero)</string>
     <string name="nava_note">Elige la vía: canal Navadmin (respuestas de solo lectura) o DM privado (PKI) al nodo seleccionado. Los comandos que necesitan llegar al propio nodo solo pueden enviarse como DM. Las respuestas a lo que envíes aparecen en la conversación de abajo.</string>
     <string name="nava_category">Categoría</string>
@@ -536,7 +885,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_ping">Respuesta de latencia con uptime y piso de ruido. Ej: PONG: RN1 | SNR: 3.5 dB | Bat: 4120 mV | UP: 32d 4h | RUIDO: -120 dBm. Rate-limit: 1 respuesta cada 10s por nodo.</string>
     <string name="nava_desc_status">Salud de memoria: nodos RAM/80, favoritos manuales/auto, huérfanos, tiempo activo.</string>
     <string name="nava_desc_env">Batería, heap, temperatura CPU nRF52 y sensor ambiental I2C.</string>
-    <string name="nava_desc_channel">Uso de espectro (airtime % y TX %).</string>
+    <string name="nava_desc_channel" formatted="false">Uso de espectro (airtime % y TX %).</string>
     <string name="nava_desc_peers">Vecinos directos a 0 saltos (ID, rol, SNR, tiempo desde último contacto).</string>
     <string name="nava_desc_rxlog">Metadatos de los últimos 5 paquetes recibidos (ID, PortNum, SNR, RSSI).</string>
     <string name="nava_desc_afc">Deriva de frecuencia del TCXO en Hz del último paquete.</string>
@@ -640,4 +989,11 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="ble_not_connected">Bluetooth no está conectado actualmente.</string>
     <string name="log_usb_disconnected_manual">USB desconectado por el usuario.</string>
     <string name="log_ble_disconnected_manual">Bluetooth desconectado por el usuario.</string>
+    <string name="manual_action_title">Manual de Documentación</string>
+    <string name="manual_action_prompt">¿Qué deseas hacer con este documento oficial?</string>
+    <string name="manual_action_open">Abrir visor</string>
+    <string name="manual_action_download">Descargar PDF</string>
+    <string name="manual_action_share">Compartir PDF</string>
+    <string name="pdf_saved_successfully">Documento PDF guardado en el dispositivo.</string>
+    <string name="pdf_save_failed">No se pudo guardar el documento PDF en el almacenamiento.</string>
 </resources>
