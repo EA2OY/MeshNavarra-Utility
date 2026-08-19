@@ -1,4 +1,4 @@
-Categories:
+﻿Categories:
   - Connectivity
   - Science & Education
 License: GPL-3.0-or-later
@@ -13,14 +13,14 @@ RepoType: git
 Repo: https://github.com/EA2OY/MeshNavarra-Utility
 
 Builds:
-  - versionName: 1.0.7
-    versionCode: 8
-    commit: f736742d3f3ecfa930f3dc79442214e20f91069f
+  - versionName: 1.0.8
+    versionCode: 9
+    commit: de869df097038765966ccdf9c2db158ca7a5417e
     gradle:
       - yes
     output: app/build/outputs/apk/release/app-release-unsigned.apk
 
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.7
-CurrentVersionCode: 8
+CurrentVersion: 1.0.8
+CurrentVersionCode: 9
