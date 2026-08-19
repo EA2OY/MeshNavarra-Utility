@@ -108,7 +108,8 @@ To record a promo: open the app, open the "?" help, tap "Usage example (demo)", 
 - **F-Droid Packaging Rules (MANDATORY)**:
   1. In `metadata/com.meshkachoutility.yml` under `Builds:`, **ALWAYS use the full 40-character git commit SHA hash** (`commit: <full_hash>`). NEVER use a tag name (e.g. `v1.0.7`) or branch.
   2. For New App inclusion MRs, include **only the single latest build block** in the metadata YAML.
-  3. NEVER put machine-specific paths (e.g. `org.gradle.java.home=c:/...`) in `gradle.properties`. Linux CI build runners in F-Droid must rely on their own `JAVA_HOME`.
+  3. For multi-module projects (`app/`), **ALWAYS set `subdir: app` and DO NOT specify `output:`**. `fdroid build` automatically finds the APK in the module's build directory.
+  4. NEVER put machine-specific paths (e.g. `org.gradle.java.home=c:/...`) in `gradle.properties`. Linux CI build runners in F-Droid must rely on their own `JAVA_HOME`.
 
 ## Quick Deploy Protocol (`/publicar-release` or "despliegue completo")
 When the user requests `/publicar`, `/publicar-release`, `despliegue completo`, or `publica la versión`:
@@ -118,7 +119,7 @@ When the user requests `/publicar`, `/publicar-release`, `despliegue completo`, 
 4. **Build signed Release APK**: Run `./gradlew testDebugUnitTest assembleRelease` (verify 28+ unit tests).
 5. **Sync & Push to GitHub**: Push all code and doc changes to `EA2OY/MeshNavarra-Utility` on `main`, recreate/push the release tag (e.g. `v1.0.8`).
 6. **Get 40-char commit SHA**: `git rev-parse HEAD`.
-7. **Update F-Droid metadata**: Update `fdroid/metadata.yml` (single build block, 40-char commit SHA, explicit `output: app/build/outputs/apk/release/app-release-unsigned.apk`) and update GitLab fork (`jcacho/fdroiddata` branch `meshnavarra` via API).
+7. **Update F-Droid metadata**: Update `fdroid/metadata.yml` (single build block, 40-char commit SHA, `subdir: app`, NO `output:`) and update GitLab fork (`jcacho/fdroiddata` branch `meshnavarra` via API).
 8. **Publish GitHub Release**: Create/update Release on GitHub with release notes, upload `MeshNavarra-Utility-vX.Y.Z.apk`, and verify HTTP download.
 9. **Update `cerebro.md`**: Update State Log + refresh Handover block with session prompt.
 10. **Run `backup.ps1`**: Final snapshot.

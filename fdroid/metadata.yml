@@ -1,4 +1,4 @@
-﻿Categories:
+Categories:
   - Connectivity
   - Science & Education
 License: GPL-3.0-or-later
@@ -16,9 +16,9 @@ Builds:
   - versionName: 1.0.8
     versionCode: 9
     commit: de869df097038765966ccdf9c2db158ca7a5417e
+    subdir: app
     gradle:
       - yes
-    output: app/build/outputs/apk/release/app-release-unsigned.apk
 
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
