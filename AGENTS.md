@@ -114,13 +114,14 @@ To record a promo: open the app, open the "?" help, tap "Usage example (demo)", 
 When the user requests `/publicar`, `/publicar-release`, `despliegue completo`, or `publica la versión`:
 1. **Run `backup.ps1`**: Baseline snapshot and brain backup.
 2. **Bump version in `app/build.gradle.kts`**: Increment `versionCode` and `versionName`.
-3. **Build signed Release APK**: Run `./gradlew testDebugUnitTest assembleRelease` (verify 28+ unit tests).
-4. **Sync & Push to GitHub**: Push all code changes to `EA2OY/MeshNavarra-Utility` on `main`, recreate/push the release tag (e.g. `v1.0.8`).
-5. **Get 40-char commit SHA**: `git rev-parse HEAD`.
-6. **Update F-Droid metadata**: Update `fdroid/metadata.yml` (single build block, 40-char commit SHA, explicit `output: app/build/outputs/apk/release/app-release-unsigned.apk`) and update GitLab fork (`jcacho/fdroiddata` branch `meshnavarra` via API).
-7. **Publish GitHub Release**: Create/update Release on GitHub with release notes, upload `MeshNavarra-Utility-vX.Y.Z.apk`, and verify HTTP download.
-8. **Update `cerebro.md`**: Update State Log + refresh Handover block.
-9. **Run `backup.ps1`**: Final snapshot.
+3. **Update Documentation & Badges**: Update `README.md` (ES/EN download badges, direct APK links, test counts, feature highlights) and `Manual_app_MeshNavarra.md` to the new version.
+4. **Build signed Release APK**: Run `./gradlew testDebugUnitTest assembleRelease` (verify 28+ unit tests).
+5. **Sync & Push to GitHub**: Push all code and doc changes to `EA2OY/MeshNavarra-Utility` on `main`, recreate/push the release tag (e.g. `v1.0.8`).
+6. **Get 40-char commit SHA**: `git rev-parse HEAD`.
+7. **Update F-Droid metadata**: Update `fdroid/metadata.yml` (single build block, 40-char commit SHA, explicit `output: app/build/outputs/apk/release/app-release-unsigned.apk`) and update GitLab fork (`jcacho/fdroiddata` branch `meshnavarra` via API).
+8. **Publish GitHub Release**: Create/update Release on GitHub with release notes, upload `MeshNavarra-Utility-vX.Y.Z.apk`, and verify HTTP download.
+9. **Update `cerebro.md`**: Update State Log + refresh Handover block with session prompt.
+10. **Run `backup.ps1`**: Final snapshot.
 
 ## Backup & brain-safety protocol (MANDATORY — project has NO git fallback for agents)
 The brain (`cerebro.md`) has been emptied twice by PowerShell write failures. Rules to never lose state:

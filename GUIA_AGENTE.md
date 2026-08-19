@@ -60,9 +60,10 @@ Single entry point for any (AI) agent resuming work on this project. Read it ful
 When the user triggers `/publicar`, `/publicar-release`, `despliegue completo`, or `publica la versión`:
 1. `backup.ps1` (snapshot + brain backup).
 2. Bump version in `app/build.gradle.kts` (`versionCode` + `versionName`).
-3. `./gradlew testDebugUnitTest assembleRelease` (verify all unit tests).
-4. Commit and push to GitHub `main` + recreate release tag (e.g. `v1.0.8`).
-5. Update `fdroid/metadata.yml` (single build block with 40-character commit SHA + explicit `output: app/build/outputs/apk/release/app-release-unsigned.apk`) and sync to GitLab fork (`jcacho/fdroiddata`).
-6. Create/update GitHub Release with official notes and attach `MeshNavarra-Utility-vX.Y.Z.apk` (verify via HTTP download).
-7. Update `cerebro.md` (State log + Handover).
-8. `backup.ps1` final snapshot.
+3. Update `README.md` (badges, direct download links, test counts) & `Manual_app_MeshNavarra.md`.
+4. `./gradlew testDebugUnitTest assembleRelease` (verify all unit tests).
+5. Commit and push to GitHub `main` + recreate release tag (e.g. `v1.0.8`).
+6. Update `fdroid/metadata.yml` (single build block with 40-character commit SHA + explicit `output: app/build/outputs/apk/release/app-release-unsigned.apk`) and sync to GitLab fork (`jcacho/fdroiddata`).
+7. Create/update GitHub Release with official notes and attach `MeshNavarra-Utility-vX.Y.Z.apk` (verify via HTTP download).
+8. Update `cerebro.md` (State log + Handover + session prompt).
+9. `backup.ps1` final snapshot.

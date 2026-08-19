@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.0.5"
+date: "Agosto 2026 · v1.0.8"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.0.5)
+# Manual de Usuario — MeshNavarra Utility (v1.0.8)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.5 (build 2026-08-17)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.8 (build 2026-08-19)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
