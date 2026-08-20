@@ -109,7 +109,8 @@ To record a promo: open the app, open the "?" help, tap "Usage example (demo)", 
   1. In `metadata/com.meshkachoutility.yml` under `Builds:`, **ALWAYS use the full 40-character git commit SHA hash** (`commit: <full_hash>`). NEVER use a tag name (e.g. `v1.0.7`) or branch.
   2. For New App inclusion MRs, include **only the single latest build block** in the metadata YAML.
   3. For multi-module projects (`app/`), **ALWAYS set `subdir: app` and DO NOT specify `output:`**. `fdroid build` automatically finds the APK in the module's build directory.
-  4. NEVER put machine-specific paths (e.g. `org.gradle.java.home=c:/...`) in `gradle.properties`. Linux CI build runners in F-Droid must rely on their own `JAVA_HOME`.
+  4. **Reproducible Builds**: Always include `AllowedAPKSigningKeys: 237c905111effb7df6cadf0b25fa13571ce012a76a69b5a2331a434d7974ab94` (lowercase SHA-256 certificate hex) and `Binaries: https://github.com/EA2OY/MeshNavarra-Utility/releases/download/v%v/MeshNavarra-Utility-v%v.apk`.
+  5. NEVER put machine-specific paths (e.g. `org.gradle.java.home=c:/...`) in `gradle.properties`. Linux CI build runners in F-Droid must rely on their own `JAVA_HOME`.
 
 ## Quick Deploy Protocol (`/publicar-release` or "despliegue completo")
 When the user requests `/publicar`, `/publicar-release`, `despliegue completo`, or `publica la versión`:
