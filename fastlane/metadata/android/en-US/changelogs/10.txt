@@ -1,0 +1,5 @@
+- Full support for repeaters running NavaTastic V5 (v4.3.4) firmware
+- New 'Radio & Panic' category with LoRa modulation controls and emergency evacuation
+- Primary and secondary channel configuration assistant with secure key generation
+- Mesh anti-saturation timing adaptation and pre-reboot grace window
+- Updated user manual and technical documentation

@@ -1,0 +1,4 @@
+- Popups cinematicos interactivos v2 con 64 diapositivas explicativas
+- Modo de navegacion tactica con pausa completa y avance manual extendido
+- Gestor integral de documentacion PDF oficial con visor, descarga SAF y compartir
+- Verificacion de compilaciones reproducibles para F-Droid

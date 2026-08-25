@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.0.8"
+date: "Agosto 2026 · v1.0.9"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.0.8)
+# Manual de Usuario — MeshNavarra Utility (v1.0.9)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.8 (build 2026-08-19)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.9 (build 2026-08-25)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -203,12 +203,19 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **📻 Canales y CLI (solo DM)**:
 - `ch_ls`: Lista los 8 slots de canales (0-7), roles, marcas CLI, nombres, crypto y MQTT.
-- `ch_set <slot 2-7> <nombre> <psk_base64>`: Configura canal secundario privado (asistente de claves integrado).
+- `ch_set <slot 0|2-7> <nombre> <psk_base64>`: Configura canal primario (slot 0) o secundario privado (slots 2-7). Asistente de claves integrado.
 - `ch_del <slot 2-7>` ⚠: Deshabilita canal y libera persistencia.
 - `ch_url [slot 0-7]`: Genera URL canónica de Meshtastic (`meshtastic.org/e/#...`).
 - `ch_reset` ⚠: Restaura la tabla de canales a valores de fábrica.
 - `set_cli_chan <slot 1-7>`: Redirige la escucha de NavaCLI y avisos solares al slot indicado.
 - `navadmin_mute [on|off]`: Silencia o activa el canal de rescate (Slot 1 Navadmin).
+
+**⚡ Radio y Pánico (Novedad V5)**:
+- `set_preset <preset>` ⚠: Aplica preset LoRa estándar (`long_fast`, `medium_fast`, `short_fast`, `long_slow`, `short_slow`, `medium_slow`, `long_moderate`, `short_turbo`) y reinicia módem en 6 s.
+- `set_lora <bw> <sf> <cr> <freq> <slot> [txpower]` ⚠: Configuración Custom de capa física LoRa. Reinicia módem en 6 s.
+- `set_freq <freq_mhz> [slot]` ⚠: Ajusta atómicamente la frecuencia central y slot en 6 s.
+- `panic <preset|sfnarrow> [minutos_aviso=10] [minutos_prueba=0]` ⚠: Inicia evacuación de emergencia en la malla con túnel silencioso en $T-60\text{s}$.
+- `panic_ok`: Cancela el auto-rollback y consolida definitivamente la nueva frecuencia/preset (en DM o con `!ID` en canal).
 
 **🌐 Infraestructura y Difusión (solo DM)**:
 - `ch_mqtt <slot 0-7> [up|down|both|off]`: Compuerta MQTT individual por canal.
@@ -217,7 +224,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 - `pos_clear`: Borra la posición fija guardada.
 - `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h).
 - `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h).
-- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 15 min).
+- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 12h = 720 min).
 - `set_beacon [1-1440]`: Cadencia de balizas NodeInfo/Posición.
 - `set_pin <6_digitos>`: PIN Bluetooth fijo persistente.
 - `mute [1-1440|off]`: Silenciado temporal de reenvío LoRa en RAM.
@@ -227,9 +234,9 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **⭐ Favoritos (solo DM)**: `fav ls` · `fav add !ID` · `fav rm !ID` · `fav auto [on|off]`
 
-**⚙️ Configuración (solo DM)**: `set_name` · `set_role` · `set_mqtt` · `set_tz` · `set_hops` · `set_txpower`
+**⚙️ Configuración (solo DM)**: `set_name` (soporta "Largo" "Corto" y `flush`) · `set_role` · `set_mqtt` · `set_tz` · `set_hops` · `set_txpower`
 
-**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠
+**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` (gracia 6s) · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠
 
 **🔋 Energía (solo DM)**: `set_chem` ⚠ · `set_vbat` ⚠ · `set_vwake` ⚠ · `storm [1-720]` ⚠ · `storm test1/test2` ⚠ · `txoff` ⚠ · `txon` · `ble [on/off]` ⚠ · `sleepmsg [on/off]`
 
@@ -237,7 +244,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **🔔 Utilidades (solo DM)**: `bell` · `admin_ls` · `keys_ls` · `keys_clear` ⚠
 
-> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos.
+> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_preset`, `set_lora`, `set_freq`, `panic`, `set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos.
 
 ### 8.5 La conversación
 

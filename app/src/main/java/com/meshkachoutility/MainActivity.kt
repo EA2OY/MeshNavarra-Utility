@@ -347,8 +347,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         private const val CONFIG_PHASE2_NONCE = 69421
         private const val CHAT_HISTORY_PER_CHANNEL = 100
         // Firmware fragments long /nava replies at 190 chars every 12 s; treat
-        // fragments from the same node+route within 15 s as one message.
-        const val NAVA_FRAGMENT_WINDOW_MS = 15000L
+        // fragments from the same node+route within 20 s as one message (covers Navadmin jitter).
+        const val NAVA_FRAGMENT_WINDOW_MS = 20000L
         const val CHAT_STATUS_ENROUTE = "enroute"
         const val CHAT_STATUS_DELIVERED = "delivered"
         const val CHAT_STATUS_RECEIVED = "received"
@@ -1240,14 +1240,14 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     AuditStep("request-telemetry(B)", { sendToRadio(MeshPacketBuilder.buildRequestTelemetryPacket(B_ID)) }),
                     AuditStep("request-position(B)", { sendToRadio(MeshPacketBuilder.buildRequestPositionPacket(B_ID)) }),
                     AuditStep("traceroute(B)", { sendToRadio(MeshPacketBuilder.buildTraceRoutePacket(B_ID)) })
-                ), 10000L
+                ), 12000L
             )
             2 -> Triple(
                 getString(R.string.battery_admin_local),
                 listOf(
                     AuditStep("set-favorite(A)", { if (local != -1) sendToRadio(MeshPacketBuilder.buildSetFavoritePacket(local, -1)) else null }),
                     AuditStep("reboot(A,10s)", { if (local != -1) sendToRadio(MeshPacketBuilder.buildRebootPacket(10, -1)) else null })
-                ), 15000L
+                ), 18000L
             )
             3 -> Triple(
                 getString(R.string.battery_chat),
@@ -1259,7 +1259,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 getString(R.string.battery_admin_remote),
                 listOf(
                     AuditStep("set-favorite(A->B)", { if (local != -1) sendToRadio(MeshPacketBuilder.buildSetFavoritePacket(local, B_ID)) else null })
-                ), 10000L
+                ), 12000L
             )
             5 -> Triple(
                 getString(R.string.battery_dm_control),
@@ -1274,7 +1274,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     AuditStep("bell (B)", { sendToRadio(MeshPacketBuilder.buildTextPacket("/nava bell", B_ID, 0, pkiEncrypted = true)) }),
                     AuditStep("admin_ls (B)", { sendToRadio(MeshPacketBuilder.buildTextPacket("/nava admin_ls", B_ID, 0, pkiEncrypted = true)) }),
                     AuditStep("txon (B)", { sendToRadio(MeshPacketBuilder.buildTextPacket("/nava txon", B_ID, 0, pkiEncrypted = true)) })
-                ), 10000L
+                ), 12000L
             )
             6 -> Triple(
                 getString(R.string.battery_config_get),
@@ -3585,6 +3585,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("set_cli_chan", "set_cli_chan", "number", "dm", getString(R.string.nava_desc_set_cli_chan)),
                 NavaCmd("navadmin_mute", "navadmin_mute", "onoff", "dm", getString(R.string.nava_desc_navadmin_mute))
             )),
+            NavaCat(getString(R.string.nava_cat_radio), listOf(
+                NavaCmd("set_preset", "set_preset", "select", "dm", getString(R.string.nava_desc_set_preset), listOf("long_fast", "medium_fast", "short_fast", "long_slow", "short_slow", "medium_slow", "long_moderate", "short_turbo"), warn = getString(R.string.nava_warn_set_preset)),
+                NavaCmd("set_lora", "set_lora", "text", "dm", getString(R.string.nava_desc_set_lora), warn = getString(R.string.nava_warn_set_lora)),
+                NavaCmd("set_freq", "set_freq", "text", "dm", getString(R.string.nava_desc_set_freq), warn = getString(R.string.nava_warn_set_freq)),
+                NavaCmd("panic", "panic", "text", "dm", getString(R.string.nava_desc_panic), warn = getString(R.string.nava_warn_panic)),
+                NavaCmd("panic_ok", "panic_ok", "none", "ch", getString(R.string.nava_desc_panic_ok))
+            )),
             NavaCat(getString(R.string.nava_cat_blocks), listOf(
                 NavaCmd("ign ls", "ign ls", "none", "dm", getString(R.string.nava_desc_ign_ls)),
                 NavaCmd("ign add", "ign add", "nodeid", "dm", getString(R.string.nava_desc_ign_add), warn = getString(R.string.nava_warn_ign_add)),
@@ -3908,7 +3915,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val needsText = cmd.argType in listOf("text", "text2", "textopt", "number", "nodeid")
         navaArgLayout.visibility = if (needsText) android.view.View.VISIBLE else android.view.View.GONE
         navaArgInput.hint = when (cmd.cmd) {
-            "ch_set" -> "2 Privada AQ=="
+            "ch_set" -> "0 Primario AQ== / 2 Privada AQ=="
             "ch_del" -> "Slot [2-7]"
             "ch_url" -> "Slot [0-7]"
             "set_cli_chan" -> "Slot [1-7]"
@@ -3919,6 +3926,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             "set_telem_tx" -> "on / off / 1-1440 min"
             "set_beacon" -> "1-1440 min"
             "set_pin" -> "PIN (6 dig)"
+            "set_name" -> "\"Largo\" \"Corto\" / flush"
+            "set_lora" -> "62 7 5 869.618 4 [22]"
+            "set_freq" -> "869.618 [4]"
+            "panic" -> "medium_fast 10 [0]"
             "mute" -> "1-1440 min / off"
             "test_tx" -> "5-30 s"
             "log" -> "1-15 lines"
@@ -3975,8 +3986,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 }
                 val current = navaArgInput.text?.toString()?.trim() ?: ""
                 val parts = current.split(Regex("\\s+")).filter { it.isNotEmpty() }
-                val slot = if (parts.isNotEmpty() && parts[0].toIntOrNull() in 2..7) parts[0] else "2"
-                val name = if (parts.size >= 2) parts[1] else "Privado"
+                val slot = if (parts.isNotEmpty() && parts[0].toIntOrNull() in 0..7) parts[0] else "2"
+                val name = if (parts.size >= 2) parts[1] else if (slot == "0") "SFNarrow" else "Privado"
                 navaArgInput.setText("$slot $name $psk")
             }
             .setNegativeButton(R.string.close, null)
@@ -4013,9 +4024,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     return getString(R.string.nava_err_need_arg)
                 }
                 if (cmd.argType == "text2") {
-                    val parts = navaArgInput.text.toString().trim().split(Regex("\\s+"))
-                    val filled = navaArgInput.text.toString().trim().isNotEmpty()
-                    if (filled && parts.size < 2) return getString(R.string.nava_err_need_two_args)
+                    val raw = navaArgInput.text.toString().trim()
+                    val parts = raw.split(Regex("\\s+"))
+                    val filled = raw.isNotEmpty()
+                    if (filled && parts.size < 2 && !raw.equals("flush", true)) return getString(R.string.nava_err_need_two_args)
                 }
             }
             "number" -> {
@@ -4081,11 +4093,22 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             }
             append(" ").append(cmd.cmd)
             when (cmd.argType) {
-                "text" -> { val v = navaArgInput.text.toString().trim(); if (v.isNotEmpty()) append(" \"").append(v).append("\"") }
+                "text" -> {
+                    val v = navaArgInput.text.toString().trim()
+                    if (v.isNotEmpty()) {
+                        if (cmd.cmd in listOf("msg", "set_tz")) append(" \"").append(v).append("\"")
+                        else append(" ").append(v)
+                    }
+                }
                 "textopt" -> { val v = navaArgInput.text.toString().trim(); if (v.isNotEmpty()) append(" ").append(v) }
                 "text2" -> {
-                    val parts = navaArgInput.text.toString().trim().split(Regex("\\s+"))
-                    if (parts.size >= 2) { append(" \"").append(parts[0]).append("\" \"").append(parts[1]).append("\"") }
+                    val raw = navaArgInput.text.toString().trim()
+                    if (raw.equals("flush", true)) {
+                        append(" flush")
+                    } else {
+                        val parts = raw.split(Regex("\\s+"))
+                        if (parts.size >= 2) { append(" \"").append(parts[0]).append("\" \"").append(parts[1]).append("\"") }
+                    }
                 }
                 "number" -> { val v = navaArgInput.text.toString().trim(); if (v.isNotEmpty()) append(" ").append(v) }
                 "nodeid" -> { val v = navaArgInput.text.toString().trim(); if (v.isNotEmpty()) append(" ").append(v) }

@@ -1,0 +1,4 @@
+- Interactive cinematic explainers v2 with 64 slides across all tabs
+- Tactical navigation mode with full pause and extended manual slide advance
+- Comprehensive official PDF documentation manager (view, SAF download, share)
+- Reproducible build verification for F-Droid

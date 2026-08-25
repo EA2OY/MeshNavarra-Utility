@@ -1,0 +1,5 @@
+- Soporte integral para repetidores con firmware NavaTastic V5 (v4.3.4)
+- Nueva categoria 'Radio y Panico' con control de modulacion LoRa y protocolos de evacuacion
+- Asistente de configuracion de canales primarios y secundarios con generacion de claves
+- Adaptacion a retardos anti-saturacion de malla y ventana pre-reboot de gracia
+- Documentacion tecnica y manual de usuario actualizados
