@@ -638,6 +638,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_err_need_value">Introduce un valor para este comando.</string>
     <string name="nava_err_invalid_number">El valor debe ser un número entero.</string>
     <string name="nava_err_range">El valor debe estar entre %1$d y %2$d.</string>
+    <string name="nava_err_need_target_navadmin">%1$s necesita un nodo destino (!ID) en el canal Navadmin.</string>
     <string name="chat_channel_default">Canal 0</string>
     <string name="chat_channel_selected">Chat: cambiado al canal %1$s</string>
     <string name="chat_channel_hint">Canal de chat</string>
@@ -906,7 +907,8 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_fav_auto">Auto-favoritiza routers directos (bypass de saltos) y los registra en RAM. Activado por defecto. Uso: fav auto [on|off] (sin argumento muestra el estado).</string>
     <string name="nava_query_blank">— Consultar —</string>
     <string name="nava_desc_set_name">Cambia el nombre y lo hardcodea persistente en /resilience.bin, o flush para modo app oficial. Uso: set_name \"Largo\" \"Corto\" o set_name flush</string>
-    <string name="nava_desc_set_role">Cambia el rol de hardware (client/mute/router). SEMI-PERMANENTE: se guarda en /resilience.bin y sobrevive al factory reset; solo nrf erase restaura el rol del perfil.</string>
+    <string name="nava_desc_set_role">Cambia el rol de hardware (client/mute/router). SEMI-PERMANENTE: se guarda en /resilience.bin y sobrevive al factory reset. Revisión 28/08: al cambiar el rol ya NO se re-aplican los defaults del rol — tus intervalos y tu modo de retransmisión se mantienen.</string>
+    <string name="nava_desc_set_rebroadcast">Elige cómo retransmite el nodo los paquetes ajenos: all (todo), local (solo nodos conocidos, valor de fábrica), known (solo emisores conocidos), core (solo portnums oficiales), none (sin reenvío — rechazado en rol ROUTER). Persiste y sobrevive a resets; se sincroniza con la App oficial. all/known/core pueden reducir la cobertura NavaCLI multi-salto — elige con criterio.</string>
     <string name="nava_desc_set_mqtt">Activa/desactiva MQTT. Opciones: on, off.</string>
     <string name="nava_desc_set_tz">Zona horaria POSIX. Uso: set_tz \"&lt;tz&gt;\"</string>
     <string name="nava_desc_set_hops">Límite de saltos LoRa [1-7].</string>
@@ -928,7 +930,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_warn_set_vbat">Bajar demasiado el corte puede sobre-descargar y dañar la batería de forma irreversible. Subirlo demasiado apaga el nodo prematuramente. Si te equivocas, requiere reajuste físico.</string>
     <string name="nava_desc_set_vwake">Nivel LPCOMP de reencendido solar [1-5]. 1=2.1V, 2=2.5V, 3=3.7V, 4=4.5V, 5=3.3V (LiFePO4).</string>
     <string name="nava_warn_set_vwake">Un nivel de reencendido LPCOMP incorrecto puede impedir que el nodo despierte del sueño solar, quedándose apagado para siempre hasta recuperarlo físicamente.</string>
-    <string name="nava_desc_storm">Hibernación con radio apagada (RTC2); despierta por temporizador y reinicia. Horas [1-720]. Responde \"MODO TORMENTA ACTIVADO...\" y espera 15s antes de dormir.</string>
+    <string name="nava_desc_storm">Hibernación con radio apagada (RTC2); despierta por temporizador y reinicia. Horas [1-720]. Responde \"MODO TORMENTA ACTIVADO...\" y duerme tras la ventana de gracia de 60 s.</string>
     <string name="nava_warn_storm">El modo tormenta apaga la radio y hiberna el nodo durante horas. Si el temporizador falla, el nodo queda dormido hasta intervención física.</string>
     <string name="nava_desc_storm_test1">Prueba rápida de modo tormenta: 60 segundos.</string>
     <string name="nava_warn_storm_test1">El modo tormenta apaga la radio y hiberna el nodo 60 segundos. Si el temporizador falla, el nodo queda dormido hasta intervención física.</string>
@@ -964,14 +966,14 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_set_pos">Fija coordenadas geográficas estáticas sin módulo GPS físico. Uso: set_pos &lt;lat&gt; &lt;lon&gt; [alt]</string>
     <string name="nava_desc_set_beacon">Configura el intervalo de emisión de balizas NodeInfo y Posición en minutos [1-1440]. Uso: set_beacon &lt;minutos&gt;</string>
     <string name="nava_desc_set_pin">Configura PIN Bluetooth fijo personalizado de 6 dígitos. Persiste en /resilience.bin. Uso: set_pin &lt;6_digitos&gt;</string>
-    <string name="nava_desc_mute">Modo silencioso temporal: no retransmite paquetes de terceros durante X minutos [1-1440|off] (100% en RAM). Uso: mute [minutos|off]</string>
+    <string name="nava_desc_mute">Modo silencioso temporal: no retransmite paquetes de terceros durante X minutos [1-1440|off] (100% en RAM). Ventana de gracia de 60 s antes de silenciar. Uso: mute [minutos|off]</string>
     <string name="nava_desc_stats">Auditoría en RAM: temps CPU mín/máx/act, batería mínima, paquetes RX/TX/Enrutados y conteo Auto-Fav (100% en RAM).</string>
     <string name="nava_desc_test_tx">Emite una ráfaga de balizas de prueba RF (1 pkt/s durante 5-30s) para medir RSSI/SNR y alinear antenas. Uso: test_tx &lt;segundos 5-30&gt;</string>
     <string name="nava_desc_log">Muestra las últimas 1-15 entradas del buffer circular forense de eventos en RAM. Uso: log [lineas 1-15]</string>
     <string name="nava_desc_pos_clear">Borra la posición fija guardada, dejando el repetidor sin coordenadas.</string>
-    <string name="nava_desc_set_pos_tx">Controla la difusión periódica de posición en flota. Opciones: on, off, minutos (1-10080, default 72h).</string>
-    <string name="nava_desc_set_nodeinfo_tx">Controla la difusión periódica de NodeInfo en flota. Opciones: on, off, minutos (1-10080, default 72h).</string>
-    <string name="nava_desc_set_telem_tx">Regula el intervalo de reporte de telemetría de sensores. Opciones: on, off, minutos (1-1440, default 12h = 720 min).</string>
+    <string name="nava_desc_set_pos_tx">Controla la difusión periódica de posición en flota. Opciones: on, off, minutos (1-10080, default 72h). El OFF persiste a reinicios y resets.</string>
+    <string name="nava_desc_set_nodeinfo_tx">Controla la difusión periódica de NodeInfo en flota. Opciones: on, off, minutos (1-10080, default 72h). El OFF persiste a reinicios y resets.</string>
+    <string name="nava_desc_set_telem_tx">Regula el intervalo de reporte de telemetría de los 5 tipos a la vez (dev/env/pow/air/sal). Opciones: on (12h), off, minutos (1-1440, default 12h = 720 min). El OFF persiste a reinicios/resets. Intervalos distintos por tipo solo desde la App oficial.</string>
     <string name="nava_desc_set_preset">Aplica un preset LoRa estándar y asigna su slot de frecuencia. Reinicia el módem en 6 s. Presets: long_fast, medium_fast, short_fast, long_slow, short_slow, medium_slow, long_moderate, short_turbo.</string>
     <string name="nava_warn_set_preset">set_preset cambia la modulación física de la radio y reinicia el nodo en 6 segundos. Si tu dispositivo no usa el mismo preset perderás la conexión.</string>
     <string name="nava_desc_set_lora">Configuración Custom de capa física LoRa: BW, SF, CR, freq (MHz), slot, txpower opcional (dBm). Reinicia en 6 s. Uso: set_lora &lt;bw&gt; &lt;sf&gt; &lt;cr&gt; &lt;freq_mhz&gt; &lt;slot&gt; [txpower]</string>
@@ -980,7 +982,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_warn_set_freq">set_freq cambia la frecuencia central de radio y reinicia en 6 segundos. Deberás cambiar la frecuencia de tu mando para mantener contacto.</string>
     <string name="nava_desc_panic">Inicia la evacuación de emergencia de frecuencia/preset en toda la flota. Uso: panic &lt;preset|sfnarrow&gt; [minutos_aviso=10] [minutos_prueba=0]</string>
     <string name="nava_warn_panic">panic lanza una evacuación masiva de la malla. Todos los repetidores al alcance cambiarán al nuevo preset. Con minutos_prueba &gt; 0 volverán a SFNarrow si no reciben panic_ok.</string>
-    <string name="nava_desc_panic_ok">Consolida la migración de emergencia definitivamente y cancela la vuelta automática. Uso: panic_ok (o con !ID en Navadmin/canal de flota).</string>
+    <string name="nava_desc_panic_ok">Consolida la migración de emergencia definitivamente y cancela la vuelta automática. Solo por DM (PKI) — bloqueado en el canal público Navadmin.</string>
     <string name="nava_desc_ign_clear">Borra la lista negra de nodos bloqueados persistentes por completo.</string>
     <string name="nava_warn_ign_clear">Borrar la lista negra elimina todos los nodos bloqueados de la memoria persistente.</string>
     <string name="nava_keygen_btn">Gen Clave</string>

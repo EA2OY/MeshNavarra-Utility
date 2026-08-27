@@ -355,7 +355,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         const val CHAT_STATUS_ERROR = "error"
     private const val MAX_PICKER_ROWS = 150
     private const val MAX_NODES_TAB_ROWS = 150
-    private const val BUILD_DATE = "2026-08-15"
+    private const val BUILD_DATE = "2026-08-27"
     private const val RECONNECT_DELAY_MS = 5000L
     private const val RECONNECT_MAX_ATTEMPTS = 5
     private const val CHAT_AUTOSCROLL_RESUME_MS = 10000L
@@ -770,7 +770,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                         showManualActionDialog(getString(R.string.cmd_nava_manual), "Manual_NavaTastic.pdf")
                     }
                     navaManualUso.setOnClickListener {
-                        showManualActionDialog(getString(R.string.cmd_nava_manual_uso), "Manual_uso_NavaTastic_4.2.pdf")
+                        showManualActionDialog(getString(R.string.cmd_nava_manual_uso), "Manual_uso_NavaTastic.pdf")
                     }
                     licenseBtn.setOnClickListener {
                         dialog.dismiss()
@@ -1861,7 +1861,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         var isExpanded = startExpanded
         var userHasInteracted = false
         var isFrozenInManualMode = false
-        var storyAnimator: ValueAnimator? = null
+        var storyTicker: Runnable? = null
+        var storyStartMs = 0L
+        var storyDurationMs = 10000L
+        var storyRemainingMs = 10000L
+        val storyHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
         val dialog = MaterialAlertDialogBuilder(this)
             .setView(view)
@@ -1871,9 +1875,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         demoActiveDialog = dialog
 
         fun updateStep(stepIndex: Int, animate: Boolean, autoPlay: Boolean = true) {
-            storyAnimator?.removeAllListeners()
-            storyAnimator?.cancel()
-            storyAnimator = null
+            storyTicker?.let { storyHandler.removeCallbacks(it) }
+            storyTicker = null
 
             currentStep = stepIndex.coerceIn(0, totalSlides - 1)
 
@@ -1940,30 +1943,38 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     slide.outputText.length
 
             val baseDurationMs = (7500L + (totalTextLen * 50L)).coerceIn(8500L, 16000L)
-            val durationMs = if (userHasInteracted) {
+            storyDurationMs = if (userHasInteracted) {
                 (baseDurationMs * 2.0f).toLong().coerceIn(16000L, 30000L)
             } else {
                 baseDurationMs
             }
 
-            storyAnimator = ValueAnimator.ofInt(0, 1000).apply {
-                duration = durationMs
-                interpolator = LinearInterpolator()
-                addUpdateListener { anim ->
+            // Time-based story ticker (immune to the system "animator duration
+            // scale"): progress advances every 50 ms and the next slide is
+            // scheduled with postDelayed, so the pacing stays correct even with
+            // animations disabled (scale = 0).
+            storyStartMs = android.os.SystemClock.uptimeMillis()
+            storyRemainingMs = storyDurationMs
+            val ticker = object : Runnable {
+                override fun run() {
+                    if (isPaused || isFrozenInManualMode) return
+                    val elapsed = android.os.SystemClock.uptimeMillis() - storyStartMs
+                    val frac = ((elapsed * 1000L) / storyDurationMs).toInt().coerceIn(0, 1000)
                     if (currentStep in 0 until totalSlides) {
-                        storyBars[currentStep].progress = anim.animatedValue as Int
+                        storyBars[currentStep].progress = frac
                     }
-                }
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        if (!isPaused && !isFrozenInManualMode && dialog.isShowing) {
+                    if (elapsed >= storyDurationMs) {
+                        if (dialog.isShowing) {
                             val next = if (currentStep < totalSlides - 1) currentStep + 1 else 0
                             updateStep(next, true, autoPlay = true)
                         }
+                    } else {
+                        storyHandler.postDelayed(this, 50L)
                     }
-                })
-                if (!isPaused && !isExpanded) start()
+                }
             }
+            storyTicker = ticker
+            storyHandler.post(ticker)
         }
 
         storyBars.forEachIndexed { idx, pb ->
@@ -1992,7 +2003,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     isPaused = true
-                    storyAnimator?.pause()
+                    storyTicker?.let { storyHandler.removeCallbacks(it) }
+                    val elapsed = android.os.SystemClock.uptimeMillis() - storyStartMs
+                    storyRemainingMs = (storyDurationMs - elapsed).coerceAtLeast(0)
                     textHoldHint.text = "⏸ Pausado"
                     true
                 }
@@ -2000,7 +2013,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     if (!isFrozenInManualMode) {
                         isPaused = false
                         if (!isExpanded) {
-                            storyAnimator?.resume()
+                            storyStartMs = android.os.SystemClock.uptimeMillis() - (storyDurationMs - storyRemainingMs)
+                            storyTicker?.let { storyHandler.postDelayed(it, 0L) }
                             textHoldHint.text = getString(R.string.cinematic_hold_hint)
                         }
                     } else {
@@ -2016,9 +2030,12 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             moreInfoContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
             btnToggleMoreInfo.text = if (isExpanded) getString(R.string.cinematic_hide_info) else getString(R.string.cinematic_more_info)
             if (isExpanded) {
-                storyAnimator?.pause()
+                val elapsed = android.os.SystemClock.uptimeMillis() - storyStartMs
+                storyRemainingMs = (storyDurationMs - elapsed).coerceAtLeast(0)
+                storyTicker?.let { storyHandler.removeCallbacks(it) }
             } else if (!isPaused && !isFrozenInManualMode) {
-                storyAnimator?.resume()
+                storyStartMs = android.os.SystemClock.uptimeMillis() - (storyDurationMs - storyRemainingMs)
+                storyTicker?.let { storyHandler.postDelayed(it, 0L) }
             }
         }
 
@@ -2039,9 +2056,8 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         btnCloseBottom.setOnClickListener { dialog.dismiss() }
 
         dialog.setOnDismissListener {
-            storyAnimator?.removeAllListeners()
-            storyAnimator?.cancel()
-            storyAnimator = null
+            storyTicker?.let { storyHandler.removeCallbacks(it) }
+            storyTicker = null
         }
 
         applyMoreInfoState()
@@ -3564,6 +3580,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("status", "status", "none", "ch", getString(R.string.nava_desc_status)),
                 NavaCmd("env", "env", "none", "ch", getString(R.string.nava_desc_env)),
                 NavaCmd("channel", "channel", "none", "ch", getString(R.string.nava_desc_channel)),
+                NavaCmd("power", "power", "none", "ch", getString(R.string.nava_desc_power)),
                 NavaCmd("peers", "peers", "none", "ch", getString(R.string.nava_desc_peers)),
                 NavaCmd("rxlog", "rxlog", "none", "ch", getString(R.string.nava_desc_rxlog)),
                 NavaCmd("afc", "afc", "none", "ch", getString(R.string.nava_desc_afc)),
@@ -3577,7 +3594,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("trace", "trace", "nodeid", "ch", getString(R.string.nava_desc_trace))
             )),
             NavaCat(getString(R.string.nava_cat_channels), listOf(
-                NavaCmd("ch_ls", "ch_ls", "none", "dm", getString(R.string.nava_desc_ch_ls)),
+                NavaCmd("ch_ls", "ch_ls", "none", "ch", getString(R.string.nava_desc_ch_ls)),
                 NavaCmd("ch_set", "ch_set", "text", "dm", getString(R.string.nava_desc_ch_set)),
                 NavaCmd("ch_del", "ch_del", "number", "dm", getString(R.string.nava_desc_ch_del), warn = getString(R.string.nava_warn_ch_del)),
                 NavaCmd("ch_url", "ch_url", "number", "dm", getString(R.string.nava_desc_ch_url)),
@@ -3590,7 +3607,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("set_lora", "set_lora", "text", "dm", getString(R.string.nava_desc_set_lora), warn = getString(R.string.nava_warn_set_lora)),
                 NavaCmd("set_freq", "set_freq", "text", "dm", getString(R.string.nava_desc_set_freq), warn = getString(R.string.nava_warn_set_freq)),
                 NavaCmd("panic", "panic", "text", "dm", getString(R.string.nava_desc_panic), warn = getString(R.string.nava_warn_panic)),
-                NavaCmd("panic_ok", "panic_ok", "none", "ch", getString(R.string.nava_desc_panic_ok))
+                NavaCmd("panic_ok", "panic_ok", "none", "dm", getString(R.string.nava_desc_panic_ok))
             )),
             NavaCat(getString(R.string.nava_cat_blocks), listOf(
                 NavaCmd("ign ls", "ign ls", "none", "dm", getString(R.string.nava_desc_ign_ls)),
@@ -3607,6 +3624,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             NavaCat(getString(R.string.nava_cat_config), listOf(
                 NavaCmd("set_name", "set_name", "text2", "dm", getString(R.string.nava_desc_set_name)),
                 NavaCmd("set_role", "set_role", "select", "dm", getString(R.string.nava_desc_set_role), listOf("client", "mute", "router")),
+                NavaCmd("set_rebroadcast", "set_rebroadcast", "select", "dm", getString(R.string.nava_desc_set_rebroadcast), listOf("all", "local", "known", "core", "none")),
                 NavaCmd("set_mqtt", "set_mqtt", "onoff", "dm", getString(R.string.nava_desc_set_mqtt)),
                 NavaCmd("ch_mqtt", "ch_mqtt", "text", "dm", getString(R.string.nava_desc_ch_mqtt)),
                 NavaCmd("set_ok_to_mqtt", "set_ok_to_mqtt", "onoff", "dm", getString(R.string.nava_desc_set_ok_to_mqtt)),
@@ -3817,6 +3835,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             sb.append(" !").append(Integer.toHexString(navaTargetNode))
         }
         sb.append(" ").append(cmd.cmd)
+        if (cmd.cmd == "full_reset" || cmd.cmd == "wipe") {
+            sb.append(" CONFIRM")
+        }
         when (cmd.argType) {
             "text", "text2", "textopt", "number", "nodeid" -> {
                 val v = navaArgInput.text.toString().trim()
@@ -4016,6 +4037,18 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             return getString(R.string.nava_invalid_route_body, cmd.cmd)
         }
         if (route == "dm" && target == -1) return getString(R.string.nava_no_target)
+        if (route == "ch") {
+            val directedOnly = cmd.cmd in setOf("stats", "log", "peers", "rxlog", "afc", "reset_reason", "help", "ch_ls")
+            if (directedOnly && target == -1) {
+                return getString(R.string.nava_err_need_target_navadmin, cmd.cmd)
+            }
+            if (cmd.cmd == "route" || cmd.cmd == "trace") {
+                val arg = navaArgInput.text.toString().trim()
+                if (target == -1 && (arg.isEmpty() || !arg.startsWith("!"))) {
+                    return getString(R.string.nava_err_need_target_navadmin, cmd.cmd)
+                }
+            }
+        }
         when (cmd.argType) {
             "text", "text2" -> {
                 // New firmware: empty argument = query state (no ERR). Only "msg"
@@ -4092,6 +4125,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 append(" !").append(Integer.toHexString(target))
             }
             append(" ").append(cmd.cmd)
+            if (cmd.cmd == "full_reset" || cmd.cmd == "wipe") {
+                append(" CONFIRM")
+            }
             when (cmd.argType) {
                 "text" -> {
                     val v = navaArgInput.text.toString().trim()

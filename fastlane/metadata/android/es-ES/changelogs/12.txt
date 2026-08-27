@@ -1,0 +1,1 @@
+- Fix: los trailers cinematograficos de las pestanas avanzan ahora al ritmo correcto aunque las animaciones del sistema esten desactivadas (temporizador por tiempo en vez de ValueAnimator)

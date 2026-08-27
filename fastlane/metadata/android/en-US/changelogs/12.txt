@@ -1,0 +1,1 @@
+- Fix: cinematic tab explainers now run at the correct pace even with system animations disabled (time-based timer instead of ValueAnimator)

@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.0.9"
+date: "Agosto 2026 · v1.1.1"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.0.9)
+# Manual de Usuario — MeshNavarra Utility (v1.1.1)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.0.9 (build 2026-08-25)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.1.1 (build 2026-08-27)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -154,7 +154,7 @@ Dirigida al nodo indicado (ID o selector con búsqueda; vacío = local):
 
 ## 🚀 8. Pestaña NavaTastic CLI (la estrella)
 
-Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`.
+Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`. Compatible con **NavaTastic Eclipse V5 (v4.3.7)** y anteriores (V5/V5.2).
 
 ### 8.1 Cómo funciona
 
@@ -164,7 +164,7 @@ Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de 
    - **DM privado (PKI)**: comandos de control, cifrados. Requiere que tu clave pública esté acreditada como admin en el repetidor.
 3. Elige **categoría** y **comando**; el campo de argumento se adapta (texto, número, ID de nodo u opciones).
 4. La línea de **preview** muestra exactamente lo que se enviará (`/nava ...`).
-5. Pulsa **enviar**. Los comandos peligrosos exigen escribir **CONFIRMAR**.
+5. Pulsa **enviar**. Los comandos peligrosos exigen escribir **CONFIRMAR** (en `full_reset` y `wipe` la app añade además automáticamente el token `CONFIRM` que exige el nodo).
 
 ### 8.2 Niveles de seguridad
 
@@ -174,6 +174,8 @@ Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de 
 | **DM PKI** | Mensaje directo cifrado | Configuración, reinicio, DB, bloqueos, favoritos, energía |
 
 Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (no se pueden enviar por ese canal). Si el canal Navadmin no existe en el nodo, la app ofrece crearlo (slot libre secundario).
+
+> **Navadmin solo lee y solo dirigido**: en el canal público el repetidor solo responde sin `!ID` a los 7 comandos ligeros (`ping`, `status`, `bat`, `power`, `env`, `channel`, `noise`). Los diagnósticos `stats`, `log`, `peers`, `rxlog`, `afc`, `reset_reason`, `help` y `ch_ls` exigen **nodo destino (!ID)** — la app lo valida antes de enviar y te avisa si falta. `route`/`trace` llevan el `!ID` como argumento propio. `panic` y `panic_ok` están **bloqueados en Navadmin** (solo DM PKI o canal privado de flota).
 
 ### 8.3 Interrogación y consulta (firmware 4.4+)
 
@@ -190,6 +192,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 | `/nava status` | Salud de memoria, favoritos, Auto-Fav, tiempo activo |
 | `/nava env` | Batería, heap, temperatura y sensor ambiental I2C |
 | `/nava channel` | Uso de espectro (airtime % y TX %) |
+| `/nava power` | Métricas de energía: ADC interno + sensor I2C (INA219) |
 | `/nava peers` | Vecinos directos a 0 saltos |
 | `/nava rxlog` | Metadatos de los últimos 5 paquetes |
 | `/nava afc` | Deriva de frecuencia del TCXO |
@@ -215,16 +218,16 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 - `set_lora <bw> <sf> <cr> <freq> <slot> [txpower]` ⚠: Configuración Custom de capa física LoRa. Reinicia módem en 6 s.
 - `set_freq <freq_mhz> [slot]` ⚠: Ajusta atómicamente la frecuencia central y slot en 6 s.
 - `panic <preset|sfnarrow> [minutos_aviso=10] [minutos_prueba=0]` ⚠: Inicia evacuación de emergencia en la malla con túnel silencioso en $T-60\text{s}$.
-- `panic_ok`: Cancela el auto-rollback y consolida definitivamente la nueva frecuencia/preset (en DM o con `!ID` en canal).
+- `panic_ok`: Cancela el auto-rollback y consolida definitivamente la nueva frecuencia/preset. **Solo por DM (PKI)** — bloqueado en el canal público Navadmin (V5.2).
 
 **🌐 Infraestructura y Difusión (solo DM)**:
 - `ch_mqtt <slot 0-7> [up|down|both|off]`: Compuerta MQTT individual por canal.
 - `set_ok_to_mqtt [on|off]`: Bandera global OK_TO_MQTT en paquetes para pasarelas.
 - `set_pos <lat> <lon> [alt]`: Coordenadas geográficas estáticas fijas.
 - `pos_clear`: Borra la posición fija guardada.
-- `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h).
-- `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h).
-- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 12h = 720 min).
+- `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h; el OFF persiste).
+- `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h; el OFF persiste).
+- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 12h = 720 min; cambia los **5 tipos a la vez**; el OFF persiste; por tipo solo desde la App oficial).
 - `set_beacon [1-1440]`: Cadencia de balizas NodeInfo/Posición.
 - `set_pin <6_digitos>`: PIN Bluetooth fijo persistente.
 - `mute [1-1440|off]`: Silenciado temporal de reenvío LoRa en RAM.
@@ -234,9 +237,12 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **⭐ Favoritos (solo DM)**: `fav ls` · `fav add !ID` · `fav rm !ID` · `fav auto [on|off]`
 
-**⚙️ Configuración (solo DM)**: `set_name` (soporta "Largo" "Corto" y `flush`) · `set_role` · `set_mqtt` · `set_tz` · `set_hops` · `set_txpower`
+**⚙️ Configuración (solo DM)**: `set_name` (soporta "Largo" "Corto" y `flush`) · `set_role` · `set_rebroadcast` · `set_mqtt` · `set_tz` · `set_hops` · `set_txpower`
 
-**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` (gracia 6s) · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠
+- `set_rebroadcast [all|local|known|core|none]`: cómo retransmite el nodo los paquetes ajenos. Persiste y sobrevive a resets; se sincroniza con la App oficial. `none` es rechazado en rol ROUTER; `all`/`known`/`core` pueden reducir la cobertura NavaCLI multi-salto.
+- `set_role` (revisión 28/08): al cambiar el rol **ya no se re-aplican los defaults del rol** — tus intervalos y tu modo de retransmisión se mantienen.
+
+**🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` (gracia 6s) · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠ — en `full_reset` y `wipe` la app añade automáticamente el token `CONFIRM` que el nodo exige.
 
 **🔋 Energía (solo DM)**: `set_chem` ⚠ · `set_vbat` ⚠ · `set_vwake` ⚠ · `storm [1-720]` ⚠ · `storm test1/test2` ⚠ · `txoff` ⚠ · `txon` · `ble [on/off]` ⚠ · `sleepmsg [on/off]`
 
@@ -244,7 +250,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **🔔 Utilidades (solo DM)**: `bell` · `admin_ls` · `keys_ls` · `keys_clear` ⚠
 
-> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_preset`, `set_lora`, `set_freq`, `panic`, `set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos.
+> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_preset`, `set_lora`, `set_freq`, `panic`, `set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos. `storm` y `mute` dejan una **ventana de gracia de 60 s** antes de actuar — no reenvíes más órdenes durante ese tiempo.
 
 ### 8.5 La conversación
 

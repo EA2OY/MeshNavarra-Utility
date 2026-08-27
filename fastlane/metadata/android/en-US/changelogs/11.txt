@@ -1,0 +1,6 @@
+- Full support for repeaters running NavaTastic Eclipse V5 (v4.3.7) firmware
+- New command set_rebroadcast (packet repeating mode, persists across resets)
+- full_reset / wipe now send the node-required CONFIRM token after the safety gate
+- panic_ok restricted to PKI DM (blocked on the public Navadmin channel, V5.2)
+- power and ch_ls available on Navadmin; directed-only commands validate the target (!ID)
+- Updated manuals, bundled PDFs and documentation

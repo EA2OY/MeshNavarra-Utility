@@ -1,0 +1,6 @@
+- Soporte integral para repetidores con firmware NavaTastic Eclipse V5 (v4.3.7)
+- Nuevo comando set_rebroadcast (modo de retransmision, persiste a resets)
+- full_reset / wipe envian ahora el token CONFIRM que exige el nodo tras la compuerta de seguridad
+- panic_ok restringido a DM PKI (bloqueado en el canal publico Navadmin, V5.2)
+- power y ch_ls disponibles en Navadmin; los comandos dirigidos validan el nodo destino (!ID)
+- Manuales, PDFs integrados y documentacion actualizados

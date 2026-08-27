@@ -105,6 +105,7 @@ To record a promo: open the app, open the "?" help, tap "Usage example (demo)", 
 ## Conventions
 - No comments unless they explain non-obvious intent; user-facing strings always via resources.
 - Any new destructive NavaTastic command MUST set `warn` and go through `confirmDangerousNava`.
+- **Version & build date (MANDATORY)**: every feature addition or fix bumps `versionCode` + `versionName` in `app/build.gradle.kts` (minor for new features, patch for fixes) AND updates `BUILD_DATE` in `MainActivity.kt` to the build day. The bump does NOT publish anything by itself — deployment still goes through `/publicar-release`. Keep the manual header (`Manual_app_MeshNavarra.md`) and fastlane changelogs (`fastlane/metadata/android/{en-US,es-ES}/changelogs/<code>.txt`) in sync.
 - **F-Droid Packaging Rules (MANDATORY)**:
   1. In `metadata/com.meshkachoutility.yml` under `Builds:`, **ALWAYS use the full 40-character git commit SHA hash** (`commit: <full_hash>`). NEVER use a tag name (e.g. `v1.0.7`) or branch.
   2. For New App inclusion MRs, include **only the single latest build block** in the metadata YAML.
