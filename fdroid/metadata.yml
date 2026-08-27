@@ -16,9 +16,9 @@ Binaries:
   https://github.com/EA2OY/MeshNavarra-Utility/releases/download/v%v/MeshNavarra-Utility-v%v.apk
 
 Builds:
-  - versionName: 1.0.9
-    versionCode: 10
-    commit: 7364dde2e1e1292a6cf12adcf6cc611f2c23b488
+  - versionName: 1.1.1
+    versionCode: 12
+    commit: cb3330fc6e1f789c46df8f029d1816dfc41023f7
     subdir: app
     gradle:
       - yes
@@ -27,5 +27,5 @@ AllowedAPKSigningKeys: 237c905111effb7df6cadf0b25fa13571ce012a76a69b5a2331a434d7
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.0.9
-CurrentVersionCode: 10
+CurrentVersion: 1.1.1
+CurrentVersionCode: 12
