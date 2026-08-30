@@ -734,6 +734,16 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="battery_admin_remote">Admin remota PKI (B)</string>
     <string name="battery_dm_control">DM control (B, seguros)</string>
     <string name="battery_config_get">Get config (A, solo lectura)</string>
+    <string name="battery_custom">Personalizada (elige comandos…)</string>
+    <string name="audit_custom_title">Auditoría personalizada — elige comandos</string>
+    <string name="audit_picker_all">Seleccionar todo / nada</string>
+    <string name="audit_cat_navadmin">Navadmin — diagnóstico</string>
+    <string name="audit_cat_dm">DM — consultas de estado</string>
+    <string name="audit_cat_maint">DM — mantenimiento</string>
+    <string name="audit_custom_none">Selecciona al menos un comando y pon un nodo destino primero.</string>
+    <string name="audit_resp_ok">RESPUESTA OK</string>
+    <string name="audit_resp_err">RESPUESTA ERR</string>
+    <string name="audit_resp_timeout">SIN RESPUESTA (TIMEOUT)</string>
     <string name="audit_chat_msg">Mensaje de prueba de auditoría (banda aislada)</string>
     <string name="navadmin_test_run">Ejecutar batería</string>
     <string name="navadmin_test_stop">Detener</string>

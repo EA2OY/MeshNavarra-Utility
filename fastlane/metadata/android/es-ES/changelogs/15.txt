@@ -1,0 +1,1 @@
+- Fix: el parseo de IDs de nodo soporta ahora IDs por encima de 0x80000000 (mascara unsigned) — targets como !8289015a funcionan en todos los flujos (auditoria, favoritos, comandos)

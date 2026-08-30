@@ -1,0 +1,1 @@
+- Fix: Navadmin audit pacing raised to 50 s per command (30 s rate limit + 5-13 s jitter + repeater fragment queue) — no more alternating timeouts on channel 1

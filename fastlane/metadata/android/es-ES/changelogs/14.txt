@@ -1,0 +1,2 @@
+- Control remoto: la bateria personalizada (posicion 7) puede lanzarse por ADB, con nodo destino opcional (audit <n> --es arg2 <id>)
+- Ventana de concatenacion de fragmentos ampliada a 65 s (respuestas largas de Navadmin como /nava help, medido 62 s punta a punta)

@@ -1,0 +1,1 @@
+- Fix: node ID parsing now handles IDs above 0x80000000 (unsigned masking) — targets like !8289015a work in every flow (audit, favorites, commands)

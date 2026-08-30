@@ -1,0 +1,3 @@
+- Disenador de auditorias personalizadas: elige exactamente que comandos /nava auditar (checklist), cada uno con los tiempos del firmware v4.3.7 y validacion automatica por prefijo de respuesta (OK/ERR/TIMEOUT)
+- Los comandos dirigidos de Navadmin usan el nodo destino; reboot anade verificacion automatica con ping post-reboot
+- Ventana de concatenacion de fragmentos ampliada a 50 s (respuestas largas)

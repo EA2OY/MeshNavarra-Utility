@@ -734,6 +734,16 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="battery_admin_remote">Admin remote PKI (B)</string>
     <string name="battery_dm_control">DM control (B, safe)</string>
     <string name="battery_config_get">Config get (A, read-only)</string>
+    <string name="battery_custom">Custom (choose commands…)</string>
+    <string name="audit_custom_title">Custom audit — choose commands</string>
+    <string name="audit_picker_all">Select all / none</string>
+    <string name="audit_cat_navadmin">Navadmin — diagnostics</string>
+    <string name="audit_cat_dm">DM — state queries</string>
+    <string name="audit_cat_maint">DM — maintenance</string>
+    <string name="audit_custom_none">Select at least one command and set a target node first.</string>
+    <string name="audit_resp_ok">RESPONSE OK</string>
+    <string name="audit_resp_err">RESPONSE ERR</string>
+    <string name="audit_resp_timeout">NO RESPONSE (TIMEOUT)</string>
     <string name="navadmin_test_title">Navadmin test battery</string>
     <string name="navadmin_test_run">Run battery</string>
     <string name="navadmin_test_stop">Stop</string>

@@ -1,0 +1,2 @@
+- Remote control: the custom audit battery (position 7) can now be launched via ADB, with optional target node (audit <n> --es arg2 <id>)
+- Fragment concatenation window widened to 65 s (long Navadmin responses like /nava help, measured 62 s peak-to-peak)

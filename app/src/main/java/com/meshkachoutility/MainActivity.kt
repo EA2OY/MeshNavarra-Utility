@@ -146,7 +146,13 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private lateinit var navadminTestStatus: TextView
     private lateinit var navadminTestButton: MaterialButton
     private lateinit var navadminTestStopButton: MaterialButton
-    private data class AuditStep(val label: String, val action: () -> ByteArray?)
+    private data class AuditStep(
+        val label: String,
+        val action: () -> ByteArray?,
+        val intervalMs: Long = -1L,
+        val expectPrefix: String? = null,
+        val expectRoute: String = ""
+    )
     private val auditHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val auditDialogHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var auditBatteryRunning = false
@@ -154,6 +160,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
     private var auditName = ""
     private var auditIntervalMs = 0L
     private var auditSteps: List<AuditStep> = emptyList()
+    private var auditExpectLabel: String? = null
+    private var auditExpectPrefix: String? = null
+    private var auditExpectRoute = ""
+    private var auditExpectDeadline = 0L
     private var auditFile: File? = null
     private var auditDialog: androidx.appcompat.app.AlertDialog? = null
     private var auditConsoleText: TextView? = null
@@ -348,7 +358,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         private const val CHAT_HISTORY_PER_CHANNEL = 100
         // Firmware fragments long /nava replies at 190 chars every 12 s; treat
         // fragments from the same node+route within 20 s as one message (covers Navadmin jitter).
-        const val NAVA_FRAGMENT_WINDOW_MS = 20000L
+        const val NAVA_FRAGMENT_WINDOW_MS = 65000L
         const val CHAT_STATUS_ENROUTE = "enroute"
         const val CHAT_STATUS_DELIVERED = "delivered"
         const val CHAT_STATUS_RECEIVED = "received"
@@ -372,6 +382,68 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         "/nava help fav",
         "/nava route !5cfaaca9",
         "/nava trace !5cfaaca9"
+    )
+
+    /**
+     * Custom audit catalog (Debug tab -> "Personalizada"): every auditable /
+     * nava command with its pacing (firmware v4.3.7 timings) and the expected
+     * response prefix used to auto-validate each step. "{t}" is replaced by the
+     * global target node. Destructive (warn) commands are never automated.
+     */
+    private data class AuditCommand(
+        val label: String,
+        val template: String,
+        val route: String,
+        val waitMs: Long,
+        val expectPrefix: String?,
+        val needsTarget: Boolean = false
+    )
+    private val AUDIT_CATALOG = listOf(
+        // --- Navadmin: diagnostico (rate-limit 30 s + jitter 5-13 s + cola ~12 s/fragmento -> 50 s) ---
+        AuditCommand("/nava ping", "/nava ping", "ch", 50000, "PONG:"),
+        AuditCommand("/nava status", "/nava status", "ch", 50000, "NAVA"),
+        AuditCommand("/nava env", "/nava env", "ch", 50000, "Bat:"),
+        AuditCommand("/nava channel", "/nava channel", "ch", 50000, "Uso canal:"),
+        AuditCommand("/nava noise", "/nava noise", "ch", 50000, "RUIDO:"),
+        AuditCommand("/nava bat", "/nava bat", "ch", 50000, "QUIMICA:"),
+        AuditCommand("/nava power", "/nava power", "ch", 50000, ""),
+        AuditCommand("/nava peers", "/nava !{t} peers", "ch", 50000, "VECINOS", true),
+        AuditCommand("/nava rxlog", "/nava !{t} rxlog", "ch", 50000, "ULTIMOS PAQUETES", true),
+        AuditCommand("/nava afc", "/nava !{t} afc", "ch", 50000, "AFC FREQ ERROR", true),
+        AuditCommand("/nava reset_reason", "/nava !{t} reset_reason", "ch", 50000, "RESETREAS", true),
+        AuditCommand("/nava stats", "/nava !{t} stats", "ch", 50000, "STATS", true),
+        AuditCommand("/nava log 10", "/nava !{t} log 10", "ch", 50000, "LOG EVENTOS", true),
+        AuditCommand("/nava ch_ls", "/nava !{t} ch_ls", "ch", 50000, "CANALES", true),
+        AuditCommand("/nava help", "/nava !{t} help", "ch", 50000, "CMDS", true),
+        AuditCommand("/nava route", "/nava route !{t}", "ch", 50000, "RUTA A", true),
+        AuditCommand("/nava trace", "/nava trace !{t}", "ch", 50000, "OK: TRACEROUTE", true),
+        // --- DM: consultas de estado (cooldown 4 s; espera 12-25 s segun saltos) ---
+        AuditCommand("/nava fav ls", "/nava fav ls", "dm", 20000, "FAVORITOS"),
+        AuditCommand("/nava fav auto ?", "/nava fav auto ?", "dm", 20000, "AUTO-FAV"),
+        AuditCommand("/nava ign ls", "/nava ign ls", "dm", 20000, "IGNORADOS"),
+        AuditCommand("/nava set_rebroadcast ?", "/nava set_rebroadcast ?", "dm", 20000, "REBROADCAST ACT"),
+        AuditCommand("/nava set_telem_tx ?", "/nava set_telem_tx ?", "dm", 20000, "TELEM (min)"),
+        AuditCommand("/nava sleepmsg", "/nava sleepmsg", "dm", 20000, "SLEEPMSGS ACT"),
+        AuditCommand("/nava navadmin_mute ?", "/nava navadmin_mute ?", "dm", 20000, "NAVADMIN MUTE"),
+        AuditCommand("/nava set_ok_to_mqtt ?", "/nava set_ok_to_mqtt ?", "dm", 20000, "OK_TO_MQTT ACT"),
+        AuditCommand("/nava set_pos ?", "/nava set_pos ?", "dm", 20000, "POS ACT"),
+        AuditCommand("/nava set_beacon ?", "/nava set_beacon ?", "dm", 20000, "BALIZA ACT"),
+        AuditCommand("/nava set_pin ?", "/nava set_pin ?", "dm", 20000, "PIN BT ACT"),
+        AuditCommand("/nava set_tz ?", "/nava set_tz ?", "dm", 20000, "TZ ACT"),
+        AuditCommand("/nava set_name ?", "/nava set_name ?", "dm", 20000, "NOMBRE"),
+        AuditCommand("/nava set_mqtt ?", "/nava set_mqtt ?", "dm", 20000, "MQTT ACT"),
+        AuditCommand("/nava set_pos_tx ?", "/nava set_pos_tx ?", "dm", 20000, "POS_TX ACT"),
+        AuditCommand("/nava set_nodeinfo_tx ?", "/nava set_nodeinfo_tx ?", "dm", 20000, "NODEINFO_TX ACT"),
+        AuditCommand("/nava set_hops ?", "/nava set_hops ?", "dm", 20000, "HOPS ACT"),
+        AuditCommand("/nava set_role ?", "/nava set_role ?", "dm", 20000, "ROL ACT"),
+        AuditCommand("/nava set_txpower ?", "/nava set_txpower ?", "dm", 20000, "TXPWR ACT"),
+        AuditCommand("/nava set_chem ?", "/nava set_chem ?", "dm", 20000, "QCA"),
+        AuditCommand("/nava set_vbat ?", "/nava set_vbat ?", "dm", 20000, "VBAT ACT"),
+        AuditCommand("/nava set_vwake ?", "/nava set_vwake ?", "dm", 20000, "VWAKE ACT"),
+        AuditCommand("/nava mute ?", "/nava mute ?", "dm", 20000, "MUTE ACT"),
+        AuditCommand("/nava ble ?", "/nava ble ?", "dm", 20000, "BLE ACT"),
+        // --- DM: mantenimiento (gracia 6 s + re-verificar a los 30 s) ---
+        AuditCommand("/nava reboot", "/nava reboot", "dm", 30000, null)
     )
     }
 
@@ -1217,9 +1289,21 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 getString(R.string.battery_chat),
                 getString(R.string.battery_admin_remote),
                 getString(R.string.battery_dm_control),
-                getString(R.string.battery_config_get)
+                getString(R.string.battery_config_get),
+                getString(R.string.battery_custom)
             )
         ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        batterySpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: android.widget.AdapterView<*>?,
+                view: android.view.View?,
+                position: Int,
+                id: Long
+            ) {
+                if (position == 7) showAuditPicker()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
         batterySpinner.setOnLongClickListener {
             showHelpDialogFor(getString(R.string.audit_title), getString(R.string.help_audit_spinner))
             true
@@ -1287,6 +1371,58 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                     AuditStep("get security (A)", { if (local != -1) sendToRadio(MeshPacketBuilder.buildGetConfigRequestPacket(AdminMessage.ConfigType.SECURITY_CONFIG, local)) else null })
                 ), 8000L
             )
+            7 -> {
+                // Custom audit: the user picks which commands to run (checklist
+                // persisted in "audit_custom_sel"); each step carries its own
+                // pacing and expected response prefix for auto-validation.
+                val target = navaTargetNode
+                val customName = getString(R.string.battery_custom)
+                if (target == -1) return@selectedAuditSteps Triple(customName, emptyList(), 0L)
+                val prefs = getSharedPreferences("meshkacho", MODE_PRIVATE)
+                val sel = prefs.getString("audit_custom_sel", null)
+                    ?.split(",")?.mapNotNull { it.toIntOrNull() }?.toSet()
+                    ?: AUDIT_CATALOG.indices.toSet()
+                val targetHex = Integer.toHexString(target)
+                val targetHops = synchronized(nodeEntries) { nodeEntries[target]?.hops ?: 0 }
+                val steps = mutableListOf<AuditStep>()
+                AUDIT_CATALOG.forEachIndexed { i, c ->
+                    if (i !in sel) return@forEachIndexed
+                    val text = c.template.replace("{t}", targetHex)
+                    val wait = if (c.route == "dm" && targetHops >= 2) 25000L else c.waitMs
+                    if (c.expectPrefix == null && c.label == "/nava reboot") {
+                        // Reboot: ACK + 6 s grace, then verify at >= 30 s with a ping.
+                        steps.add(
+                            AuditStep(
+                                "/nava reboot (espera 30s)",
+                                { sendToRadio(MeshPacketBuilder.buildTextPacket(text, target, 0, pkiEncrypted = true)) },
+                                intervalMs = 30000, expectPrefix = null, expectRoute = "dm"
+                            )
+                        )
+                        steps.add(
+                            AuditStep(
+                                "ping post-reboot",
+                                { sendToRadio(MeshPacketBuilder.buildTextPacket("/nava ping", target, 0, pkiEncrypted = true)) },
+                                intervalMs = 20000, expectPrefix = "PONG:", expectRoute = "dm"
+                            )
+                        )
+                    } else {
+                        steps.add(
+                            AuditStep(
+                                c.label,
+                                {
+                                    if (c.route == "ch") {
+                                        sendToRadio(MeshPacketBuilder.buildTextPacket(text, -1, navadminChannelIndex))
+                                    } else {
+                                        sendToRadio(MeshPacketBuilder.buildTextPacket(text, target, 0, pkiEncrypted = true))
+                                    }
+                                },
+                                intervalMs = wait, expectPrefix = c.expectPrefix, expectRoute = c.route
+                            )
+                        )
+                    }
+                }
+                Triple(customName, steps, 0L)
+            }
             else -> Triple(
                 getString(R.string.battery_navadmin),
                 NAVADMIN_TEST_COMMANDS.map { cmd ->
@@ -1294,6 +1430,74 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 }, NAVADMIN_TEST_INTERVAL_MS
             )
         }
+    }
+
+    /**
+     * Custom audit checklist: the user picks exactly which /nava commands to
+     * audit (grouped by route). The selection persists across sessions.
+     */
+    private fun showAuditPicker() {
+        val prefs = getSharedPreferences("meshkacho", MODE_PRIVATE)
+        val saved = prefs.getString("audit_custom_sel", null)
+            ?.split(",")?.mapNotNull { it.toIntOrNull() }?.toMutableSet()
+            ?: AUDIT_CATALOG.indices.toMutableSet()
+        val checks = mutableListOf<android.widget.CheckBox>()
+        val column = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(8), dp(4), dp(8), dp(4))
+        }
+        var header = ""
+        AUDIT_CATALOG.forEachIndexed { i, c ->
+            val cat = when {
+                c.route == "ch" -> getString(R.string.audit_cat_navadmin)
+                c.label == "/nava reboot" -> getString(R.string.audit_cat_maint)
+                else -> getString(R.string.audit_cat_dm)
+            }
+            if (cat != header) {
+                header = cat
+                column.addView(TextView(this).apply {
+                    text = cat
+                    setTextColor(getColorAttr(com.google.android.material.R.attr.colorPrimary))
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    setPadding(dp(4), dp(10), 0, dp(2))
+                })
+            }
+            val cb = android.widget.CheckBox(this).apply {
+                text = c.label
+                isChecked = i in saved
+                textSize = 13f
+            }
+            checks.add(cb)
+            column.addView(cb)
+        }
+        val scroll = ScrollView(this).apply {
+            addView(column)
+            layoutParams = android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, dp(560)
+            )
+        }
+        val toggle = MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+            text = getString(R.string.audit_picker_all)
+            isAllCaps = false
+            setOnClickListener {
+                val target = checks.all { it.isChecked }
+                checks.forEach { it.isChecked = !target }
+            }
+        }
+        val wrap = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(toggle)
+            addView(scroll)
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.audit_custom_title)
+            .setView(wrap)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val sel = checks.mapIndexedNotNull { i, cb -> if (cb.isChecked) i else null }
+                prefs.edit().putString("audit_custom_sel", sel.joinToString(",")).apply()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun startAuditBattery() {
@@ -1306,6 +1510,11 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             return
         }
         val (name, steps, intervalMs) = selectedAuditSteps()
+        if (steps.isEmpty()) {
+            navadminTestStatus.text = getString(R.string.audit_custom_none)
+            appendLog(getString(R.string.audit_custom_none))
+            return
+        }
         auditBatteryRunning = true
         auditName = name
         auditIndex = 0
@@ -1338,12 +1547,45 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val result = if (bytes != null) "OK(${bytes.size}B)" else "FAILED"
         navadminTestStatus.text = getString(R.string.audit_progress, auditName, auditIndex, auditSteps.size, step.label)
         appendLog("AUDIT[$auditName] $auditIndex/${auditSteps.size} ${step.label} -> $result")
-        auditHandler.postDelayed({ runNextAuditStep() }, auditIntervalMs)
+        val wait = if (step.intervalMs > 0) step.intervalMs else auditIntervalMs
+        if (step.expectPrefix != null && bytes != null) {
+            // Custom steps wait for the node's response (or timeout) before
+            // advancing: set the expectation and poll until matched/deadline.
+            auditExpectLabel = step.label
+            auditExpectPrefix = step.expectPrefix
+            auditExpectRoute = step.expectRoute
+            auditExpectDeadline = System.currentTimeMillis() + wait
+            auditHandler.postDelayed({ checkAuditResponse() }, 1000L)
+        } else {
+            auditHandler.postDelayed({ runNextAuditStep() }, wait)
+        }
+    }
+
+    /**
+     * Custom-audit response poller: advances the battery when the expected
+     * response arrived (marked in maybeCaptureNavaMessage) or when the deadline
+     * expires without any match (timeout = FAIL).
+     */
+    private fun checkAuditResponse() {
+        if (!auditBatteryRunning) return
+        val label = auditExpectLabel ?: return
+        if (System.currentTimeMillis() >= auditExpectDeadline) {
+            auditExpectLabel = null
+            auditExpectPrefix = null
+            auditExpectRoute = ""
+            appendLog("AUDIT[$auditName] $label -> ${getString(R.string.audit_resp_timeout)}")
+            runNextAuditStep()
+        } else {
+            auditHandler.postDelayed({ checkAuditResponse() }, 1000L)
+        }
     }
 
     private fun stopAuditBattery() {
         auditBatteryRunning = false
         auditHandler.removeCallbacksAndMessages(null)
+        auditExpectLabel = null
+        auditExpectPrefix = null
+        auditExpectRoute = ""
         closeAuditFile()
         // Auto-close the live console a few seconds after the battery finishes
         // so the user can read the result without tapping (and popups never stack).
@@ -4545,6 +4787,29 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         if (packet.from == navaTargetNode || onNavadmin) {
             appendLog("NAVA rx: navadmin=$onNavadmin from=${packet.from} to=${packet.to} ch=${packet.channel} => ${text.take(48)}")
         }
+        // Custom-audit response validation (reader thread -> state only here).
+        if (auditBatteryRunning && auditExpectLabel != null && packet.from == navaTargetNode) {
+            val routeOk = if (auditExpectRoute == "ch") onNavadmin else packet.to != -1
+            if (routeOk) {
+                val prefix = auditExpectPrefix
+                val label = auditExpectLabel
+                auditExpectLabel = null
+                auditExpectPrefix = null
+                auditExpectRoute = ""
+                val trimmed = text.trimStart()
+                if (trimmed.startsWith("ERR:", ignoreCase = true) ||
+                    (prefix != null && prefix.isNotEmpty() && !text.contains(prefix, ignoreCase = true))
+                ) {
+                    appendLog("AUDIT[$auditName] $label -> ${getString(R.string.audit_resp_err)}: ${text.take(60)}")
+                } else {
+                    appendLog(
+                        "AUDIT[$auditName] $label -> ${getString(R.string.audit_resp_ok)}" +
+                            (if (!prefix.isNullOrEmpty()) " ($prefix)" else "")
+                    )
+                }
+                runOnUiThread { runNextAuditStep() }
+            }
+        }
         if (onNavadmin || fromTarget) {
             val route = if (onNavadmin) "ch" else "dm"
             val now = System.currentTimeMillis()
@@ -6594,7 +6859,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
             "remove" -> remoteAdminAction("remove", arg)
             "chat" -> sendChatReply(arg)
             "import_url" -> importContactFromUrl(arg)
-            "audit" -> remoteStartAudit(num)
+            "audit" -> remoteStartAudit(num, arg2)
             "audit_stop" -> {
                 stopAuditBattery()
                 appendLog("REMOTE: audit_stop")
@@ -6747,10 +7012,26 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         appendLog(if (bytes != null) "REMOTE: $op $id (local) enviado" else "REMOTE: $op $id fallo de envío")
     }
 
-    private fun remoteStartAudit(n: Int) {
-        if (n < 0 || n > 6) {
+    private fun remoteStartAudit(n: Int, targetArg: String) {
+        if (n < 0 || n > 7) {
             appendLog("REMOTE: audit índice fuera de rango ($n)")
             return
+        }
+        if (targetArg.isNotBlank()) {
+            val nodeId = try {
+                parseNodeId(targetArg.trim().removePrefix("!"))
+            } catch (e: Exception) {
+                -1
+            }
+            // Node IDs are unsigned 32-bit: values >= 0x80000000 arrive as
+            // negative Ints and are valid. Only -1 (broadcast) and 0 are invalid.
+            if (nodeId == -1 || nodeId == 0) {
+                appendLog("REMOTE: audit target inválido '$targetArg'")
+                return
+            }
+            navaTargetInput.setText("!${Integer.toHexString(nodeId)}")
+            navaTargetId()
+            appendLog("REMOTE: audit target -> !${Integer.toHexString(nodeId)}")
         }
         batterySpinner.setSelection(n)
         startAuditBattery()
@@ -6889,19 +7170,19 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         val clean = input.trim()
         return when {
             clean.startsWith("0x", ignoreCase = true) -> {
-                clean.substring(2).toLong(16).toInt()
+                (clean.substring(2).toLong(16) and 0xFFFFFFFFL).toInt()
             }
             clean.startsWith("!") -> {
-                clean.substring(1).toLong(16).toInt()
+                (clean.substring(1).toLong(16) and 0xFFFFFFFFL).toInt()
             }
             clean.any { it in 'a'..'f' || it in 'A'..'F' } -> {
-                clean.toLong(16).toInt()
+                (clean.toLong(16) and 0xFFFFFFFFL).toInt()
             }
             else -> {
                 try {
-                    clean.toLong().toInt()
+                    (clean.toLong() and 0xFFFFFFFFL).toInt()
                 } catch (e: NumberFormatException) {
-                    clean.toLong(16).toInt()
+                    (clean.toLong(16) and 0xFFFFFFFFL).toInt()
                 }
             }
         }

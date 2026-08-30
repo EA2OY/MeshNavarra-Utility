@@ -1,0 +1,1 @@
+- Fix: ritmo de auditoria Navadmin subido a 50 s por comando (rate-limit 30 s + jitter 5-13 s + cola de fragmentos del repetidor) — sin timeouts alternados en el canal 1

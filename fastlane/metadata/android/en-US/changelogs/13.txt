@@ -1,0 +1,3 @@
+- Custom audit designer: choose exactly which /nava commands to audit (checklist), each paced with the firmware v4.3.7 timings and auto-validated by response prefix (OK/ERR/TIMEOUT)
+- Navadmin directed commands run with the target node; reboot adds an automatic post-reboot ping verification
+- Fragment concatenation window widened to 50 s (long responses)
