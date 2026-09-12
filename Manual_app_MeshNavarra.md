@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Agosto 2026 · v1.2.3"
+date: "Septiembre 2026 · v1.2.4"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.2.3)
+# Manual de Usuario — MeshNavarra Utility (v1.2.4)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.2.3 (build 2026-08-27)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.2.4 (build 2026-09-12)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -154,7 +154,7 @@ Dirigida al nodo indicado (ID o selector con búsqueda; vacío = local):
 
 ## 🚀 8. Pestaña NavaTastic CLI (la estrella)
 
-Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`. Compatible con **NavaTastic Eclipse V5 (v4.3.7)** y anteriores (V5/V5.2).
+Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`. Compatible con **NavaTastic Eclipse V5.1 (v4.3.8)** y anteriores (V5/V5.2).
 
 ### 8.1 Cómo funciona
 
@@ -306,7 +306,7 @@ Incluye:
   5. **Admin remota PKI (B)**
   6. **DM control (B, seguros)**
   7. **Config get (A, solo lectura)**
-  8. **Personalizada (elige comandos)** (v1.2.0): checklist con todos los comandos `/nava` auditables — diagnóstico por Navadmin (incluidos los dirigidos con `!ID`), consultas de estado por DM (`set_rebroadcast ?`, `set_telem_tx ?`, ...) y mantenimiento (`reboot` con verificación automática por ping post-reboot) — cada uno con su **ritmo del firmware v4.3.7** (Navadmin 35 s, DM 12-25 s según saltos) y **validación automática de la respuesta** (prefijo esperado → OK, `ERR:` → error, sin respuesta → TIMEOUT). Solo se ejecutan los marcados y contra el **nodo destino global**.
+  8. **Personalizada (elige comandos)** (v1.2.0): checklist con todos los comandos `/nava` auditables — diagnóstico por Navadmin (incluidos los dirigidos con `!ID`), consultas de estado por DM (`set_rebroadcast ?`, `set_telem_tx ?`, ...) y mantenimiento (`reboot` con verificación automática por ping post-reboot) — cada uno con su **ritmo del firmware v4.3.8** (Navadmin 50 s, DM 12-25 s según saltos) y **validación automática de la respuesta** (prefijo esperado → OK, `ERR:` → error, sin respuesta → TIMEOUT). Solo se ejecutan los marcados y contra el **nodo destino global**.
 
 > ⚠️ **Uso responsable**: usa estas herramientas solo en banda de pruebas aislada y respetando siempre la normativa ETSI EN 300 220 de la banda de 868 MHz (ciclo de trabajo y potencia).
 

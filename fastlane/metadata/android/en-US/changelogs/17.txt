@@ -1,0 +1,3 @@
+- NavaTastic V5.1 (v4.3.8) sync: trace results now shown as highlighted IDA:/VUELTA: routes and TRACE: notices
+- Updated descriptions: set_name (name remembered in natural mode), status/reset_reason (FR:n counter), set_chem (lifepo4 board limits), storm/ble (ESP32 ERR)
+- Bundled NavaTastic PDF manuals regenerated from the 11/09 sources

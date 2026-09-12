@@ -1,0 +1,3 @@
+- Sincronizacion NavaTastic V5.1 (v4.3.8): los resultados de trace se muestran resaltados (IDA:/VUELTA:) y avisos TRACE:
+- Descripciones actualizadas: set_name (nombre recordado en modo natural), status/reset_reason (contador FR:n), set_chem (limites de lifepo4 por placa), storm/ble (ERR en ESP32)
+- PDFs integrados de NavaTastic regenerados desde las fuentes del 11/09

@@ -895,18 +895,18 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="log_rebooted">Radio Rebooted</string>
     <string name="log_unformatted">Unformatted Payload Type: %1$s</string>
     <string name="nava_desc_ping">Latency reply with uptime and noise floor. E.g. PONG: RN1 | SNR: 3.5 dB | Bat: 4120 mV | UP: 32d 4h | RUIDO: -120 dBm. Rate limit: 1 reply every 10 s per node.</string>
-    <string name="nava_desc_status">Memory health: nodes RAM/80, manual/auto favorites, orphans, uptime.</string>
+    <string name="nava_desc_status">Memory health: nodes RAM/80, manual/auto favorites, orphans, uptime. Since V5.1 it also appends | FR:n (factory resets suffered, only if &gt; 0).</string>
     <string name="nava_desc_env">Battery, heap, nRF52 CPU temperature and I2C environment sensor.</string>
     <string name="nava_desc_channel" formatted="false">Spectrum usage (airtime % and TX %).</string>
     <string name="nava_desc_peers">Direct 0-hop neighbors (ID, role, SNR, time since last contact).</string>
     <string name="nava_desc_rxlog">Metadata of the last 5 received packets (ID, PortNum, SNR, RSSI).</string>
     <string name="nava_desc_afc">TCXO frequency drift in Hz of the last packet.</string>
-    <string name="nava_desc_reset_reason">Last reset reason (RESETREAS register).</string>
+    <string name="nava_desc_reset_reason">Last reset reason (RESETREAS register). Since V5.1 it also appends | FR:n (factory resets suffered, only if &gt; 0).</string>
     <string name="nava_desc_noise">Instant LoRa chip noise floor in dBm.</string>
     <string name="nava_desc_bat" formatted="false">Active chemistry, mV, OCV % and TX state.</string>
     <string name="nava_desc_help">Short command glossary.</string>
     <string name="nava_desc_route">Hops and SNR with which the node hears you. If not in the DB it auto-launches a TraceRoute. Usage: route !ID</string>
-    <string name="nava_desc_trace">Launches a native TraceRoute to the node (RF probe fires 8 s after text ACK). Usage: trace !ID</string>
+    <string name="nava_desc_trace">Launches a native TraceRoute to the node (RF probe fires 8 s after text ACK). Since V5.1 the full route comes back as text on the same channel: TRACE ... IDA: (out) and VUELTA: (back) with node names and per-hop SNR; if the target does not answer within ~90 s: TRACE: SIN RESPUESTA DEL DESTINO (or TRACE: SONDA NO LANZADA if the node is busy). Usage: trace !ID</string>
     <string name="nava_desc_ign_ls">Lists the blocked nodes.</string>
     <string name="nava_desc_ign_add">Blocks and silences the node, purging its public key. Usage: ign add !ID</string>
     <string name="nava_desc_ign_rm">Unblocks the node. Usage: ign rm !ID</string>
@@ -916,7 +916,7 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_fav_rm">Removes from favorites. Usage: fav rm !ID</string>
     <string name="nava_desc_fav_auto">Auto-favorites direct routers (hop bypass) and registers them in RAM. Default ON. Usage: fav auto [on|off] (no argument shows the state).</string>
     <string name="nava_query_blank">— Query —</string>
-    <string name="nava_desc_set_name">Sets persistent node name in /resilience.bin or flushes to official app mode. Usage: set_name \"Long\" \"Short\" or set_name flush</string>
+    <string name="nava_desc_set_name">Sets persistent node name in /resilience.bin or flushes to official app mode. Since V5.1, in natural mode (after flush) the name set from the official app is remembered by the node (survives reboots and factory reset); while fixed, app changes apply live but the fixed name returns on reboot. Usage: set_name \"Long\" \"Short\" or set_name flush</string>
     <string name="nava_desc_set_role">Changes the hardware role (client/mute/router). SEMI-PERMANENT: saved in /resilience.bin and survives factory reset. Since 28/08: changing the role no longer re-applies role defaults — your intervals and rebroadcast mode are kept.</string>
     <string name="nava_desc_set_rebroadcast">Selects how the node repeats third-party packets: all (everything), local (known nodes only, factory default), known (known senders only), core (official portnums only), none (no repeating — rejected in ROUTER role). Persists and survives resets; syncs both ways with the official app. all/known/core can reduce multi-hop NavaCLI coverage — choose with care.</string>
     <string name="nava_desc_set_mqtt">Turns MQTT on/off. Options: on, off.</string>
@@ -934,13 +934,13 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_warn_full_reset">Full reset: restores configuration and /resilience.bin to defaults. Keeps PKI keypair, BLE bonds and admin keys. Role and energy settings return to profile defaults.</string>
     <string name="nava_desc_wipe">Compromise purge: total erase + NEW PKI keypair + BLE bonds and persisted admin keys deleted (only the project rescue key remains). Remote equivalent of nrf erase.</string>
     <string name="nava_warn_wipe">WIPE: total erase with a NEW PKI keypair. Peers will fail PKI DM until they re-learn the new key. Only the project rescue key remains. There is no remote undo.</string>
-    <string name="nava_desc_set_chem">Changes battery chemistry and adjusts cutoff/OCV/LPCOMP. Persists in /resilience.bin. Cutoffs: lipo 3500, nimh 3400, sodium 2600, lifepo4 2800.</string>
+    <string name="nava_desc_set_chem">Changes battery chemistry and adjusts cutoff/OCV/LPCOMP. Persists in /resilience.bin. Cutoffs: lipo 3500, nimh 3400, sodium 2600, lifepo4 2800. On boards with fixed LPCOMP (Seed Solar P1, Xiao Kit i2c, Xiao E22P, Heltec T114) lifepo4 is rejected: ERR: LIFEPO4 NO COMPATIBLE, UMBRAL LPCOMP FIJO.</string>
     <string name="nava_warn_set_chem">Changes battery chemistry: modifies the cutoff voltage, OCV curve and power-off trigger. A wrong chemistry can drain or damage the battery and leave the node unusable until physically adjusted.</string>
     <string name="nava_desc_set_vbat">Battery power-off cutoff in mV [2400-3600].</string>
     <string name="nava_warn_set_vbat">Lowering the cutoff too much can over-discharge and irreversibly damage the battery. Raising it too much powers the node off prematurely. If wrong, physical adjustment is required.</string>
     <string name="nava_desc_set_vwake">LPCOMP solar wake level [1-5]. 1=2.1V, 2=2.5V, 3=3.7V, 4=4.5V, 5=3.3V (LiFePO4).</string>
     <string name="nava_warn_set_vwake">A wrong LPCOMP wake level can prevent the node from waking from solar sleep, leaving it off forever until physically recovered.</string>
-    <string name="nava_desc_storm">Hibernation with radio off (RTC2); wakes by timer and reboots. Hours [1-720]. Replies \"MODO TORMENTA ACTIVADO...\" and sleeps after the 60 s grace window.</string>
+    <string name="nava_desc_storm">Hibernation with radio off (RTC2); wakes by timer and reboots. Hours [1-720]. Replies \"MODO TORMENTA ACTIVADO...\" and sleeps after the 60 s grace window. On Heltec V3/V4 (ESP32) it responds: ERR: STORM SOLO DISPONIBLE EN NRF52.</string>
     <string name="nava_warn_storm">Storm mode switches the radio off and hibernates the node for hours. If the timer fails, the node stays asleep until physical intervention.</string>
     <string name="nava_desc_storm_test1">Quick storm mode test: 60 seconds.</string>
     <string name="nava_warn_storm_test1">Storm mode switches the radio off and hibernates the node for 60 seconds. If the timer fails, the node stays asleep until physical intervention.</string>
@@ -949,7 +949,7 @@ Note: this is an unofficial fork. Remote administration may be rejected by newer
     <string name="nava_desc_txoff">Turns TX off after 3 s (keeps RX).</string>
     <string name="nava_warn_txoff">TX off persists in the node; rollback ONLY with nrf erase.</string>
     <string name="nava_desc_txon">Re-enables TX.</string>
-    <string name="nava_desc_ble">Turns Bluetooth off/on; schedules a real reboot (read at boot).</string>
+    <string name="nava_desc_ble">Turns Bluetooth off/on; schedules a real reboot (read at boot). On Heltec V3/V4 (ESP32) it responds: ERR: GESTION BLE SOLO DISPONIBLE EN NRF52 (BLE cannot be forced on ESP32).</string>
     <string name="nava_warn_ble">BLE on/off persists in the node and schedules a reboot; rollback ONLY with nrf erase.</string>
     <string name="nava_desc_sleepmsg">Turns sleep/wake announcements ([Sueño]/[Vivo]/[Listo]/[Boot]) on the Navadmin channel on/off. Persists in /resilience.bin. No argument shows the current state.</string>
     <string name="nava_desc_msg">Broadcasts a message on channel 0 signed by the repeater. Usage: msg \"text\"</string>

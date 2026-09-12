@@ -365,7 +365,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         const val CHAT_STATUS_ERROR = "error"
     private const val MAX_PICKER_ROWS = 150
     private const val MAX_NODES_TAB_ROWS = 150
-    private const val BUILD_DATE = "2026-08-27"
+    private const val BUILD_DATE = "2026-09-12"
     private const val RECONNECT_DELAY_MS = 5000L
     private const val RECONNECT_MAX_ATTEMPTS = 5
     private const val CHAT_AUTOSCROLL_RESUME_MS = 10000L
@@ -4638,12 +4638,15 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         navaMessagesContainer.addView(TextView(this).apply { setPadding(0, dp(4), 0, 0) })
     }
 
-    /** Sleep/wake announcements from the node ([Sueño]/[Vivo]/[Listo]/[Boot]): emoji + highlight color. */
+    /** Sleep/wake announcements ([Sueño]/[Vivo]/[Listo]/[Boot]) + trace results (V5.1): emoji + highlight color. */
     private fun navaAlertStyle(text: String): Pair<String, Int> = when {
         text.startsWith("[Sue\u00f1o]") -> "\uD83D\uDCA4 " to 0xFF42A5F5.toInt()
         text.startsWith("[Vivo]") -> "\u2600\uFE0F " to 0xFFFFB300.toInt()
         text.startsWith("[Listo]") -> "\u2705 " to 0xFF4CAF50.toInt()
         text.startsWith("[Boot]") -> "\uD83D\uDE80 " to 0xFF26C6DA.toInt()
+        text.startsWith("TRACE:") -> "\u26A0\uFE0F " to 0xFFFF7043.toInt()
+        text.startsWith("TRACE") && text.contains("IDA:") -> "\uD83D\uDDFA\uFE0F " to 0xFF7E57C2.toInt()
+        text.startsWith("VUELTA:") -> "\uD83D\uDD19 " to 0xFF7E57C2.toInt()
         else -> "" to 0
     }
 
