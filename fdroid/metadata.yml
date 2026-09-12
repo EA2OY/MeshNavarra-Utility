@@ -14,14 +14,14 @@ RepoType: git
 Repo: https://github.com/EA2OY/MeshNavarra-Utility
 
 Builds:
-  - versionName: 1.2.3
-    versionCode: 16
-    commit: 482941654e5ea8b178ba067b6513819dcd25f747
+  - versionName: 1.2.4
+    versionCode: 17
+    commit: 8221110e7f7b49cda7134876e108a582f9755337
     subdir: app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.2.3
-CurrentVersionCode: 16
+CurrentVersion: 1.2.4
+CurrentVersionCode: 17
