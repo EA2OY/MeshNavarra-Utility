@@ -4,7 +4,6 @@ Categories:
 License: GPL-3.0-or-later
 AuthorName: Tai Soluciones
 AuthorEmail: taisoluciones@gmail.com
-AuthorWebSite: https://github.com/EA2OY/MeshNavarra-Utility
 SourceCode: https://github.com/EA2OY/MeshNavarra-Utility
 IssueTracker: https://github.com/EA2OY/MeshNavarra-Utility/issues
 
@@ -14,14 +13,14 @@ RepoType: git
 Repo: https://github.com/EA2OY/MeshNavarra-Utility
 
 Builds:
-  - versionName: 1.2.4
-    versionCode: 17
-    commit: 8221110e7f7b49cda7134876e108a582f9755337
+  - versionName: 1.2.5
+    versionCode: 18
+    commit: 7a086712ca64631fce7660fc0defbab1de9d8235
     subdir: app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.2.4
-CurrentVersionCode: 17
+CurrentVersion: 1.2.5
+CurrentVersionCode: 18
