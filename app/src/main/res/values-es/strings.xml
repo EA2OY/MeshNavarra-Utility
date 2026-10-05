@@ -638,6 +638,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_err_need_value">Introduce un valor para este comando.</string>
     <string name="nava_err_invalid_number">El valor debe ser un número entero.</string>
     <string name="nava_err_range">El valor debe estar entre %1$d y %2$d.</string>
+    <string name="nava_err_txpower">La potencia TX debe ser -5..-1 o 1-22 dBm (tope de la placa), o la palabra auto (también max, def, default). El 0 no vale: significa \"máxima de la región\".</string>
     <string name="nava_err_need_target_navadmin">%1$s necesita un nodo destino (!ID) en el canal Navadmin.</string>
     <string name="chat_channel_default">Canal 0</string>
     <string name="chat_channel_selected">Chat: cambiado al canal %1$s</string>
@@ -922,7 +923,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_set_mqtt">Activa/desactiva MQTT. Opciones: on, off.</string>
     <string name="nava_desc_set_tz">Zona horaria POSIX. Uso: set_tz \"&lt;tz&gt;\"</string>
     <string name="nava_desc_set_hops">Límite de saltos LoRa [1-7].</string>
-    <string name="nava_desc_set_txpower">Potencia TX [0-12] (Promicro/E22P). En la Faketec HT-RA62 es [0-22].</string>
+    <string name="nava_desc_set_txpower">Potencia TX en dBm. Desde la V5.3: -5..-1 o 1..tope de la placa (22 dBm en placas SX1262, 12 dBm en E22P). El 0 se rechaza (en el protocolo significa "máxima de la región"): para eso usa auto (también max, def, default), que fija el máximo de la placa como número real. Se aplica con reinicio diferido. Uso: set_txpower [-5..-1|1-22|auto]</string>
     <string name="nava_desc_db_purge">Expulsa nodos temporales conservando favoritos y admins.</string>
     <string name="nava_warn_db_purge">Vaciarás los nodos temporales aprendidos (se re-aprenderán con el tráfico). Favoritos y admins se conservan.</string>
     <string name="nava_desc_db_clear">Vacía la base de nodos (nuclear). Borra también TU entrada del repetidor: fuerza tu propio NodeInfo (broadcast, NO DM) antes de volver a mandar /nava.</string>
@@ -934,7 +935,7 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_warn_full_reset">Reset completo: restaura configuración y /resilience.bin a defaults. Conserva par PKI, bonds BLE y claves admin. Rol y ajustes de energía vuelven a los defaults del perfil.</string>
     <string name="nava_desc_wipe">Purga de compromiso: erase total + par PKI NUEVO + bonds BLE y claves admin persistidas borradas (queda solo la del proyecto — rescate garantizado). Equivalente remoto de nrf erase.</string>
     <string name="nava_warn_wipe">WIPE: borrado total con par PKI NUEVO. Los peers fallarán el DM PKI hasta re-aprender la clave nueva. Solo queda la clave de rescate del proyecto. No hay vuelta atrás remota.</string>
-    <string name="nava_desc_set_chem">Cambia química de batería y ajusta corte/OCV/LPCOMP. Persiste en /resilience.bin. Cortes: lipo 3500, nimh 3400, sodium 2600, lifepo4 2800. En placas con LPCOMP fijo (Seed Solar P1, Xiao Kit i2c, Xiao E22P, Heltec T114) lifepo4 se rechaza: ERR: LIFEPO4 NO COMPATIBLE, UMBRAL LPCOMP FIJO.</string>
+    <string name="nava_desc_set_chem">Cambia la química de la batería y ajusta a la vez el corte de apagado y el nivel de reencendido solar. Persiste en /resilience.bin. Valores: lipo 3500 (nivel 3), nimh 3400 (nivel 3), sodium 3000 (nivel 5), lifepo4 2800 (nivel 5). En placas con LPCOMP fijo (Seed Solar P1, Xiao Kit i2c, Xiao E22P, Heltec T114) lifepo4 se rechaza: ERR: LIFEPO4 NO COMPATIBLE, UMBRAL LPCOMP FIJO.</string>
     <string name="nava_warn_set_chem">Cambia la química de la batería: modifica el voltaje de corte, la curva OCV y el disparo de apagado. Elegir mal la química puede agotar o dañar la batería y dejar el nodo inoperativo hasta reajustarlo físicamente.</string>
     <string name="nava_desc_set_vbat">Corte de apagado por batería en mV [2400-3600].</string>
     <string name="nava_warn_set_vbat">Bajar demasiado el corte puede sobre-descargar y dañar la batería de forma irreversible. Subirlo demasiado apaga el nodo prematuramente. Si te equivocas, requiere reajuste físico.</string>
@@ -958,15 +959,15 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_sendtel">Telemetrías ambientales inmediatas.</string>
     <string name="nava_desc_power">Métricas del sensor de potencia I2C (INA219/260): V, mA, mW.</string>
     <string name="nava_desc_bell">Alarma acústica para localización.</string>
-    <string name="nava_desc_admin_ls">Muestra las 3 claves criptográficas de admin en base64.</string>
+    <string name="nava_desc_admin_ls">Muestra las 3 claves de admin ACTIVAS (admin_key[0..2], las que autorizan) en base64.</string>
     <string name="nava_desc_keys_ls">Lista las claves admin PERSISTIDAS en /resilience.bin (las que volverán tras un factory/full reset).</string>
-    <string name="nava_desc_keys_clear">Borra SOLO la copia persistida de las claves admin (la configuración actual no se toca y no reinicia). Después, el próximo factory/full reset dejará solo la clave del proyecto.</string>
+    <string name="nava_desc_keys_clear">Borra SOLO la copia persistida de las claves admin (la configuración actual no se toca y no reinicia). Ya NO es un paso obligatorio antes de configurar claves: desde el 15/09 manda la configuración del nodo. Después, el próximo factory/full reset dejará solo la clave del proyecto.</string>
     <string name="nava_warn_keys_clear">keys_clear: borrar la copia persistida de claves admin es permanente. Quitar una clave en la app NO la purga del nodo — reaparece tras el próximo reset. Este comando borra TODAS las copias persistidas.</string>
     <string name="nava_desc_ch_ls">Lista los 8 slots de canales (0-7), rol, canal CLI (*), nombre, tipo de cifrado y compuerta MQTT.</string>
     <string name="nava_desc_ch_set">Configura el canal primario (slot 0) o secundarios privados (slots 2-7). Uso: ch_set &lt;slot 0|2-7&gt; &lt;nombre&gt; &lt;psk_base64&gt; (admite AQ==, 16B AES-128 o 32B AES-256 en Base64).</string>
     <string name="nava_desc_ch_del">Deshabilita el canal secundario y libera su persistencia. Uso: ch_del &lt;slot 2-7&gt;</string>
     <string name="nava_warn_ch_del">Deshabilita el canal secundario y borra su configuración persistente.</string>
-    <string name="nava_desc_ch_url">Genera la URL canónica de Meshtastic (meshtastic.org/e/#...) para importar canales en la app móvil. Uso: ch_url [slot 0-7]</string>
+    <string name="nava_desc_ch_url">Genera la URL canónica de Meshtastic (meshtastic.org/e/#...) de un canal o, con "all", el espejo completo del nodo (todos los slots + radio) para clonarlo en otro. Se contesta siempre por privado (lleva las claves). Uso: ch_url [slot 0-7|all]</string>
     <string name="nava_desc_ch_reset">Restaura la tabla de canales de fábrica (Slot 0 SFNarrow, Slot 1 Navadmin, Slots 2-7 desactivados, CLI en Slot 1). Persiste vía /resilience.bin.</string>
     <string name="nava_warn_ch_reset">Restaura la configuración de canales por defecto. Todos los canales secundarios personalizados (slots 2-7) se borrarán.</string>
     <string name="nava_desc_set_cli_chan">Redirige la escucha de NavaCLI y los avisos de ciclo solar al slot indicado [1-7]. Uso: set_cli_chan &lt;slot 1-7&gt;</string>
@@ -974,22 +975,19 @@ Nota: es un fork no oficial. La administración remota puede ser rechazada por f
     <string name="nava_desc_ch_mqtt">Configura la compuerta MQTT individual por canal. Opciones: up (solo subida), down (solo bajada), both (bidireccional), off (aislado). Uso: ch_mqtt &lt;slot 0-7&gt; [up|down|both|off]</string>
     <string name="nava_desc_set_ok_to_mqtt">Activa/desactiva la bandera global OK_TO_MQTT en paquetes, autorizando a pasarelas a subirlos a internet. Opciones: on, off.</string>
     <string name="nava_desc_set_pos">Fija coordenadas geográficas estáticas sin módulo GPS físico. Uso: set_pos &lt;lat&gt; &lt;lon&gt; [alt]</string>
-    <string name="nava_desc_set_beacon">Configura el intervalo de emisión de balizas NodeInfo y Posición en minutos [1-1440]. Uso: set_beacon &lt;minutos&gt;</string>
     <string name="nava_desc_set_pin">Configura PIN Bluetooth fijo personalizado de 6 dígitos. Persiste en /resilience.bin. Uso: set_pin &lt;6_digitos&gt;</string>
     <string name="nava_desc_mute">Modo silencioso temporal: no retransmite paquetes de terceros durante X minutos [1-1440|off] (100% en RAM). Ventana de gracia de 60 s antes de silenciar. Uso: mute [minutos|off]</string>
     <string name="nava_desc_stats">Auditoría en RAM: temps CPU mín/máx/act, batería mínima, paquetes RX/TX/Enrutados y conteo Auto-Fav (100% en RAM).</string>
     <string name="nava_desc_test_tx">Emite una ráfaga de balizas de prueba RF (1 pkt/s durante 5-30s) para medir RSSI/SNR y alinear antenas. Uso: test_tx &lt;segundos 5-30&gt;</string>
     <string name="nava_desc_log">Muestra las últimas 1-15 entradas del buffer circular forense de eventos en RAM. Uso: log [lineas 1-15]</string>
     <string name="nava_desc_pos_clear">Borra la posición fija guardada, dejando el repetidor sin coordenadas.</string>
-    <string name="nava_desc_set_pos_tx">Controla la difusión periódica de posición en flota. Opciones: on, off, minutos (1-10080, default 72h). El OFF persiste a reinicios y resets.</string>
-    <string name="nava_desc_set_nodeinfo_tx">Controla la difusión periódica de NodeInfo en flota. Opciones: on, off, minutos (1-10080, default 72h). El OFF persiste a reinicios y resets.</string>
-    <string name="nava_desc_set_telem_tx">Regula el intervalo de reporte de telemetría de los 5 tipos a la vez (dev/env/pow/air/sal). Opciones: on (12h), off, minutos (1-1440, default 12h = 720 min). El OFF persiste a reinicios/resets. Intervalos distintos por tipo solo desde la App oficial.</string>
+    <string name="nava_desc_set_pos_tx">Controla la difusión periódica de posición en flota. Opciones: on, off, minutos (1-10080, default 72h). Desde la V5.3 un 0 la apaga de verdad. El OFF persiste a reinicios y resets.</string>
+    <string name="nava_desc_set_nodeinfo_tx">Controla la difusión periódica de NodeInfo en flota. Opciones: on, off, minutos (1-10080, default 72h). Desde la V5.3 un 0 la apaga de verdad. El OFF persiste a reinicios y resets.</string>
+    <string name="nava_desc_set_telem_tx">Regula el intervalo de reporte de telemetría de los 5 tipos a la vez (dev/env/pow/air/sal). Opciones: on (12h), off, minutos (1-1440, default 12h = 720 min). Desde la V5.3 un 0 la apaga de verdad. Intervalos distintos por tipo solo desde la App oficial. Los vecinos y el contador de personas de las placas ESP32 siguen emitiendo por su cuenta.</string>
     <string name="nava_desc_set_preset">Aplica un preset LoRa estándar y asigna su slot de frecuencia. Reinicia el módem en 6 s. Presets: long_fast, medium_fast, short_fast, long_slow, short_slow, medium_slow, long_moderate, short_turbo.</string>
     <string name="nava_warn_set_preset">set_preset cambia la modulación física de la radio y reinicia el nodo en 6 segundos. Si tu dispositivo no usa el mismo preset perderás la conexión.</string>
-    <string name="nava_desc_set_lora">Configuración Custom de capa física LoRa: BW, SF, CR, freq (MHz), slot, txpower opcional (dBm). Reinicia en 6 s. Uso: set_lora &lt;bw&gt; &lt;sf&gt; &lt;cr&gt; &lt;freq_mhz&gt; &lt;slot&gt; [txpower]</string>
-    <string name="nava_warn_set_lora">set_lora modifica parámetros físicos LoRa y frecuencia, reiniciando en 6 segundos. Parámetros incorrectos provocarán pérdida de enlace.</string>
-    <string name="nava_desc_set_freq">Ajusta la frecuencia central de emisión en MHz y slot asociado. Reinicia en 6 s. Uso: set_freq &lt;freq_mhz&gt; [slot]</string>
-    <string name="nava_warn_set_freq">set_freq cambia la frecuencia central de radio y reinicia en 6 segundos. Deberás cambiar la frecuencia de tu mando para mantener contacto.</string>
+    <string name="nava_desc_set_url">Aplica el juego completo de canales y la radio de red desde un enlace de meshtastic.org (el de compartir/QR, o el espejo que genera ch_url all). REEMPLAZA: lo que no venga en el enlace se quita. El canal de rescate (slot 1) no se toca nunca y la potencia TX no se cambia (es de cada nodo: usa set_txpower). Solo administradores, por privado y de uno en uno. Uso: set_url &lt;enlace&gt;</string>
+    <string name="nava_warn_set_url">set_url reemplaza el juego de canales del nodo y puede mover la consola a otro canal. Si tu mando no sigue el cambio pierdes el contacto hasta arreglarlo en el sitio o por USB. El enlace lleva las claves de los canales.</string>
     <string name="nava_desc_panic">Inicia la evacuación de emergencia de frecuencia/preset en toda la flota. Uso: panic &lt;preset|sfnarrow&gt; [minutos_aviso=10] [minutos_prueba=0]</string>
     <string name="nava_warn_panic">panic lanza una evacuación masiva de la malla. Todos los repetidores al alcance cambiarán al nuevo preset. Con minutos_prueba &gt; 0 volverán a SFNarrow si no reciben panic_ok.</string>
     <string name="nava_desc_panic_ok">Consolida la migración de emergencia definitivamente y cancela la vuelta automática. Solo por DM (PKI) — bloqueado en el canal público Navadmin.</string>

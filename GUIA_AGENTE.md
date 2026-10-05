@@ -36,7 +36,7 @@ Single entry point for any (AI) agent resuming work on this project. Read it ful
 | Tool | Path / command |
 |---|---|
 | Build | `$env:JAVA_HOME="c:\Users\Jesus\Desktop\MeshKachoUtility\jdk-17\jdk-17.0.10+7"`; `.\gradlew.bat assembleDebug` |
-| Tests | `.\gradlew.bat testDebugUnitTest` (16 tests) |
+| Tests | `.\gradlew.bat testDebugUnitTest` (24 tests) |
 | Install on phone | `adb -s 192.168.3.206:5555 install -r app\build\outputs\apk\debug\app-debug.apk` |
 | ADB | not on PATH → `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` |
 | ffmpeg | Python `imageio-ffmpeg` (binary in site-packages) |

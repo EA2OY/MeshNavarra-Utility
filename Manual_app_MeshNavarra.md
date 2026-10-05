@@ -2,17 +2,17 @@
 title: "Manual de Usuario"
 subtitle: "Administración de nodos Meshtastic y NavaTastic desde Android"
 author: "Tai Soluciones · taisoluciones@gmail.com"
-date: "Septiembre 2026 · v1.2.4"
+date: "Octubre 2026 · v1.2.5"
 colorlinks: true
 toc: true
 toc-title: "Índice"
 ---
 
-# Manual de Usuario — MeshNavarra Utility (v1.2.4)
+# Manual de Usuario — MeshNavarra Utility (v1.2.5)
 
 Herramienta Android no oficial para administrar nodos **Meshtastic** (y repetidores **NavaTastic/Navarrico**) por **USB OTG** y **Bluetooth LE**.
 
-**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.2.4 (build 2026-09-12)
+**Autor**: Tai Soluciones · **Contacto**: taisoluciones@gmail.com · **Licencia**: GPL-3.0 · **Versión**: 1.2.5 (build 2026-10-05)
 
 > **Aviso importante**: la app se distribuye **TAL CUAL**, sin garantía de ningún tipo. Los comandos de administración (reinicio, borrado de NodeDB, cambios de configuración) pueden afectar al funcionamiento de los nodos. El autor no asume ninguna responsabilidad por daños o mal funcionamiento. Úsala bajo tu propia responsabilidad. Software libre bajo **GNU GPL v3.0**; el código fuente está disponible en GitHub (ver Contacto).
 
@@ -154,7 +154,7 @@ Dirigida al nodo indicado (ID o selector con búsqueda; vacío = local):
 
 ## 🚀 8. Pestaña NavaTastic CLI (la estrella)
 
-Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`. Compatible con **NavaTastic Eclipse V5.1 (v4.3.8)** y anteriores (V5/V5.2).
+Control remoto de repetidores con el **firmware Navarrico/NavaTastic** (fork de Meshtastic optimizado para repetidores solares de infraestructura). El módulo `NavaCLIModule` del firmware intercepta los comandos `/nava`. Compatible con **NavaTastic Eclipse V5.3.1** (base Meshtastic 2.7.26) y anteriores (V5.1/V5.2). Desde la V5.3 el firmware **retiró `set_lora` y `set_freq`** (no aplicaban nada: la lectura de decimales no está enlazada): la modulación se cambia con `set_preset` y la red completa con `set_url`.
 
 ### 8.1 Cómo funciona
 
@@ -213,10 +213,9 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 - `set_cli_chan <slot 1-7>`: Redirige la escucha de NavaCLI y avisos solares al slot indicado.
 - `navadmin_mute [on|off]`: Silencia o activa el canal de rescate (Slot 1 Navadmin).
 
-**⚡ Radio y Pánico (Novedad V5)**:
+**⚡ Radio y Pánico**:
 - `set_preset <preset>` ⚠: Aplica preset LoRa estándar (`long_fast`, `medium_fast`, `short_fast`, `long_slow`, `short_slow`, `medium_slow`, `long_moderate`, `short_turbo`) y reinicia módem en 6 s.
-- `set_lora <bw> <sf> <cr> <freq> <slot> [txpower]` ⚠: Configuración Custom de capa física LoRa. Reinicia módem en 6 s.
-- `set_freq <freq_mhz> [slot]` ⚠: Ajusta atómicamente la frecuencia central y slot en 6 s.
+- `set_url <enlace>` ⚠ **(novedad V5.3)**: aplica de una vez **el juego completo de canales y la radio de red** desde un enlace de meshtastic.org (el de compartir/QR o el que genera `ch_url all`). **Reemplaza**: lo que no venga en el enlace se quita (y la respuesta dice cuáles). El canal de rescate (slot 1) no se toca nunca y la potencia TX no se cambia (es de cada nodo). Solo administradores, por privado y de uno en uno; avisa si tu consola cambia de canal. **Retirados en V5.3: `set_lora` y `set_freq`** (no llegaban a aplicarse).
 - `panic <preset|sfnarrow> [minutos_aviso=10] [minutos_prueba=0]` ⚠: Inicia evacuación de emergencia en la malla con túnel silencioso en $T-60\text{s}$.
 - `panic_ok`: Cancela el auto-rollback y consolida definitivamente la nueva frecuencia/preset. **Solo por DM (PKI)** — bloqueado en el canal público Navadmin (V5.2).
 
@@ -225,10 +224,10 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 - `set_ok_to_mqtt [on|off]`: Bandera global OK_TO_MQTT en paquetes para pasarelas.
 - `set_pos <lat> <lon> [alt]`: Coordenadas geográficas estáticas fijas.
 - `pos_clear`: Borra la posición fija guardada.
-- `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h; el OFF persiste).
-- `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h; el OFF persiste).
-- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 12h = 720 min; cambia los **5 tipos a la vez**; el OFF persiste; por tipo solo desde la App oficial).
-- `set_beacon [1-1440]`: Cadencia de balizas NodeInfo/Posición.
+- `set_pos_tx [on|off|minutos]`: Difusión periódica de posición en flota (default 72h; el OFF persiste; **desde la V5.3 un 0 la apaga de verdad**).
+- `set_nodeinfo_tx [on|off|minutos]`: Difusión periódica de NodeInfo en flota (default 72h; el OFF persiste; **desde la V5.3 un 0 la apaga de verdad**).
+- `set_telem_tx [on|off|minutos]`: Intervalo de reporte de telemetría (default 12h = 720 min; cambia los **5 tipos a la vez**; el OFF persiste; por tipo solo desde la App oficial). Los vecinos y el contador de personas de las placas ESP32 siguen emitiendo por su cuenta.
+- `set_beacon`: **retirado el 15/09/2026** (escribía el mismo ajuste por otro camino y al arrancar no se leía). Para NodeInfo usa `set_nodeinfo_tx`.
 - `set_pin <6_digitos>`: PIN Bluetooth fijo persistente.
 - `mute [1-1440|off]`: Silenciado temporal de reenvío LoRa en RAM.
 - `test_tx [5-30]`: Ráfaga de prueba RF periódica para alineación.
@@ -241,6 +240,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 - `set_rebroadcast [all|local|known|core|none]`: cómo retransmite el nodo los paquetes ajenos. Persiste y sobrevive a resets; se sincroniza con la App oficial. `none` es rechazado en rol ROUTER; `all`/`known`/`core` pueden reducir la cobertura NavaCLI multi-salto.
 - `set_role` (revisión 28/08): al cambiar el rol **ya no se re-aplican los defaults del rol** — tus intervalos y tu modo de retransmisión se mantienen.
+- `set_txpower [-5..-1 | 1-tope | auto]` **(revisado en V5.3)**: el **0 se rechaza** (en el protocolo significa «máxima de la región»); para eso está `auto` (también `max`, `def`, `default`), que fija el máximo de la placa (22 dBm en las SX1262, 12 dBm en las E22P) como número real. Se aplica con reinicio diferido. La app valida el valor antes de enviarlo.
 
 **🧹 Mantenimiento (solo DM)**: `db_purge` ⚠ · `db_clear` ⚠ · `reboot` (gracia 6s) · `factory_reset` ⚠ · `full_reset` ⚠ · `wipe` ⚠ — en `full_reset` y `wipe` la app añade automáticamente el token `CONFIRM` que el nodo exige.
 
@@ -250,7 +250,7 @@ Los comandos **de control se muestran en rojo** si la ruta activa es Navadmin (n
 
 **🔔 Utilidades (solo DM)**: `bell` · `admin_ls` · `keys_ls` · `keys_clear` ⚠
 
-> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_preset`, `set_lora`, `set_freq`, `panic`, `set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos. `storm` y `mute` dejan una **ventana de gracia de 60 s** antes de actuar — no reenvíes más órdenes durante ese tiempo.
+> ⚠ = exige **CONFIRMAR**. Los comandos que persisten configuración (`set_preset`, `set_url`, `panic`, `set_chem`, `set_vbat`, `set_vwake`, `txoff`, `ble`, `ch_del`, `ch_reset`, `ign clear`, `keys_clear`) advierten: el rollback solo es posible con `nrf erase` o comandos específicos. `storm` y `mute` dejan una **ventana de gracia de 60 s** antes de actuar — no reenvíes más órdenes durante ese tiempo. `keys_clear` ya **no** es un paso obligatorio antes de configurar claves (desde el 15/09 manda la configuración del nodo sobre el respaldo interno).
 
 ### 8.5 La conversación
 

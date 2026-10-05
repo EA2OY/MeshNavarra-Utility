@@ -1,0 +1,7 @@
+- Synced with NavaTastic Eclipse V5.3.1: new set_url command (applies a whole network's channels and radio from a link) and ch_url all (full mirror of a node)
+- Retired set_lora, set_freq and set_beacon (the firmware no longer uses them)
+- Revised set_txpower: now accepts negative values and the word auto; 0 is rejected (the app validates before sending)
+- A 0 in the position, presence and telemetry intervals now really turns that broadcast off
+- Updated set_chem (sodium 3000 mV, sets cut-off and wake level together) and keys_clear is no longer a mandatory step
+- GPL-3.0-or-later license header added to the source files
+- Bundled PDF manuals regenerated (NavaTastic V5.3.1 and app manual)

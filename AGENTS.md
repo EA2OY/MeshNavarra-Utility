@@ -110,7 +110,7 @@ To record a promo: open the app, open the "?" help, tap "Usage example (demo)", 
   1. In `metadata/com.meshkachoutility.yml` under `Builds:`, **ALWAYS use the full 40-character git commit SHA hash** (`commit: <full_hash>`). NEVER use a tag name (e.g. `v1.0.7`) or branch.
   2. For New App inclusion MRs, include **only the single latest build block** in the metadata YAML.
   3. For multi-module projects (`app/`), **ALWAYS set `subdir: app` and DO NOT specify `output:`**. `fdroid build` automatically finds the APK in the module's build directory.
-  4. **Reproducible Builds**: DO NOT declare `Binaries` or `AllowedAPKSigningKeys` while the build is NOT byte-reproducible — the F-Droid `fdroid build` job hard-fails with `compared built binary to supplied reference binary but failed` and blocks the whole pipeline (learned 2026-08-30, MR !45843). Reproducible builds are a future task; until then keep the metadata without those fields and the "Enable Reproducible Builds" box unchecked. (Signing key fingerprint for the future: `237c905111effb7df6cadf0b25fa13571ce012a76a69b5a2331a434d7974ab94`.)
+  4. **Reproducible Builds — DECISION (2026-09-12, MR !45843)**: the app ships **signed by F-Droid** (no reproducible build). The Gradle/AGP build is not byte-reproducible, so `Binaries`/`AllowedAPKSigningKeys` MUST NOT be declared (the `fdroid build` job hard-fails with `compared built binary to supplied reference binary but failed`). Per @linsui, the signing cannot be switched later (users could not update), so this decision is **final**: do not re-add those fields. Keep the "Enable Reproducible Builds" box unchecked. (Signing key fingerprint for reference: `237c905111effb7df6cadf0b25fa13571ce012a76a69b5a2331a434d7974ab94`.)
   5. NEVER put machine-specific paths (e.g. `org.gradle.java.home=c:/...`) in `gradle.properties`. Linux CI build runners in F-Droid must rely on their own `JAVA_HOME`.
 
 ## Quick Deploy Protocol (`/publicar-release` or "despliegue completo")
@@ -118,7 +118,7 @@ When the user requests `/publicar`, `/publicar-release`, `despliegue completo`, 
 1. **Run `backup.ps1`**: Baseline snapshot and brain backup.
 2. **Bump version in `app/build.gradle.kts`**: Increment `versionCode` and `versionName`.
 3. **Update Documentation & Badges**: Update `README.md` (ES/EN download badges, direct APK links, test counts, feature highlights) and `Manual_app_MeshNavarra.md` to the new version.
-4. **Build signed Release APK**: Run `./gradlew testDebugUnitTest assembleRelease` (verify 28+ unit tests).
+4. **Build signed Release APK**: Run `./gradlew testDebugUnitTest assembleRelease` (verify 24+ unit tests).
 5. **Sync & Push to GitHub**: Push all code and doc changes to `EA2OY/MeshNavarra-Utility` on `main`, recreate/push the release tag (e.g. `v1.0.8`).
 6. **Get 40-char commit SHA**: `git rev-parse HEAD`.
 7. **Update F-Droid metadata**: Update `fdroid/metadata.yml` (single build block, 40-char commit SHA, `subdir: app`, NO `output:`) and update GitLab fork (`jcacho/fdroiddata` branch `meshnavarra` via API).

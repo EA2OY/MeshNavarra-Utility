@@ -1,0 +1,7 @@
+- Sincronizacion con NavaTastic Eclipse V5.3.1: nuevos comandos set_url (aplica canales y radio de toda la red desde un enlace) y ch_url all (espejo completo de un nodo)
+- Retirados set_lora, set_freq y set_beacon (el firmware ya no los usa)
+- set_txpower revisado: admite valores negativos y la palabra auto; el 0 se rechaza (la app avisa antes de enviar)
+- Un 0 en los intervalos de posicion, presencia y telemetria ahora apaga esa emision de verdad
+- set_chem actualizado (sodio 3000 mV, ajusta corte y despertar a la vez) y keys_clear ya no es paso obligatorio
+- Cabecera de licencia GPL-3.0-or-later en los archivos de codigo
+- Manuales PDF integrados regenerados (NavaTastic V5.3.1 y manual de la app)

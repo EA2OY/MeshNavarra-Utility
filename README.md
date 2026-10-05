@@ -20,7 +20,7 @@ Aplicación Android **no oficial** para administrar nodos **Meshtastic** — por
 | **Utilidades** | Buenas Prácticas (read-modify-write consciente del duty cycle ETSI EN 300 220) + presets de radio en un toque (SFN Spain 869.618 MHz + presets de módem estándar) |
 | **Commands** | Telemetría, posición, traceroute, cambiar owner + popups con respuesta decodificada |
 | **Administration** | Info de nodo, reboot, limpiar NodeDB (conservando favoritos), favorito/bloqueado, eliminar nodo, claves admin (PKI), Convertir en Nodo Maestro |
-| **NavaTastic CLI** | Control remoto integral de repetidores Navarrico/NavaTastic (soporte completo NavaTastic Eclipse V5.1 v4.3.8): categoría Radio y Pánico (`set_preset`, `set_lora`, `set_freq`, `panic`, `panic_ok`), modo de retransmisión (`set_rebroadcast`), química de baterías, umbrales de corte/despertar, modo tormenta, canal primario y secundarios (slots 0-7), redirección CLI, silenciamiento Navadmin, pasarelas MQTT, posición fija y cadencias de difusión (`pos_clear`, `set_pos_tx`, `set_nodeinfo_tx`, `set_telem_tx`), diagnósticos 100% en RAM (`stats`/`log`), lista negra (`ign clear` ⚠) y control por DM cifrado PKI con compuerta CONFIRMAR |
+| **NavaTastic CLI** | Control remoto integral de repetidores Navarrico/NavaTastic (soporte completo NavaTastic Eclipse V5.3.1, base Meshtastic 2.7.26): categoría Radio y Pánico (`set_preset`, `set_url` para aplicar canales y radio de toda la red desde un enlace, `panic`, `panic_ok`), modo de retransmisión (`set_rebroadcast`), química de baterías, umbrales de corte/despertar, modo tormenta, canal primario y secundarios (slots 0-7, `ch_url all` para clonar los canales de un nodo), redirección CLI, silenciamiento Navadmin, pasarelas MQTT, posición fija y cadencias de difusión (`pos_clear`, `set_pos_tx`, `set_nodeinfo_tx`, `set_telem_tx`), diagnósticos 100% en RAM (`stats`/`log`), lista negra (`ign clear` ⚠) y control por DM cifrado PKI con compuerta CONFIRMAR |
 | **Chat** | Historial persistente por canal, indicador de entrega (⟳ en camino / ✓ entregado / ✗ error + reenviar) |
 | **Nodes** | Tarjetas de nodo (favoritos primero), caché propia persistente (sobrevive al NodeDB de 80 entradas del nodo), búsqueda inteligente, importar nodos por URL, popup de nodo con 11 acciones |
 | **Log** | Consola persistente de peticiones/respuestas con botón de borrado de registros |
@@ -50,7 +50,7 @@ Requiere JDK 17 (el proyecto incluye uno en `jdk-17/jdk-17.0.10+7`).
 ```powershell
 $env:JAVA_HOME = "c:\Users\...\jdk-17\jdk-17.0.10+7"
 .\gradlew.bat assembleDebug           # APK debug → app\build\outputs\apk\debug\
-.\gradlew.bat testDebugUnitTest       # 28 tests unitarios
+.\gradlew.bat testDebugUnitTest       # 24 tests unitarios
 ```
 
 En Linux/macOS: `JAVA_HOME=/ruta/al/jdk17 ./gradlew assembleDebug`.
@@ -120,7 +120,7 @@ Unofficial Android app to administer **Meshtastic** nodes — USB serial and Blu
 | **Utilidades** | Good Practices (ETSI EN 300 220 duty-cycle aware read-modify-write) + one-tap radio presets (SFN Spain 869.618 MHz + stock modem presets) |
 | **Commands** | Telemetry, position, traceroute, set owner + decoded response popups |
 | **Administration** | Get node info, reboot, wipe NodeDB (keep favorites), set favorite/ignored, remove node, admin keys (PKI), Convert to Master Node |
-| **NavaTastic CLI** | Comprehensive remote control of Navarrico/NavaTastic repeaters (full NavaTastic Eclipse V5.1 v4.3.8 support): Radio & Panic category (`set_preset`, `set_lora`, `set_freq`, `panic`, `panic_ok`), rebroadcast mode (`set_rebroadcast`), battery chemistry curves, low/wake voltage thresholds, storm mode, primary & secondary channels (slots 0-7), CLI redirection, Navadmin muting, per-channel MQTT, static position & broadcast cadences (`pos_clear`, `set_pos_tx`, `set_nodeinfo_tx`, `set_telem_tx`), 100% RAM diagnostics (`stats`/`log`), blacklist purge (`ign clear` ⚠) and PKI-encrypted DM control with CONFIRMAR safety gate |
+| **NavaTastic CLI** | Comprehensive remote control of Navarrico/NavaTastic repeaters (full NavaTastic Eclipse V5.3.1 support, Meshtastic 2.7.26 base): Radio & Panic category (`set_preset`, `set_url` to apply a whole network's channels and radio from a link, `panic`, `panic_ok`), rebroadcast mode (`set_rebroadcast`), battery chemistry curves, low/wake voltage thresholds, storm mode, primary & secondary channels (slots 0-7, `ch_url all` to clone a node's channels), CLI redirection, Navadmin muting, per-channel MQTT, static position & broadcast cadences (`pos_clear`, `set_pos_tx`, `set_nodeinfo_tx`, `set_telem_tx`), 100% RAM diagnostics (`stats`/`log`), blacklist purge (`ign clear` ⚠) and PKI-encrypted DM control with CONFIRMAR safety gate |
 | **Chat** | Persistent per-channel history, delivery indicator (⟳ enroute / ✓ delivered / ✗ error + resend) |
 | **Nodes** | Visual node cards (favorites first), own persistent cache (survives the node's 80-entry NodeDB), smart search, import nodes by shared URL, rich node popup with 11 request actions |
 | **Log** | Persistent request/response console with clear log button |
@@ -150,7 +150,7 @@ Requires a JDK 17 (the project bundles one at `jdk-17/jdk-17.0.10+7`).
 ```powershell
 $env:JAVA_HOME = "c:\Users\...\jdk-17\jdk-17.0.10+7"
 .\gradlew.bat assembleDebug           # debug APK → app\build\outputs\apk\debug\
-.\gradlew.bat testDebugUnitTest       # 28 unit tests
+.\gradlew.bat testDebugUnitTest       # 24 unit tests
 ```
 
 On Linux/macOS: `JAVA_HOME=/path/to/jdk17 ./gradlew assembleDebug`.

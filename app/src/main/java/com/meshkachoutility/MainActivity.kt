@@ -1,4 +1,20 @@
-/* Copyright (c) 2026 Tai Soluciones - taisoluciones@gmail.com */
+/*
+ * Copyright (c) 2026 Tai Soluciones - taisoluciones@gmail.com
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.meshkachoutility
 
 import android.content.Context
@@ -365,7 +381,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         const val CHAT_STATUS_ERROR = "error"
     private const val MAX_PICKER_ROWS = 150
     private const val MAX_NODES_TAB_ROWS = 150
-    private const val BUILD_DATE = "2026-09-12"
+    private const val BUILD_DATE = "2026-10-05"
     private const val RECONNECT_DELAY_MS = 5000L
     private const val RECONNECT_MAX_ATTEMPTS = 5
     private const val CHAT_AUTOSCROLL_RESUME_MS = 10000L
@@ -427,7 +443,7 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         AuditCommand("/nava navadmin_mute ?", "/nava navadmin_mute ?", "dm", 20000, "NAVADMIN MUTE"),
         AuditCommand("/nava set_ok_to_mqtt ?", "/nava set_ok_to_mqtt ?", "dm", 20000, "OK_TO_MQTT ACT"),
         AuditCommand("/nava set_pos ?", "/nava set_pos ?", "dm", 20000, "POS ACT"),
-        AuditCommand("/nava set_beacon ?", "/nava set_beacon ?", "dm", 20000, "BALIZA ACT"),
+        AuditCommand("/nava set_url ?", "/nava set_url ?", "dm", 20000, "set_url:"),
         AuditCommand("/nava set_pin ?", "/nava set_pin ?", "dm", 20000, "PIN BT ACT"),
         AuditCommand("/nava set_tz ?", "/nava set_tz ?", "dm", 20000, "TZ ACT"),
         AuditCommand("/nava set_name ?", "/nava set_name ?", "dm", 20000, "NOMBRE"),
@@ -3839,15 +3855,14 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("ch_ls", "ch_ls", "none", "ch", getString(R.string.nava_desc_ch_ls)),
                 NavaCmd("ch_set", "ch_set", "text", "dm", getString(R.string.nava_desc_ch_set)),
                 NavaCmd("ch_del", "ch_del", "number", "dm", getString(R.string.nava_desc_ch_del), warn = getString(R.string.nava_warn_ch_del)),
-                NavaCmd("ch_url", "ch_url", "number", "dm", getString(R.string.nava_desc_ch_url)),
+                NavaCmd("ch_url", "ch_url", "select", "dm", getString(R.string.nava_desc_ch_url), listOf("all", "0", "1", "2", "3", "4", "5", "6", "7")),
                 NavaCmd("ch_reset", "ch_reset", "none", "dm", getString(R.string.nava_desc_ch_reset), warn = getString(R.string.nava_warn_ch_reset)),
                 NavaCmd("set_cli_chan", "set_cli_chan", "number", "dm", getString(R.string.nava_desc_set_cli_chan)),
                 NavaCmd("navadmin_mute", "navadmin_mute", "onoff", "dm", getString(R.string.nava_desc_navadmin_mute))
             )),
             NavaCat(getString(R.string.nava_cat_radio), listOf(
                 NavaCmd("set_preset", "set_preset", "select", "dm", getString(R.string.nava_desc_set_preset), listOf("long_fast", "medium_fast", "short_fast", "long_slow", "short_slow", "medium_slow", "long_moderate", "short_turbo"), warn = getString(R.string.nava_warn_set_preset)),
-                NavaCmd("set_lora", "set_lora", "text", "dm", getString(R.string.nava_desc_set_lora), warn = getString(R.string.nava_warn_set_lora)),
-                NavaCmd("set_freq", "set_freq", "text", "dm", getString(R.string.nava_desc_set_freq), warn = getString(R.string.nava_warn_set_freq)),
+                NavaCmd("set_url", "set_url", "text", "dm", getString(R.string.nava_desc_set_url), warn = getString(R.string.nava_warn_set_url)),
                 NavaCmd("panic", "panic", "text", "dm", getString(R.string.nava_desc_panic), warn = getString(R.string.nava_warn_panic)),
                 NavaCmd("panic_ok", "panic_ok", "none", "dm", getString(R.string.nava_desc_panic_ok))
             )),
@@ -3875,11 +3890,10 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 NavaCmd("set_pos_tx", "set_pos_tx", "text", "dm", getString(R.string.nava_desc_set_pos_tx)),
                 NavaCmd("set_nodeinfo_tx", "set_nodeinfo_tx", "text", "dm", getString(R.string.nava_desc_set_nodeinfo_tx)),
                 NavaCmd("set_telem_tx", "set_telem_tx", "text", "dm", getString(R.string.nava_desc_set_telem_tx)),
-                NavaCmd("set_beacon", "set_beacon", "number", "dm", getString(R.string.nava_desc_set_beacon)),
                 NavaCmd("set_pin", "set_pin", "text", "dm", getString(R.string.nava_desc_set_pin)),
                 NavaCmd("set_tz", "set_tz", "text", "dm", getString(R.string.nava_desc_set_tz)),
                 NavaCmd("set_hops", "set_hops", "number", "dm", getString(R.string.nava_desc_set_hops)),
-                NavaCmd("set_txpower", "set_txpower", "number", "dm", getString(R.string.nava_desc_set_txpower))
+                NavaCmd("set_txpower", "set_txpower", "text", "dm", getString(R.string.nava_desc_set_txpower))
             )),
             NavaCat(getString(R.string.nava_cat_maint), listOf(
                 NavaCmd("mute", "mute", "text", "dm", getString(R.string.nava_desc_mute)),
@@ -4180,18 +4194,16 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
         navaArgInput.hint = when (cmd.cmd) {
             "ch_set" -> "0 Primario AQ== / 2 Privada AQ=="
             "ch_del" -> "Slot [2-7]"
-            "ch_url" -> "Slot [0-7]"
             "set_cli_chan" -> "Slot [1-7]"
             "ch_mqtt" -> "2 up (up/down/both/off)"
             "set_pos" -> "42.8168 -1.6432 450"
             "set_pos_tx" -> "on / off / 1-10080 min"
             "set_nodeinfo_tx" -> "on / off / 1-10080 min"
             "set_telem_tx" -> "on / off / 1-1440 min"
-            "set_beacon" -> "1-1440 min"
             "set_pin" -> "PIN (6 dig)"
             "set_name" -> "\"Largo\" \"Corto\" / flush"
-            "set_lora" -> "62 7 5 869.618 4 [22]"
-            "set_freq" -> "869.618 [4]"
+            "set_url" -> "https://meshtastic.org/e/#..."
+            "set_txpower" -> "-5..-1 / 1-22 / auto"
             "panic" -> "medium_fast 10 [0]"
             "mute" -> "1-1440 min / off"
             "test_tx" -> "5-30 s"
@@ -4298,6 +4310,15 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 if (cmd.cmd == "msg" && navaArgInput.text.toString().trim().isEmpty()) {
                     return getString(R.string.nava_err_need_arg)
                 }
+                // V5.3: set_txpower takes -5..-1 or 1..board max, or the word auto
+                // (also max/def/default); the 0 is rejected by the firmware.
+                if (cmd.cmd == "set_txpower") {
+                    val v = navaArgInput.text.toString().trim().lowercase()
+                    if (v.isNotEmpty() && v !in setOf("auto", "max", "def", "default")) {
+                        val n = v.toIntOrNull()
+                        if (n == null || n == 0 || n < -5 || n > 22) return getString(R.string.nava_err_txpower)
+                    }
+                }
                 if (cmd.argType == "text2") {
                     val raw = navaArgInput.text.toString().trim()
                     val parts = raw.split(Regex("\\s+"))
@@ -4312,12 +4333,9 @@ class MainActivity : AppCompatActivity(), UsbConnectionManager.ConnectionListene
                 val range = when (cmd.cmd) {
                     "set_vbat" -> 2400 to 3600
                     "set_hops" -> 1 to 7
-                    "set_txpower" -> 0 to 22
                     "storm" -> 1 to 720
                     "ch_del" -> 2 to 7
-                    "ch_url" -> 0 to 7
                     "set_cli_chan" -> 1 to 7
-                    "set_beacon" -> 1 to 1440
                     "test_tx" -> 5 to 30
                     "log" -> 1 to 15
                     else -> null
