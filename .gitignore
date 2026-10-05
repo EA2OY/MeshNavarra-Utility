@@ -22,3 +22,10 @@ snap-*.zip
 
 # Working/scratch files
 *.log
+
+# Entorno de compilacion local (nunca se publica): cache de Gradle copiada
+# dentro del proyecto y temporales de build/publicacion
+.gradle-home/
+.build-tmp/
+.pubtmp/
+_dshtest.txt
